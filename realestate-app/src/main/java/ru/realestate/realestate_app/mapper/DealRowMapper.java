@@ -2,12 +2,14 @@ package ru.realestate.realestate_app.mapper;
 
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.lang.NonNull;
+import org.springframework.stereotype.Component;
 
 import ru.realestate.realestate_app.model.Deal;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+@Component
 public class DealRowMapper implements RowMapper<Deal> {
     
     @Override
