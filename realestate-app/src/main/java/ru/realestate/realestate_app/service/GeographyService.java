@@ -1,42 +1,38 @@
-package ru.realestate.realestate_app.dao;
+package ru.realestate.realestate_app.service;
 
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Service;
+
+import ru.realestate.realestate_app.dao.GeographyDao;
 import ru.realestate.realestate_app.model.geography.*;
 
 import java.util.List;
 
 /**
- * DAO класс для работы с географическими справочниками
- * Обеспечивает доступ к данным о странах, регионах, городах, районах и улицах
+ * Сервис для работы с географическими справочниками
+ * Содержит бизнес-логику для операций со странами, регионами, городами, районами и улицами
+ * Делегирует выполнение операций с базой данных в GeographyDao
  */
-@Repository
-public class GeographyDao {
-
-    private final JdbcTemplate jdbcTemplate;
+@Service
+public class GeographyService {
+    
+    private final GeographyDao geographyDao;
 
     /**
-     * Конструктор DAO с инжекцией зависимостей
-     * @param jdbcTemplate шаблон для выполнения SQL запросов
+     * Конструктор сервиса с инжекцией зависимостей
+     * @param geographyDao DAO для работы с географическими данными
      */
-    public GeographyDao(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
+    public GeographyService(GeographyDao geographyDao) {
+        this.geographyDao = geographyDao;
     }
 
     // ========== СТРАНЫ ==========
-    
+
     /**
      * Получить все страны, отсортированные по названию
      * @return список всех стран
      */
     public List<Country> findAllCountries() {
-        return jdbcTemplate.query(
-            "SELECT * FROM countries ORDER BY country_name",
-            (rs, _) -> new Country(
-                rs.getLong("id_country"),
-                rs.getString("country_name")
-            )
-        );
+        return geographyDao.findAllCountries();
     }
 
     /**
@@ -46,14 +42,7 @@ public class GeographyDao {
      * @throws org.springframework.dao.EmptyResultDataAccessException если страна не найдена
      */
     public Country findCountryById(Long id) {
-        return jdbcTemplate.queryForObject(
-            "SELECT * FROM countries WHERE id_country = ?",
-            (rs, _) -> new Country(
-                rs.getLong("id_country"),
-                rs.getString("country_name")
-            ),
-            id
-        );
+        return geographyDao.findCountryById(id);
     }
 
     /**
@@ -63,32 +52,17 @@ public class GeographyDao {
      * @throws org.springframework.dao.EmptyResultDataAccessException если страна не найдена
      */
     public Country findCountryByName(String name) {
-        return jdbcTemplate.queryForObject(
-            "SELECT * FROM countries WHERE country_name = ?",
-            (rs, _) -> new Country(
-                rs.getLong("id_country"),
-                rs.getString("country_name")
-            ),
-            name
-        );
+        return geographyDao.findCountryByName(name);
     }
 
     // ========== РЕГИОНЫ ==========
-    
+
     /**
      * Получить все регионы, отсортированные по названию
      * @return список всех регионов
      */
     public List<Region> findAllRegions() {
-        return jdbcTemplate.query(
-            "SELECT * FROM regions ORDER BY name",
-            (rs, _) -> new Region(
-                rs.getLong("id_region"),
-                rs.getString("name"),
-                rs.getString("code"),
-                rs.getLong("id_country")
-            )
-        );
+        return geographyDao.findAllRegions();
     }
 
     /**
@@ -98,16 +72,7 @@ public class GeographyDao {
      * @throws org.springframework.dao.EmptyResultDataAccessException если регион не найден
      */
     public Region findRegionById(Long id) {
-        return jdbcTemplate.queryForObject(
-            "SELECT * FROM regions WHERE id_region = ?",
-            (rs, _) -> new Region(
-                rs.getLong("id_region"),
-                rs.getString("name"),
-                rs.getString("code"),
-                rs.getLong("id_country")
-            ),
-            id
-        );
+        return geographyDao.findRegionById(id);
     }
 
     /**
@@ -116,15 +81,7 @@ public class GeographyDao {
      * @return список регионов с указанным кодом, отсортированный по названию
      */
     public List<Region> findRegionByCode(String code) {
-        return jdbcTemplate.query(
-            "SELECT * FROM regions WHERE code = ? ORDER BY name",
-            (rs, _) -> new Region(
-                rs.getLong("id_region"),
-                rs.getString("name"),
-                rs.getString("code"),
-                rs.getLong("id_country")
-            ), code
-        );
+        return geographyDao.findRegionByCode(code);
     }
 
     /**
@@ -133,16 +90,7 @@ public class GeographyDao {
      * @return список регионов указанной страны, отсортированный по названию
      */
     public List<Region> findRegionsByCountry(Long countryId) {
-        return jdbcTemplate.query(
-            "SELECT * FROM regions WHERE id_country = ? ORDER BY name",
-            (rs, _) -> new Region(
-                rs.getLong("id_region"),
-                rs.getString("name"),
-                rs.getString("code"),
-                rs.getLong("id_country")
-            ),
-            countryId
-        );
+        return geographyDao.findRegionsByCountry(countryId);
     }
 
     /**
@@ -153,33 +101,17 @@ public class GeographyDao {
      * @throws org.springframework.dao.EmptyResultDataAccessException если регион не найден
      */
     public Region findRegionByNameAndCountry(String regionName, Long countryId) {
-        return jdbcTemplate.queryForObject(
-            "SELECT * FROM regions WHERE name = ? AND id_country = ?",
-            (rs, _) -> new Region(
-                rs.getLong("id_region"),
-                rs.getString("name"),
-                rs.getString("code"),
-                rs.getLong("id_country")
-            ),
-            regionName, countryId
-        );
+        return geographyDao.findRegionByNameAndCountry(regionName, countryId);
     }
 
     // ========== ГОРОДА ==========
-    
+
     /**
      * Получить все города, отсортированные по названию
      * @return список всех городов
      */
     public List<City> findAllCities() {
-        return jdbcTemplate.query(
-            "SELECT * FROM cities ORDER BY city_name",
-            (rs, _) -> new City(
-                rs.getLong("id_city"),
-                rs.getString("city_name"),
-                rs.getLong("id_region")
-            )
-        );
+        return geographyDao.findAllCities();
     }
 
     /**
@@ -189,15 +121,7 @@ public class GeographyDao {
      * @throws org.springframework.dao.EmptyResultDataAccessException если город не найден
      */
     public City findCityById(Long id) {
-        return jdbcTemplate.queryForObject(
-            "SELECT * FROM cities WHERE id_city = ?",
-            (rs, _) -> new City(
-                rs.getLong("id_city"),
-                rs.getString("city_name"),
-                rs.getLong("id_region")
-            ),
-            id
-        );
+        return geographyDao.findCityById(id);
     }
 
     /**
@@ -206,15 +130,7 @@ public class GeographyDao {
      * @return список городов указанного региона, отсортированный по названию
      */
     public List<City> findCitiesByRegion(Long regionId) {
-        return jdbcTemplate.query(
-            "SELECT * FROM cities WHERE id_region = ? ORDER BY city_name",
-            (rs, _) -> new City(
-                rs.getLong("id_city"),
-                rs.getString("city_name"),
-                rs.getLong("id_region")
-            ),
-            regionId
-        );
+        return geographyDao.findCitiesByRegion(regionId);
     }
 
     /**
@@ -223,17 +139,7 @@ public class GeographyDao {
      * @return список городов указанной страны, отсортированный по названию
      */
     public List<City> findCitiesByCountry(Long countryId) {
-        return jdbcTemplate.query(
-            "SELECT c.* FROM cities c " +
-            "INNER JOIN regions r ON c.id_region = r.id_region " +
-            "WHERE r.id_country = ? ORDER BY c.city_name",
-            (rs, _) -> new City(
-                rs.getLong("id_city"),
-                rs.getString("city_name"),
-                rs.getLong("id_region")
-            ),
-            countryId
-        );
+        return geographyDao.findCitiesByCountry(countryId);
     }
 
     /**
@@ -244,15 +150,7 @@ public class GeographyDao {
      * @throws org.springframework.dao.EmptyResultDataAccessException если город не найден
      */
     public City findCityByNameAndRegion(String cityName, Long regionId) {
-        return jdbcTemplate.queryForObject(
-            "SELECT * FROM cities WHERE city_name = ? AND id_region = ?",
-            (rs, _) -> new City(
-                rs.getLong("id_city"),
-                rs.getString("city_name"),
-                rs.getLong("id_region")
-            ),
-            cityName, regionId
-        );
+        return geographyDao.findCityByNameAndRegion(cityName, regionId);
     }
 
     /**
@@ -261,32 +159,17 @@ public class GeographyDao {
      * @return список городов, названия которых содержат указанный паттерн, отсортированный по названию
      */
     public List<City> findCitiesByNamePattern(String cityNamePattern) {
-        return jdbcTemplate.query(
-            "SELECT * FROM cities WHERE city_name ILIKE ? ORDER BY city_name",
-            (rs, _) -> new City(
-                rs.getLong("id_city"),
-                rs.getString("city_name"),
-                rs.getLong("id_region")
-            ),
-            "%" + cityNamePattern + "%"
-        );
+        return geographyDao.findCitiesByNamePattern(cityNamePattern);
     }
 
     // ========== РАЙОНЫ ==========
-    
+
     /**
      * Получить все районы, отсортированные по названию
      * @return список всех районов
      */
     public List<District> findAllDistricts() {
-        return jdbcTemplate.query(
-            "SELECT * FROM districts ORDER BY district_name",
-            (rs, _) -> new District(
-                rs.getLong("id_district"),
-                rs.getString("district_name"),
-                rs.getLong("id_city")
-            )
-        );
+        return geographyDao.findAllDistricts();
     }
 
     /**
@@ -296,15 +179,7 @@ public class GeographyDao {
      * @throws org.springframework.dao.EmptyResultDataAccessException если район не найден
      */
     public District findDistrictById(Long id) {
-        return jdbcTemplate.queryForObject(
-            "SELECT * FROM districts WHERE id_district = ?",
-            (rs, _) -> new District(
-                rs.getLong("id_district"),
-                rs.getString("district_name"),
-                rs.getLong("id_city")
-            ),
-            id
-        );
+        return geographyDao.findDistrictById(id);
     }
 
     /**
@@ -313,15 +188,7 @@ public class GeographyDao {
      * @return список районов указанного города, отсортированный по названию
      */
     public List<District> findDistrictsByCity(Long cityId) {
-        return jdbcTemplate.query(
-            "SELECT * FROM districts WHERE id_city = ? ORDER BY district_name",
-            (rs, _) -> new District(
-                rs.getLong("id_district"),
-                rs.getString("district_name"),
-                rs.getLong("id_city")
-            ),
-            cityId
-        );
+        return geographyDao.findDistrictsByCity(cityId);
     }
 
     /**
@@ -330,17 +197,7 @@ public class GeographyDao {
      * @return список районов всех городов указанного региона, отсортированный по названию
      */
     public List<District> findDistrictsByRegion(Long regionId) {
-        return jdbcTemplate.query(
-            "SELECT d.* FROM districts d " +
-            "INNER JOIN cities c ON d.id_city = c.id_city " +
-            "WHERE c.id_region = ? ORDER BY d.district_name",
-            (rs, _) -> new District(
-                rs.getLong("id_district"),
-                rs.getString("district_name"),
-                rs.getLong("id_city")
-            ),
-            regionId
-        );
+        return geographyDao.findDistrictsByRegion(regionId);
     }
 
     /**
@@ -349,18 +206,7 @@ public class GeographyDao {
      * @return список районов всех городов указанной страны, отсортированный по названию
      */
     public List<District> findDistrictsByCountry(Long countryId) {
-        return jdbcTemplate.query(
-            "SELECT d.* FROM districts d " +
-            "INNER JOIN cities c ON d.id_city = c.id_city " +
-            "INNER JOIN regions r ON c.id_region = r.id_region " +
-            "WHERE r.id_country = ? ORDER BY d.district_name",
-            (rs, _) -> new District(
-                rs.getLong("id_district"),
-                rs.getString("district_name"),
-                rs.getLong("id_city")
-            ),
-            countryId
-        );
+        return geographyDao.findDistrictsByCountry(countryId);
     }
 
     /**
@@ -371,32 +217,17 @@ public class GeographyDao {
      * @throws org.springframework.dao.EmptyResultDataAccessException если район не найден
      */
     public District findDistrictByNameAndCity(String districtName, Long cityId) {
-        return jdbcTemplate.queryForObject(
-            "SELECT * FROM districts WHERE district_name = ? AND id_city = ?",
-            (rs, _) -> new District(
-                rs.getLong("id_district"),
-                rs.getString("district_name"),
-                rs.getLong("id_city")
-            ),
-            districtName, cityId
-        );
+        return geographyDao.findDistrictByNameAndCity(districtName, cityId);
     }
 
     // ========== УЛИЦЫ ==========
-    
+
     /**
      * Получить все улицы, отсортированные по названию
      * @return список всех улиц
      */
     public List<Street> findAllStreets() {
-        return jdbcTemplate.query(
-            "SELECT * FROM streets ORDER BY street_name",
-            (rs, _) -> new Street(
-                rs.getLong("id_street"),
-                rs.getString("street_name"),
-                rs.getLong("id_city")
-            )
-        );
+        return geographyDao.findAllStreets();
     }
 
     /**
@@ -406,15 +237,7 @@ public class GeographyDao {
      * @throws org.springframework.dao.EmptyResultDataAccessException если улица не найдена
      */
     public Street findStreetById(Long id) {
-        return jdbcTemplate.queryForObject(
-            "SELECT * FROM streets WHERE id_street = ?",
-            (rs, _) -> new Street(
-                rs.getLong("id_street"),
-                rs.getString("street_name"),
-                rs.getLong("id_city")
-            ),
-            id
-        );
+        return geographyDao.findStreetById(id);
     }
 
     /**
@@ -423,15 +246,7 @@ public class GeographyDao {
      * @return список улиц указанного города, отсортированный по названию
      */
     public List<Street> findStreetsByCity(Long cityId) {
-        return jdbcTemplate.query(
-            "SELECT * FROM streets WHERE id_city = ? ORDER BY street_name",
-            (rs, _) -> new Street(
-                rs.getLong("id_street"),
-                rs.getString("street_name"),
-                rs.getLong("id_city")
-            ),
-            cityId
-        );
+        return geographyDao.findStreetsByCity(cityId);
     }
 
     /**
@@ -442,15 +257,7 @@ public class GeographyDao {
      * @throws org.springframework.dao.EmptyResultDataAccessException если улица не найдена
      */
     public Street findStreetByNameAndCity(String streetName, Long cityId) {
-        return jdbcTemplate.queryForObject(
-            "SELECT * FROM streets WHERE street_name = ? AND id_city = ?",
-            (rs, _) -> new Street(
-                rs.getLong("id_street"),
-                rs.getString("street_name"),
-                rs.getLong("id_city")
-            ),
-            streetName, cityId
-        );
+        return geographyDao.findStreetByNameAndCity(streetName, cityId);
     }
 
     /**
@@ -459,15 +266,6 @@ public class GeographyDao {
      * @return список улиц, названия которых содержат указанный паттерн, отсортированный по названию
      */
     public List<Street> findStreetsByNamePattern(String streetNamePattern) {
-        return jdbcTemplate.query(
-            "SELECT * FROM streets WHERE street_name ILIKE ? ORDER BY street_name",
-            (rs, _) -> new Street(
-                rs.getLong("id_street"),
-                rs.getString("street_name"),
-                rs.getLong("id_city")
-            ),
-            "%" + streetNamePattern + "%"
-        );
+        return geographyDao.findStreetsByNamePattern(streetNamePattern);
     }
-    
 } 

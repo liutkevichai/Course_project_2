@@ -4,14 +4,21 @@ public class Region {
     private Long idRegion;
     private String name;
     private String code;
+    private Long idCountry;
     
-    // Конструкторы
     public Region() {}
     
     public Region(Long idRegion, String name, String code) {
         this.idRegion = idRegion;
         this.name = name;
         this.code = code;
+    }
+    
+    public Region(Long idRegion, String name, String code, Long idCountry) {
+        this.idRegion = idRegion;
+        this.name = name;
+        this.code = code;
+        this.idCountry = idCountry;
     }
     
     // Геттеры и сеттеры
@@ -39,12 +46,21 @@ public class Region {
         this.code = code;
     }
     
+    public Long getIdCountry() {
+        return idCountry;
+    }
+    
+    public void setIdCountry(Long idCountry) {
+        this.idCountry = idCountry;
+    }
+    
     @Override
     public String toString() {
         return "Region{" +
                 "idRegion=" + idRegion +
                 ", name='" + name + '\'' +
                 ", code='" + code + '\'' +
+                ", idCountry=" + idCountry +
                 '}';
     }
 } 

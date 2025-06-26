@@ -1,20 +1,31 @@
 package ru.realestate.realestate_app.dao;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import ru.realestate.realestate_app.model.DealType;
 
 import java.util.List;
 
+/**
+ * DAO класс для работы с типами сделок
+ * Обеспечивает доступ к справочнику типов сделок в базе данных
+ */
 @Repository
 public class DealTypeDao {
 
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
+    private final JdbcTemplate jdbcTemplate;
 
     /**
-     * Получить все типы сделок
+     * Конструктор DAO с инжекцией зависимостей
+     * @param jdbcTemplate шаблон для выполнения SQL запросов
+     */
+    public DealTypeDao(JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
+    }
+
+    /**
+     * Получить все типы сделок, отсортированные по названию
+     * @return список всех типов сделок
      */
     public List<DealType> findAll() {
         return jdbcTemplate.query(
@@ -27,7 +38,10 @@ public class DealTypeDao {
     }
 
     /**
-     * Найти тип сделки по ID
+     * Найти тип сделки по уникальному идентификатору
+     * @param id идентификатор типа сделки
+     * @return объект типа сделки
+     * @throws org.springframework.dao.EmptyResultDataAccessException если тип не найден
      */
     public DealType findById(Long id) {
         return jdbcTemplate.queryForObject(
@@ -41,7 +55,10 @@ public class DealTypeDao {
     }
 
     /**
-     * Найти тип сделки по названию
+     * Найти тип сделки по названию (точное совпадение)
+     * @param name название типа сделки
+     * @return объект типа сделки
+     * @throws org.springframework.dao.EmptyResultDataAccessException если тип не найден
      */
     public DealType findByName(String name) {
         return jdbcTemplate.queryForObject(

@@ -4,7 +4,6 @@ public class Country {
     private Long idCountry;
     private String countryName;
     
-    // Конструкторы
     public Country() {}
     
     public Country(Long idCountry, String countryName) {

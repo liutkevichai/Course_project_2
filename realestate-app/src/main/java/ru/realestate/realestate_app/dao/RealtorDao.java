@@ -1,6 +1,5 @@
 package ru.realestate.realestate_app.dao;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -16,17 +15,29 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.lang.StringBuilder;
 
+/**
+ * DAO класс для работы с риелторами
+ * Обеспечивает доступ к данным риелторов в базе данных
+ */
 @Repository
 public class RealtorDao {
 
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
-
-    @Autowired
-    private RealtorRowMapper realtorRowMapper;
+    private final JdbcTemplate jdbcTemplate;
+    private final RealtorRowMapper realtorRowMapper;
 
     /**
-     * Получить всех риелторов
+     * Конструктор DAO с инжекцией зависимостей
+     * @param jdbcTemplate шаблон для выполнения SQL запросов
+     * @param realtorRowMapper маппер для преобразования строк результата в объекты Realtor
+     */
+    public RealtorDao(JdbcTemplate jdbcTemplate, RealtorRowMapper realtorRowMapper) {
+        this.jdbcTemplate = jdbcTemplate;
+        this.realtorRowMapper = realtorRowMapper;
+    }
+
+    /**
+     * Получить всех риелторов, отсортированных по фамилии и имени
+     * @return список всех риелторов
      */
     public List<Realtor> findAll() {
         return jdbcTemplate.query(
@@ -36,7 +47,10 @@ public class RealtorDao {
     }
 
     /**
-     * Найти риелтора по ID
+     * Найти риелтора по уникальному идентификатору
+     * @param id идентификатор риелтора
+     * @return объект риелтора
+     * @throws org.springframework.dao.EmptyResultDataAccessException если риелтор не найден
      */
     public Realtor findById(Long id) {
         return jdbcTemplate.queryForObject(
@@ -47,7 +61,9 @@ public class RealtorDao {
     }
 
     /**
-     * Сохранить нового риелтора
+     * Сохранить нового риелтора в базе данных
+     * @param realtor объект риелтора для сохранения
+     * @return идентификатор созданного риелтора
      */
     @SuppressWarnings({ "null" })
     public Long save(Realtor realtor) {
@@ -74,10 +90,10 @@ public class RealtorDao {
     }
 
     /**
-     * Обновление риелтора
-     * @param id ID риелтора для обновления
-     * @param updates Map с полями для обновления (ключ - название поля, значение - новое значение)
-     * @return true если обновление прошло успешно
+     * Обновить данные существующего риелтора
+     * @param id идентификатор риелтора для обновления
+     * @param updates карта с полями для обновления (ключ - название поля, значение - новое значение)
+     * @return true если обновление прошло успешно, false если данных для обновления нет
      */
     public boolean update(Long id, Map<String, Object> updates) {
         // Проверяем, что есть поля для обновления
@@ -130,7 +146,9 @@ public class RealtorDao {
     }
 
     /**
-     * Удалить риелтора по ID
+     * Удалить риелтора по идентификатору
+     * @param id идентификатор риелтора для удаления
+     * @return true если удаление прошло успешно, false если риелтор не найден
      */
     public boolean deleteById(Long id) {
         int deletedRows = jdbcTemplate.update(
@@ -142,7 +160,9 @@ public class RealtorDao {
     }
 
     /**
-     * Найти риелторов по фамилии
+     * Найти риелторов по фамилии (поиск по частичному совпадению)
+     * @param lastName фамилия для поиска
+     * @return список риелторов с указанной фамилией
      */
     public List<Realtor> findByLastName(String lastName) {
         return jdbcTemplate.query(
@@ -153,7 +173,9 @@ public class RealtorDao {
     }
 
     /**
-     * Найти риелторов с опытом больше указанного
+     * Найти риелторов с опытом работы больше указанного значения
+     * @param minExperience минимальный опыт работы в годах
+     * @return список риелторов с подходящим опытом, отсортированный по убыванию опыта
      */
     public List<Realtor> findByExperienceGreaterThan(int minExperience) {
         return jdbcTemplate.query(
@@ -164,7 +186,10 @@ public class RealtorDao {
     }
 
     /**
-     * Найти риелтора по телефону
+     * Найти риелтора по номеру телефона (точное совпадение)
+     * @param phone номер телефона
+     * @return объект риелтора
+     * @throws org.springframework.dao.EmptyResultDataAccessException если риелтор не найден
      */
     public Realtor findByPhone(String phone) {
         return jdbcTemplate.queryForObject(
@@ -175,7 +200,10 @@ public class RealtorDao {
     }
 
     /**
-     * Найти риелтора по email
+     * Найти риелтора по адресу электронной почты (точное совпадение)
+     * @param email адрес электронной почты
+     * @return объект риелтора
+     * @throws org.springframework.dao.EmptyResultDataAccessException если риелтор не найден
      */
     public Realtor findByEmail(String email) {
         return jdbcTemplate.queryForObject(
@@ -186,7 +214,8 @@ public class RealtorDao {
     }
 
     /**
-     * Получить количество риелторов
+     * Получить общее количество риелторов в базе данных
+     * @return количество риелторов
      */
     public int getCount() {
         Integer count = jdbcTemplate.queryForObject(

@@ -1,12 +1,24 @@
 package ru.realestate.realestate_app.model;
 
+import jakarta.validation.constraints.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
 public class Payment {
     private Long idPayment;
+    
+    @NotNull(message = "Дата платежа обязательна для заполнения")
+    @PastOrPresent(message = "Дата платежа не может быть в будущем")
     private LocalDate paymentDate;
+    
+    @NotNull(message = "Сумма платежа обязательна для заполнения")
+    @DecimalMin(value = "0.01", message = "Сумма платежа должна быть больше 0")
+    @DecimalMax(value = "999999999.9999", message = "Сумма платежа не может превышать 999,999,999.9999")
+    @Digits(integer = 9, fraction = 4, message = "Сумма платежа должна содержать не более 9 целых и 4 дробных цифр")
     private BigDecimal amount;
+    
+    @NotNull(message = "Сделка обязательна для заполнения")
+    @Positive(message = "ID сделки должен быть положительным")
     private Integer idDeal;
     
     // Конструкторы

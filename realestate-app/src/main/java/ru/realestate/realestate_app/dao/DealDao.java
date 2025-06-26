@@ -1,6 +1,5 @@
 package ru.realestate.realestate_app.dao;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -17,17 +16,29 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.lang.StringBuilder;
 
+/**
+ * DAO класс для работы с сделками
+ * Обеспечивает доступ к данным сделок в базе данных
+ */
 @Repository
 public class DealDao {
 
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
-
-    @Autowired
-    private DealRowMapper dealRowMapper;
+    private final JdbcTemplate jdbcTemplate;
+    private final DealRowMapper dealRowMapper;
 
     /**
-     * Получить все сделки
+     * Конструктор DAO с инжекцией зависимостей
+     * @param jdbcTemplate шаблон для выполнения SQL запросов
+     * @param dealRowMapper маппер для преобразования строк результата в объекты Deal
+     */
+    public DealDao(JdbcTemplate jdbcTemplate, DealRowMapper dealRowMapper) {
+        this.jdbcTemplate = jdbcTemplate;
+        this.dealRowMapper = dealRowMapper;
+    }
+
+    /**
+     * Получить все сделки, отсортированные по дате в убывающем порядке
+     * @return список всех сделок
      */
     public List<Deal> findAll() {
         return jdbcTemplate.query(
@@ -37,7 +48,10 @@ public class DealDao {
     }
 
     /**
-     * Найти сделку по ID
+     * Найти сделку по уникальному идентификатору
+     * @param id идентификатор сделки
+     * @return объект сделки
+     * @throws org.springframework.dao.EmptyResultDataAccessException если сделка не найдена
      */
     public Deal findById(Long id) {
         return jdbcTemplate.queryForObject(
@@ -48,7 +62,9 @@ public class DealDao {
     }
 
     /**
-     * Сохранить новую сделку
+     * Сохранить новую сделку в базе данных
+     * @param deal объект сделки для сохранения
+     * @return идентификатор созданной сделки
      */
     @SuppressWarnings({ "null" })
     public Long save(Deal deal) {
@@ -75,10 +91,10 @@ public class DealDao {
     }
 
     /**
-     * Обновление сделки
-     * @param id ID сделки для обновления
-     * @param updates Map с полями для обновления (ключ - название поля, значение - новое значение)
-     * @return true если обновление прошло успешно
+     * Обновить данные существующей сделки
+     * @param id идентификатор сделки для обновления
+     * @param updates карта с полями для обновления (ключ - название поля, значение - новое значение)
+     * @return true если обновление прошло успешно, false если данных для обновления нет
      */
     public boolean update(Long id, Map<String, Object> updates) {
         // Проверяем, что есть поля для обновления
@@ -131,7 +147,9 @@ public class DealDao {
     }
 
     /**
-     * Удалить сделку по ID
+     * Удалить сделку по идентификатору
+     * @param id идентификатор сделки для удаления
+     * @return true если удаление прошло успешно, false если сделка не найдена
      */
     public boolean deleteById(Long id) {
         int deletedRows = jdbcTemplate.update(
@@ -143,7 +161,9 @@ public class DealDao {
     }
 
     /**
-     * Найти сделки по дате
+     * Найти сделки по конкретной дате
+     * @param date дата совершения сделки
+     * @return список сделок, совершенных в указанную дату, отсортированный по убыванию стоимости
      */
     public List<Deal> findByDate(LocalDate date) {
         return jdbcTemplate.query(
@@ -154,7 +174,10 @@ public class DealDao {
     }
 
     /**
-     * Найти сделки по диапазону дат
+     * Найти сделки в указанном диапазоне дат
+     * @param startDate начальная дата периода (включительно)
+     * @param endDate конечная дата периода (включительно)
+     * @return список сделок в указанном диапазоне дат, отсортированный по убыванию даты
      */
     public List<Deal> findByDateRange(LocalDate startDate, LocalDate endDate) {
         return jdbcTemplate.query(
@@ -165,7 +188,9 @@ public class DealDao {
     }
 
     /**
-     * Найти сделки по риелтору
+     * Найти сделки конкретного риелтора
+     * @param realtorId идентификатор риелтора
+     * @return список сделок указанного риелтора, отсортированный по убыванию даты
      */
     public List<Deal> findByRealtorId(Integer realtorId) {
         return jdbcTemplate.query(
@@ -176,7 +201,9 @@ public class DealDao {
     }
 
     /**
-     * Найти сделки по клиенту
+     * Найти сделки конкретного клиента
+     * @param clientId идентификатор клиента
+     * @return список сделок указанного клиента, отсортированный по убыванию даты
      */
     public List<Deal> findByClientId(Integer clientId) {
         return jdbcTemplate.query(
@@ -187,7 +214,9 @@ public class DealDao {
     }
 
     /**
-     * Найти сделки по недвижимости
+     * Найти сделки по конкретному объекту недвижимости
+     * @param propertyId идентификатор объекта недвижимости
+     * @return список сделок по указанному объекту недвижимости, отсортированный по убыванию даты
      */
     public List<Deal> findByPropertyId(Integer propertyId) {
         return jdbcTemplate.query(
@@ -199,6 +228,8 @@ public class DealDao {
 
     /**
      * Найти сделки по типу сделки
+     * @param dealTypeId идентификатор типа сделки
+     * @return список сделок указанного типа, отсортированный по убыванию даты
      */
     public List<Deal> findByDealTypeId(Integer dealTypeId) {
         return jdbcTemplate.query(
@@ -209,7 +240,10 @@ public class DealDao {
     }
 
     /**
-     * Найти сделки по ценовому диапазону
+     * Найти сделки в указанном ценовом диапазоне
+     * @param minCost минимальная стоимость сделки
+     * @param maxCost максимальная стоимость сделки
+     * @return список сделок в ценовом диапазоне, отсортированный по убыванию стоимости
      */
     public List<Deal> findByCostRange(BigDecimal minCost, BigDecimal maxCost) {
         return jdbcTemplate.query(
@@ -220,7 +254,8 @@ public class DealDao {
     }
 
     /**
-     * Получить общую сумму сделок
+     * Получить общую сумму всех сделок
+     * @return общая сумма сделок или 0 если сделок нет
      */
     public BigDecimal getTotalDealsAmount() {
         BigDecimal total = jdbcTemplate.queryForObject(
@@ -231,7 +266,8 @@ public class DealDao {
     }
 
     /**
-     * Получить количество сделок
+     * Получить общее количество сделок в базе данных
+     * @return количество сделок
      */
     public int getCount() {
         Integer count = jdbcTemplate.queryForObject(
