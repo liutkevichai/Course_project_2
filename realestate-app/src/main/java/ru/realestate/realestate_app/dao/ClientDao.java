@@ -1,6 +1,5 @@
 package ru.realestate.realestate_app.dao;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -15,17 +14,29 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * DAO класс для работы с клиентами
+ * Обеспечивает доступ к данным клиентов в базе данных
+ */
 @Repository
 public class ClientDao {
 
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
-
-    @Autowired
-    private ClientRowMapper clientRowMapper;
+    private final JdbcTemplate jdbcTemplate;
+    private final ClientRowMapper clientRowMapper;
 
     /**
-     * Получить всех клиентов
+     * Конструктор DAO с инжекцией зависимостей
+     * @param jdbcTemplate шаблон для выполнения SQL запросов
+     * @param clientRowMapper маппер для преобразования строк результата в объекты Client
+     */
+    public ClientDao(JdbcTemplate jdbcTemplate, ClientRowMapper clientRowMapper) {
+        this.jdbcTemplate = jdbcTemplate;
+        this.clientRowMapper = clientRowMapper;
+    }
+
+    /**
+     * Получить всех клиентов, отсортированных по фамилии и имени
+     * @return список всех клиентов
      */
     public List<Client> findAll() {
         return jdbcTemplate.query(
@@ -35,7 +46,10 @@ public class ClientDao {
     }
 
     /**
-     * Найти клиента по ID
+     * Найти клиента по уникальному идентификатору
+     * @param id идентификатор клиента
+     * @return объект клиента
+     * @throws org.springframework.dao.EmptyResultDataAccessException если клиент не найден
      */
     public Client findById(Long id) {
         return jdbcTemplate.queryForObject(
@@ -46,7 +60,9 @@ public class ClientDao {
     }
 
     /**
-     * Сохранить нового клиента
+     * Сохранить нового клиента в базе данных
+     * @param client объект клиента для сохранения
+     * @return идентификатор созданного клиента или null в случае ошибки
      */
     @SuppressWarnings({ "null" })
     public Long save(Client client) {
@@ -72,10 +88,10 @@ public class ClientDao {
     }
 
     /**
-     * Обновить клиента
-     * @param id ID клиента для обновления
-     * @param updates Map с полями для обновления (ключ - название поля, значение - новое значение)
-     * @return true если обновление прошло успешно
+     * Обновить данные существующего клиента
+     * @param id идентификатор клиента для обновления
+     * @param updates карта с полями для обновления (ключ - название поля, значение - новое значение)
+     * @return true если обновление прошло успешно, false если данных для обновления нет
      */
     public boolean update(Long id, Map<String, Object> updates) {
         if (updates == null || updates.isEmpty()) {
@@ -122,7 +138,9 @@ public class ClientDao {
     }
 
     /**
-     * Удалить клиента по ID
+     * Удалить клиента по идентификатору
+     * @param id идентификатор клиента для удаления
+     * @return true если удаление прошло успешно, false если клиент не найден
      */
     public boolean deleteById(Long id) {
         int deletedRows = jdbcTemplate.update(
@@ -134,7 +152,9 @@ public class ClientDao {
     }
 
     /**
-     * Найти клиентов по фамилии
+     * Найти клиентов по фамилии (поиск по частичному совпадению)
+     * @param lastName фамилия для поиска
+     * @return список клиентов с указанной фамилией
      */
     public List<Client> findByLastName(String lastName) {
         return jdbcTemplate.query(
@@ -145,7 +165,10 @@ public class ClientDao {
     }
 
     /**
-     * Найти клиента по телефону
+     * Найти клиента по номеру телефона (точное совпадение)
+     * @param phone номер телефона
+     * @return объект клиента
+     * @throws org.springframework.dao.EmptyResultDataAccessException если клиент не найден
      */
     public Client findByPhone(String phone) {
         return jdbcTemplate.queryForObject(
@@ -156,7 +179,10 @@ public class ClientDao {
     }
 
     /**
-     * Найти клиента по email
+     * Найти клиента по адресу электронной почты (точное совпадение)
+     * @param email адрес электронной почты
+     * @return объект клиента
+     * @throws org.springframework.dao.EmptyResultDataAccessException если клиент не найден
      */
     public Client findByEmail(String email) {
         return jdbcTemplate.queryForObject(
@@ -167,7 +193,8 @@ public class ClientDao {
     }
 
     /**
-     * Получить количество клиентов
+     * Получить общее количество клиентов в базе данных
+     * @return количество клиентов
      */
     public int getCount() {
         Integer count = jdbcTemplate.queryForObject(

@@ -1,15 +1,36 @@
 package ru.realestate.realestate_app.model;
 
+import jakarta.validation.constraints.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
 public class Deal {
     private Long idDeal;
+    
+    @NotNull(message = "Дата сделки обязательна для заполнения")
+    @PastOrPresent(message = "Дата сделки не может быть в будущем")
     private LocalDate dealDate;
+    
+    @NotNull(message = "Стоимость сделки обязательна для заполнения")
+    @DecimalMin(value = "0.01", message = "Стоимость сделки должна быть больше 0")
+    @DecimalMax(value = "999999999.9999", message = "Стоимость сделки не может превышать 999,999,999.9999")
+    @Digits(integer = 9, fraction = 4, message = "Стоимость сделки должна содержать не более 9 целых и 4 дробных цифр")
     private BigDecimal dealCost;
+    
+    @NotNull(message = "Объект недвижимости обязателен для заполнения")
+    @Positive(message = "ID объекта недвижимости должен быть положительным")
     private Integer idProperty;
+    
+    @NotNull(message = "Риелтор обязателен для заполнения")
+    @Positive(message = "ID риелтора должен быть положительным")
     private Integer idRealtor;
+    
+    @NotNull(message = "Клиент обязателен для заполнения")
+    @Positive(message = "ID клиента должен быть положительным")
     private Integer idClient;
+    
+    @NotNull(message = "Тип сделки обязателен для заполнения")
+    @Positive(message = "ID типа сделки должен быть положительным")
     private Integer idDealType;
     
     // Конструкторы

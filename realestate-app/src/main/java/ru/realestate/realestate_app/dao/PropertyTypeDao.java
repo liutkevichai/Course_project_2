@@ -1,20 +1,31 @@
 package ru.realestate.realestate_app.dao;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import ru.realestate.realestate_app.model.PropertyType;
 
 import java.util.List;
 
+/**
+ * DAO класс для работы с типами недвижимости
+ * Обеспечивает доступ к справочнику типов недвижимости в базе данных
+ */
 @Repository
 public class PropertyTypeDao {
 
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
+    private final JdbcTemplate jdbcTemplate;
 
     /**
-     * Получить все типы недвижимости
+     * Конструктор DAO с инжекцией зависимостей
+     * @param jdbcTemplate шаблон для выполнения SQL запросов
+     */
+    public PropertyTypeDao(JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
+    }
+
+    /**
+     * Получить все типы недвижимости, отсортированные по названию
+     * @return список всех типов недвижимости
      */
     public List<PropertyType> findAll() {
         return jdbcTemplate.query(
@@ -27,7 +38,10 @@ public class PropertyTypeDao {
     }
 
     /**
-     * Найти тип недвижимости по ID
+     * Найти тип недвижимости по уникальному идентификатору
+     * @param id идентификатор типа недвижимости
+     * @return объект типа недвижимости
+     * @throws org.springframework.dao.EmptyResultDataAccessException если тип не найден
      */
     public PropertyType findById(Long id) {
         return jdbcTemplate.queryForObject(
@@ -41,7 +55,10 @@ public class PropertyTypeDao {
     }
 
     /**
-     * Найти тип недвижимости по названию
+     * Найти тип недвижимости по названию (точное совпадение)
+     * @param name название типа недвижимости
+     * @return объект типа недвижимости
+     * @throws org.springframework.dao.EmptyResultDataAccessException если тип не найден
      */
     public PropertyType findByName(String name) {
         return jdbcTemplate.queryForObject(

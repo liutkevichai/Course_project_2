@@ -1,6 +1,5 @@
 package ru.realestate.realestate_app.dao;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -16,17 +15,29 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.lang.StringBuilder;
 
+/**
+ * DAO класс для работы с объектами недвижимости
+ * Обеспечивает доступ к данным недвижимости в базе данных
+ */
 @Repository
 public class PropertyDao {
 
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
-
-    @Autowired
-    private PropertyRowMapper propertyRowMapper;
+    private final JdbcTemplate jdbcTemplate;
+    private final PropertyRowMapper propertyRowMapper;
 
     /**
-     * Получить все объекты недвижимости
+     * Конструктор DAO с инжекцией зависимостей
+     * @param jdbcTemplate шаблон для выполнения SQL запросов
+     * @param propertyRowMapper маппер для преобразования строк результата в объекты Property
+     */
+    public PropertyDao(JdbcTemplate jdbcTemplate, PropertyRowMapper propertyRowMapper) {
+        this.jdbcTemplate = jdbcTemplate;
+        this.propertyRowMapper = propertyRowMapper;
+    }
+
+    /**
+     * Получить все объекты недвижимости, отсортированные по идентификатору
+     * @return список всех объектов недвижимости
      */
     public List<Property> findAll() {
         return jdbcTemplate.query(
@@ -36,7 +47,10 @@ public class PropertyDao {
     }
 
     /**
-     * Найти недвижимость по ID
+     * Найти объект недвижимости по уникальному идентификатору
+     * @param id идентификатор объекта недвижимости
+     * @return объект недвижимости
+     * @throws org.springframework.dao.EmptyResultDataAccessException если объект не найден
      */
     public Property findById(Long id) {
         return jdbcTemplate.queryForObject(
@@ -47,7 +61,9 @@ public class PropertyDao {
     }
 
     /**
-     * Сохранить новую недвижимость
+     * Сохранить новый объект недвижимости в базе данных
+     * @param property объект недвижимости для сохранения
+     * @return идентификатор созданного объекта недвижимости
      */
     @SuppressWarnings({ "null" })
     public Long save(Property property) {
@@ -83,10 +99,10 @@ public class PropertyDao {
     }
 
     /**
-     * Обновление недвижимости
-     * @param id ID недвижимости для обновления
-     * @param updates Map с полями для обновления (ключ - название поля, значение - новое значение)
-     * @return true если обновление прошло успешно
+     * Обновить данные существующего объекта недвижимости
+     * @param id идентификатор объекта недвижимости для обновления
+     * @param updates карта с полями для обновления (ключ - название поля, значение - новое значение)
+     * @return true если обновление прошло успешно, false если данных для обновления нет
      */
     public boolean update(Long id, Map<String, Object> updates) {
         // Проверяем, что есть поля для обновления
@@ -171,7 +187,9 @@ public class PropertyDao {
     }
 
     /**
-     * Удалить недвижимость по ID
+     * Удалить объект недвижимости по идентификатору
+     * @param id идентификатор объекта недвижимости для удаления
+     * @return true если удаление прошло успешно, false если объект не найден
      */
     public boolean deleteById(Long id) {
         int deletedRows = jdbcTemplate.update(
@@ -183,7 +201,10 @@ public class PropertyDao {
     }
 
     /**
-     * Найти недвижимость по ценовому диапазону
+     * Найти объекты недвижимости в указанном ценовом диапазоне
+     * @param minPrice минимальная цена
+     * @param maxPrice максимальная цена
+     * @return список объектов недвижимости в ценовом диапазоне, отсортированный по цене
      */
     public List<Property> findByPriceRange(BigDecimal minPrice, BigDecimal maxPrice) {
         return jdbcTemplate.query(
@@ -194,7 +215,9 @@ public class PropertyDao {
     }
 
     /**
-     * Найти недвижимость по городу
+     * Найти объекты недвижимости по городу
+     * @param cityId идентификатор города
+     * @return список объектов недвижимости в указанном городе, отсортированный по цене
      */
     public List<Property> findByCityId(Integer cityId) {
         return jdbcTemplate.query(
@@ -205,7 +228,9 @@ public class PropertyDao {
     }
 
     /**
-     * Найти недвижимость по типу
+     * Найти объекты недвижимости по типу
+     * @param propertyTypeId идентификатор типа недвижимости
+     * @return список объектов недвижимости указанного типа, отсортированный по цене
      */
     public List<Property> findByPropertyTypeId(Integer propertyTypeId) {
         return jdbcTemplate.query(
@@ -216,7 +241,8 @@ public class PropertyDao {
     }
 
     /**
-     * Получить количество объектов недвижимости
+     * Получить общее количество объектов недвижимости в базе данных
+     * @return количество объектов недвижимости
      */
     public int getCount() {
         Integer count = jdbcTemplate.queryForObject(
