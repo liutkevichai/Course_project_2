@@ -1,5 +1,8 @@
 package ru.realestate.realestate_app.dao;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -22,6 +25,9 @@ import java.lang.StringBuilder;
 @Repository
 public class PropertyDao {
 
+    // Логгер для записи событий и ошибок
+    private static final Logger logger = LoggerFactory.getLogger(PropertyDao.class);
+
     private final JdbcTemplate jdbcTemplate;
     private final PropertyRowMapper propertyRowMapper;
 
@@ -40,6 +46,7 @@ public class PropertyDao {
      * @return список всех объектов недвижимости
      */
     public List<Property> findAll() {
+        logger.debug("Получение списка всех объектов недвижимости");
         return jdbcTemplate.query(
             "SELECT * FROM properties ORDER BY id_property",
             propertyRowMapper
@@ -51,8 +58,16 @@ public class PropertyDao {
      * @param id идентификатор объекта недвижимости
      * @return объект недвижимости
      * @throws org.springframework.dao.EmptyResultDataAccessException если объект не найден
+     * @throws IllegalArgumentException если id равен null
      */
     public Property findById(Long id) {
+        // Валидация входного параметра
+        if (id == null) {
+            logger.error("Попытка поиска объекта недвижимости с null id");
+            throw new IllegalArgumentException("Идентификатор объекта недвижимости не может быть null");
+        }
+        
+        logger.debug("Поиск объекта недвижимости по id: {}", id);
         return jdbcTemplate.queryForObject(
             "SELECT * FROM properties WHERE id_property = ?",
             propertyRowMapper,
@@ -64,9 +79,20 @@ public class PropertyDao {
      * Сохранить новый объект недвижимости в базе данных
      * @param property объект недвижимости для сохранения
      * @return идентификатор созданного объекта недвижимости
+     * @throws IllegalArgumentException если данные объекта некорректны
+     * @throws DataIntegrityViolationException если связанные сущности не существуют
      */
     @SuppressWarnings({ "null" })
     public Long save(Property property) {
+        // Валидация входного объекта
+        validatePropertyForSave(property);
+        
+        // Проверка существования связанных сущностей
+        validateRelatedEntities(property);
+        
+        logger.debug("Сохранение нового объекта недвижимости: тип={}, стоимость={}", 
+                    property.getIdPropertyType(), property.getCost());
+        
         KeyHolder keyHolder = new GeneratedKeyHolder();
         
         jdbcTemplate.update(connection -> {
@@ -95,7 +121,14 @@ public class PropertyDao {
             return ps;
         }, keyHolder);
         
-        return keyHolder.getKey().longValue();
+        Long generatedId = keyHolder.getKey() != null ? keyHolder.getKey().longValue() : null;
+        if (generatedId == null) {
+            logger.error("Не удалось получить сгенерированный id для объекта недвижимости");
+            throw new DataIntegrityViolationException("Не удалось создать объект недвижимости в базе данных");
+        }
+        
+        logger.info("Объект недвижимости успешно сохранен с id: {}", generatedId);
+        return generatedId;
     }
 
     /**
@@ -103,12 +136,29 @@ public class PropertyDao {
      * @param id идентификатор объекта недвижимости для обновления
      * @param updates карта с полями для обновления (ключ - название поля, значение - новое значение)
      * @return true если обновление прошло успешно, false если данных для обновления нет
+     * @throws IllegalArgumentException если id равен null или данные некорректны
+     * @throws DataIntegrityViolationException если связанные сущности не существуют
      */
     public boolean update(Long id, Map<String, Object> updates) {
+        // Валидация входных параметров
+        if (id == null) {
+            logger.error("Попытка обновления объекта недвижимости с null id");
+            throw new IllegalArgumentException("Идентификатор объекта недвижимости не может быть null");
+        }
+        
         // Проверяем, что есть поля для обновления
         if (updates == null || updates.isEmpty()) {
+            logger.debug("Нет данных для обновления объекта недвижимости с id: {}", id);
             return false;
         }
+        
+        // Валидация обновляемых данных
+        validatePropertyUpdates(updates);
+        
+        // Проверка существования связанных сущностей при обновлении
+        validateRelatedEntitiesForUpdate(updates);
+        
+        logger.debug("Обновление объекта недвижимости с id: {}", id);
         
         // Строим динамический SQL запрос
         StringBuilder sql = new StringBuilder("UPDATE properties SET ");
@@ -183,6 +233,13 @@ public class PropertyDao {
         
         // Выполняем обновление
         int updatedRows = jdbcTemplate.update(sql.toString(), params.toArray());
+        
+        if (updatedRows > 0) {
+            logger.info("Объект недвижимости с id {} успешно обновлен", id);
+        } else {
+            logger.warn("Объект недвижимости с id {} не найден для обновления", id);
+        }
+        
         return updatedRows > 0;
     }
 
@@ -190,12 +247,27 @@ public class PropertyDao {
      * Удалить объект недвижимости по идентификатору
      * @param id идентификатор объекта недвижимости для удаления
      * @return true если удаление прошло успешно, false если объект не найден
+     * @throws IllegalArgumentException если id равен null
      */
     public boolean deleteById(Long id) {
+        // Валидация входного параметра
+        if (id == null) {
+            logger.error("Попытка удаления объекта недвижимости с null id");
+            throw new IllegalArgumentException("Идентификатор объекта недвижимости не может быть null");
+        }
+        
+        logger.debug("Удаление объекта недвижимости с id: {}", id);
+        
         int deletedRows = jdbcTemplate.update(
             "DELETE FROM properties WHERE id_property = ?",
             id
         );
+        
+        if (deletedRows > 0) {
+            logger.info("Объект недвижимости с id {} успешно удален", id);
+        } else {
+            logger.warn("Объект недвижимости с id {} не найден для удаления", id);
+        }
         
         return deletedRows > 0;
     }
@@ -245,10 +317,270 @@ public class PropertyDao {
      * @return количество объектов недвижимости
      */
     public int getCount() {
+        logger.debug("Получение общего количества объектов недвижимости");
         Integer count = jdbcTemplate.queryForObject(
             "SELECT COUNT(*) FROM properties",
             Integer.class
         );
         return count != null ? count : 0;
+    }
+
+    /**
+     * Валидация объекта недвижимости для сохранения
+     * @param property объект недвижимости для валидации
+     * @throws IllegalArgumentException если данные некорректны
+     */
+    private void validatePropertyForSave(Property property) {
+        if (property == null) {
+            logger.error("Попытка сохранения null объекта недвижимости");
+            throw new IllegalArgumentException("Объект недвижимости не может быть null");
+        }
+        
+        // Проверка обязательных полей
+        if (property.getArea() == null || property.getArea().compareTo(BigDecimal.ZERO) <= 0) {
+            logger.error("Попытка сохранения объекта недвижимости с некорректной площадью: {}", property.getArea());
+            throw new IllegalArgumentException("Площадь объекта недвижимости должна быть больше нуля");
+        }
+        
+        if (property.getCost() == null || property.getCost().compareTo(BigDecimal.ZERO) <= 0) {
+            logger.error("Попытка сохранения объекта недвижимости с некорректной стоимостью: {}", property.getCost());
+            throw new IllegalArgumentException("Стоимость объекта недвижимости должна быть больше нуля");
+        }
+        
+        // Проверка географических идентификаторов
+        if (property.getIdCountry() == null) {
+            logger.error("Попытка сохранения объекта недвижимости без указания страны");
+            throw new IllegalArgumentException("Идентификатор страны обязателен");
+        }
+        
+        if (property.getIdRegion() == null) {
+            logger.error("Попытка сохранения объекта недвижимости без указания региона");
+            throw new IllegalArgumentException("Идентификатор региона обязателен");
+        }
+        
+        if (property.getIdCity() == null) {
+            logger.error("Попытка сохранения объекта недвижимости без указания города");
+            throw new IllegalArgumentException("Идентификатор города обязателен");
+        }
+        
+        if (property.getIdStreet() == null) {
+            logger.error("Попытка сохранения объекта недвижимости без указания улицы");
+            throw new IllegalArgumentException("Идентификатор улицы обязателен");
+        }
+        
+        if (property.getIdPropertyType() == null) {
+            logger.error("Попытка сохранения объекта недвижимости без указания типа");
+            throw new IllegalArgumentException("Идентификатор типа недвижимости обязателен");
+        }
+        
+        // Проверка номера дома
+        if (property.getHouseNumber() == null || property.getHouseNumber().trim().isEmpty()) {
+            logger.error("Попытка сохранения объекта недвижимости без номера дома");
+            throw new IllegalArgumentException("Номер дома обязателен");
+        }
+    }
+
+    /**
+     * Валидация обновляемых данных объекта недвижимости
+     * @param updates карта с полями для обновления
+     * @throws IllegalArgumentException если данные некорректны
+     */
+    private void validatePropertyUpdates(Map<String, Object> updates) {
+        // Валидация площади
+        if (updates.containsKey("area")) {
+            BigDecimal area = (BigDecimal) updates.get("area");
+            if (area == null || area.compareTo(BigDecimal.ZERO) <= 0) {
+                logger.error("Попытка обновления объекта недвижимости с некорректной площадью: {}", area);
+                throw new IllegalArgumentException("Площадь объекта недвижимости должна быть больше нуля");
+            }
+        }
+        
+        // Валидация стоимости
+        if (updates.containsKey("cost")) {
+            BigDecimal cost = (BigDecimal) updates.get("cost");
+            if (cost == null || cost.compareTo(BigDecimal.ZERO) <= 0) {
+                logger.error("Попытка обновления объекта недвижимости с некорректной стоимостью: {}", cost);
+                throw new IllegalArgumentException("Стоимость объекта недвижимости должна быть больше нуля");
+            }
+        }
+        
+        // Валидация номера дома
+        if (updates.containsKey("houseNumber")) {
+            String houseNumber = (String) updates.get("houseNumber");
+            if (houseNumber == null || houseNumber.trim().isEmpty()) {
+                logger.error("Попытка обновления объекта недвижимости с пустым номером дома");
+                throw new IllegalArgumentException("Номер дома не может быть пустым");
+            }
+        }
+    }
+
+    /**
+     * Проверка существования связанных сущностей для объекта недвижимости
+     * @param property объект недвижимости для проверки
+     * @throws DataIntegrityViolationException если связанная сущность не существует
+     */
+    private void validateRelatedEntities(Property property) {
+        // Проверка типа недвижимости
+        if (!propertyTypeExists(property.getIdPropertyType())) {
+            logger.error("Попытка сохранения объекта недвижимости с несуществующим типом: {}", property.getIdPropertyType());
+            throw new DataIntegrityViolationException("Тип недвижимости с id " + property.getIdPropertyType() + " не найден");
+        }
+        
+        // Проверка страны
+        if (!countryExists(property.getIdCountry())) {
+            logger.error("Попытка сохранения объекта недвижимости с несуществующей страной: {}", property.getIdCountry());
+            throw new DataIntegrityViolationException("Страна с id " + property.getIdCountry() + " не найдена");
+        }
+        
+        // Проверка региона
+        if (!regionExists(property.getIdRegion())) {
+            logger.error("Попытка сохранения объекта недвижимости с несуществующим регионом: {}", property.getIdRegion());
+            throw new DataIntegrityViolationException("Регион с id " + property.getIdRegion() + " не найден");
+        }
+        
+        // Проверка города
+        if (!cityExists(property.getIdCity())) {
+            logger.error("Попытка сохранения объекта недвижимости с несуществующим городом: {}", property.getIdCity());
+            throw new DataIntegrityViolationException("Город с id " + property.getIdCity() + " не найден");
+        }
+        
+        // Проверка района (если указан)
+        if (property.getIdDistrict() != null && !districtExists(property.getIdDistrict())) {
+            logger.error("Попытка сохранения объекта недвижимости с несуществующим районом: {}", property.getIdDistrict());
+            throw new DataIntegrityViolationException("Район с id " + property.getIdDistrict() + " не найден");
+        }
+        
+        // Проверка улицы
+        if (!streetExists(property.getIdStreet())) {
+            logger.error("Попытка сохранения объекта недвижимости с несуществующей улицей: {}", property.getIdStreet());
+            throw new DataIntegrityViolationException("Улица с id " + property.getIdStreet() + " не найдена");
+        }
+    }
+
+    /**
+     * Проверка существования связанных сущностей при обновлении
+     * @param updates карта с полями для обновления
+     * @throws DataIntegrityViolationException если связанная сущность не существует
+     */
+    private void validateRelatedEntitiesForUpdate(Map<String, Object> updates) {
+        // Проверка типа недвижимости
+        if (updates.containsKey("idPropertyType")) {
+            Integer propertyTypeId = (Integer) updates.get("idPropertyType");
+            if (!propertyTypeExists(propertyTypeId)) {
+                logger.error("Попытка обновления объекта недвижимости с несуществующим типом: {}", propertyTypeId);
+                throw new DataIntegrityViolationException("Тип недвижимости с id " + propertyTypeId + " не найден");
+            }
+        }
+        
+        // Проверка страны
+        if (updates.containsKey("idCountry")) {
+            Integer countryId = (Integer) updates.get("idCountry");
+            if (!countryExists(countryId)) {
+                logger.error("Попытка обновления объекта недвижимости с несуществующей страной: {}", countryId);
+                throw new DataIntegrityViolationException("Страна с id " + countryId + " не найдена");
+            }
+        }
+        
+        // Проверка региона
+        if (updates.containsKey("idRegion")) {
+            Integer regionId = (Integer) updates.get("idRegion");
+            if (!regionExists(regionId)) {
+                logger.error("Попытка обновления объекта недвижимости с несуществующим регионом: {}", regionId);
+                throw new DataIntegrityViolationException("Регион с id " + regionId + " не найден");
+            }
+        }
+        
+        // Проверка города
+        if (updates.containsKey("idCity")) {
+            Integer cityId = (Integer) updates.get("idCity");
+            if (!cityExists(cityId)) {
+                logger.error("Попытка обновления объекта недвижимости с несуществующим городом: {}", cityId);
+                throw new DataIntegrityViolationException("Город с id " + cityId + " не найден");
+            }
+        }
+        
+        // Проверка района
+        if (updates.containsKey("idDistrict")) {
+            Integer districtId = (Integer) updates.get("idDistrict");
+            if (districtId != null && !districtExists(districtId)) {
+                logger.error("Попытка обновления объекта недвижимости с несуществующим районом: {}", districtId);
+                throw new DataIntegrityViolationException("Район с id " + districtId + " не найден");
+            }
+        }
+        
+        // Проверка улицы
+        if (updates.containsKey("idStreet")) {
+            Integer streetId = (Integer) updates.get("idStreet");
+            if (!streetExists(streetId)) {
+                logger.error("Попытка обновления объекта недвижимости с несуществующей улицей: {}", streetId);
+                throw new DataIntegrityViolationException("Улица с id " + streetId + " не найдена");
+            }
+        }
+    }
+
+    /**
+     * Проверить существование типа недвижимости
+     * @param propertyTypeId идентификатор типа недвижимости
+     * @return true если тип недвижимости существует
+     */
+    private boolean propertyTypeExists(Integer propertyTypeId) {
+        String sql = "SELECT COUNT(*) FROM property_types WHERE id_property_type = ?";
+        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, propertyTypeId);
+        return count != null && count > 0;
+    }
+
+    /**
+     * Проверить существование страны
+     * @param countryId идентификатор страны
+     * @return true если страна существует
+     */
+    private boolean countryExists(Integer countryId) {
+        String sql = "SELECT COUNT(*) FROM countries WHERE id_country = ?";
+        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, countryId);
+        return count != null && count > 0;
+    }
+
+    /**
+     * Проверить существование региона
+     * @param regionId идентификатор региона
+     * @return true если регион существует
+     */
+    private boolean regionExists(Integer regionId) {
+        String sql = "SELECT COUNT(*) FROM regions WHERE id_region = ?";
+        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, regionId);
+        return count != null && count > 0;
+    }
+
+    /**
+     * Проверить существование города
+     * @param cityId идентификатор города
+     * @return true если город существует
+     */
+    private boolean cityExists(Integer cityId) {
+        String sql = "SELECT COUNT(*) FROM cities WHERE id_city = ?";
+        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, cityId);
+        return count != null && count > 0;
+    }
+
+    /**
+     * Проверить существование района
+     * @param districtId идентификатор района
+     * @return true если район существует
+     */
+    private boolean districtExists(Integer districtId) {
+        String sql = "SELECT COUNT(*) FROM districts WHERE id_district = ?";
+        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, districtId);
+        return count != null && count > 0;
+    }
+
+    /**
+     * Проверить существование улицы
+     * @param streetId идентификатор улицы
+     * @return true если улица существует
+     */
+    private boolean streetExists(Integer streetId) {
+        String sql = "SELECT COUNT(*) FROM streets WHERE id_street = ?";
+        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, streetId);
+        return count != null && count > 0;
     }
 } 
