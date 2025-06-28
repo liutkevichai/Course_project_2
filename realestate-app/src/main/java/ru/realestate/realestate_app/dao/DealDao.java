@@ -17,7 +17,6 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
-import java.lang.StringBuilder;
 
 /**
  * DAO класс для работы с сделками

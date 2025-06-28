@@ -1,7 +1,13 @@
 package ru.realestate.realestate_app.service;
 
 import org.springframework.stereotype.Service;
+
 import ru.realestate.realestate_app.dao.PropertyTypeDao;
+import ru.realestate.realestate_app.exception.DatabaseException;
+import ru.realestate.realestate_app.exception.EntityNotFoundException;
+import ru.realestate.realestate_app.exception.RealEstateException;
+import ru.realestate.realestate_app.exception.ValidationException;
+import ru.realestate.realestate_app.exception.handler.ExceptionHandler;
 import ru.realestate.realestate_app.model.PropertyType;
 
 import java.util.List;
@@ -28,28 +34,50 @@ public class PropertyTypeService {
     /**
      * Получить все типы недвижимости, отсортированные по названию
      * @return список всех типов недвижимости
+     * @throws DatabaseException если произошла ошибка при работе с базой данных
      */
     public List<PropertyType> findAll() {
-        return propertyTypeDao.findAll();
+        try {
+            return propertyTypeDao.findAll();
+        } catch (Exception e) {
+            RealEstateException re = ExceptionHandler.handleDatabaseException(e, "SELECT", "PropertyType", null);
+            ExceptionHandler.logException(re, "Ошибка при получении списка всех типов недвижимости");
+            throw re;
+        }
     }
 
     /**
      * Найти тип недвижимости по уникальному идентификатору
      * @param id идентификатор типа недвижимости
      * @return объект типа недвижимости
-     * @throws org.springframework.dao.EmptyResultDataAccessException если тип не найден
+     * @throws EntityNotFoundException если тип недвижимости не найден
+     * @throws DatabaseException если произошла ошибка при работе с базой данных
      */
     public PropertyType findById(Long id) {
-        return propertyTypeDao.findById(id);
+        try {
+            return propertyTypeDao.findById(id);
+        } catch (Exception e) {
+            RealEstateException re = ExceptionHandler.handleDatabaseException(e, "SELECT", "PropertyType", id);
+            ExceptionHandler.logException(re, "Ошибка при поиске типа недвижимости по id: " + id);
+            throw re;
+        }
     }
 
     /**
      * Найти тип недвижимости по названию (точное совпадение)
      * @param name название типа недвижимости
      * @return объект типа недвижимости
-     * @throws org.springframework.dao.EmptyResultDataAccessException если тип не найден
+     * @throws EntityNotFoundException если тип недвижимости не найден
+     * @throws ValidationException если название не указано
+     * @throws DatabaseException если произошла ошибка при работе с базой данных
      */
     public PropertyType findByName(String name) {
-        return propertyTypeDao.findByName(name);
+        try {
+            return propertyTypeDao.findByName(name);
+        } catch (Exception e) {
+            RealEstateException re = ExceptionHandler.handleDatabaseException(e, "SELECT", "PropertyType", null);
+            ExceptionHandler.logException(re, "Ошибка при поиске типа недвижимости по названию: " + name);
+            throw re;
+        }
     }
 } 

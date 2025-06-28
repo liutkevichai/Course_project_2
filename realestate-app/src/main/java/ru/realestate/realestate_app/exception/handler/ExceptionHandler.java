@@ -17,9 +17,13 @@ import ru.realestate.realestate_app.exception.ValidationException;
  * Утилитный класс для обработки и преобразования исключений
  * Преобразует Spring Data исключения в специфичные исключения приложения
  */
-public class ExceptionHandler {
+public final class ExceptionHandler {
     
     private static final Logger logger = LoggerFactory.getLogger(ExceptionHandler.class);
+
+    private ExceptionHandler() {
+        throw new IllegalStateException("Utility class");
+    }
     
     /**
      * Обработать исключение базы данных и преобразовать в специфичное исключение приложения
@@ -93,12 +97,12 @@ public class ExceptionHandler {
             return new ValidationException("Общие данные", e.getMessage());
         }
         
-        // Если это уже наше исключение валидации, возвращаем как есть
+        // Если это кастомное исключение валидации, возвращаем как есть
         if (e instanceof ValidationException) {
             return (ValidationException) e;
         }
         
-        // Для других типов исключений создаем общее исключение валидации
+        // Общее исключение валидации для других типов исключений 
         logger.error("Неизвестная ошибка валидации для {}: {}", entityType, e.getMessage());
         return new ValidationException("Неизвестная ошибка валидации: " + e.getMessage());
     }

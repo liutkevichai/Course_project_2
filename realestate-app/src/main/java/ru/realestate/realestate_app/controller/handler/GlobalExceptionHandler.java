@@ -14,6 +14,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.BadSqlGrammarException;
 import org.springframework.jdbc.CannotGetJdbcConnectionException;
 
+import ru.realestate.realestate_app.exception.BusinessRuleException;
 import ru.realestate.realestate_app.exception.DatabaseException;
 import ru.realestate.realestate_app.exception.EntityNotFoundException;
 import ru.realestate.realestate_app.exception.RealEstateException;
@@ -116,6 +117,37 @@ public class GlobalExceptionHandler {
         }
         
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+    
+    /**
+     * Обработка исключений нарушений бизнес-правил
+     * @param e исключение BusinessRuleException
+     * @param request HTTP запрос
+     * @return HTTP ответ с кодом 422 (Unprocessable Entity)
+     */
+    @ExceptionHandler(BusinessRuleException.class)
+    public ResponseEntity<ErrorResponse> handleBusinessRuleException(
+            BusinessRuleException e, WebRequest request) {
+        
+        logger.warn("Нарушение бизнес-правила '{}': {}", e.getRuleName(), e.getDetailedMessage());
+        
+        // Формируем понятное пользователю сообщение
+        String userMessage = String.format("Операция не может быть выполнена: %s", e.getMessage());
+        
+        // Если есть контекст, добавляем его в детали
+        String details = e.getMessage();
+        if (e.hasContext()) {
+            details = String.format("%s (контекст: %s)", e.getMessage(), e.getContext());
+        }
+        
+        ErrorResponse errorResponse = new ErrorResponse(
+            HttpStatus.UNPROCESSABLE_ENTITY.value(),
+            userMessage,
+            details,
+            request.getDescription(false)
+        );
+        
+        return new ResponseEntity<>(errorResponse, HttpStatus.UNPROCESSABLE_ENTITY);
     }
     
     /**
