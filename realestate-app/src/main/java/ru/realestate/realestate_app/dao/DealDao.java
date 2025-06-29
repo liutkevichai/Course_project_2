@@ -8,7 +8,11 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 import ru.realestate.realestate_app.mapper.DealRowMapper;
+import ru.realestate.realestate_app.mapper.dto.DealWithDetailsRowMapper;
+import ru.realestate.realestate_app.mapper.dto.DealTableRowMapper;
 import ru.realestate.realestate_app.model.Deal;
+import ru.realestate.realestate_app.model.dto.DealWithDetailsDto;
+import ru.realestate.realestate_app.model.dto.DealTableDto;
 
 import java.math.BigDecimal;
 import java.sql.PreparedStatement;
@@ -29,15 +33,23 @@ public class DealDao {
 
     private final JdbcTemplate jdbcTemplate;
     private final DealRowMapper dealRowMapper;
+    private final DealWithDetailsRowMapper dealWithDetailsRowMapper;
+    private final DealTableRowMapper dealTableRowMapper;
 
     /**
      * Конструктор DAO с инжекцией зависимостей
      * @param jdbcTemplate шаблон для выполнения SQL запросов
      * @param dealRowMapper маппер для преобразования строк результата в объекты Deal
+     * @param dealWithDetailsRowMapper маппер для DealWithDetailsDto
+     * @param dealTableRowMapper маппер для DealTableDto
      */
-    public DealDao(JdbcTemplate jdbcTemplate, DealRowMapper dealRowMapper) {
+    public DealDao(JdbcTemplate jdbcTemplate, DealRowMapper dealRowMapper, 
+                   DealWithDetailsRowMapper dealWithDetailsRowMapper, 
+                   DealTableRowMapper dealTableRowMapper) {
         this.jdbcTemplate = jdbcTemplate;
         this.dealRowMapper = dealRowMapper;
+        this.dealWithDetailsRowMapper = dealWithDetailsRowMapper;
+        this.dealTableRowMapper = dealTableRowMapper;
     }
 
     /**
@@ -370,6 +382,451 @@ public class DealDao {
             Integer.class
         );
         return count != null ? count : 0;
+    }
+
+    // ========== МЕТОДЫ ДЛЯ РАБОТЫ С DTO ==========
+
+    /**
+     * Получить все сделки с детальной информацией (JOIN запрос)
+     * @return список всех сделок с полной информацией о связанных сущностях
+     */
+    public List<DealWithDetailsDto> findAllWithDetails() {
+        logger.debug("Получение списка всех сделок с детальной информацией");
+        String sql = """
+            SELECT 
+                d.id_deal as deal_id,
+                d.deal_date,
+                d.deal_cost,
+                -- Клиент
+                c.id_client as client_id,
+                c.first_name as client_first_name,
+                c.last_name as client_last_name,
+                c.middle_name as client_middle_name,
+                c.phone_number as client_phone,
+                c.email as client_email,
+                -- Риелтор
+                r.id_realtor as realtor_id,
+                r.first_name as realtor_first_name,
+                r.last_name as realtor_last_name,
+                r.middle_name as realtor_middle_name,
+                r.phone_number as realtor_phone,
+                r.email as realtor_email,
+                r.experience_years as realtor_experience,
+                -- Недвижимость
+                p.id_property as property_id,
+                p.area as property_area,
+                p.cost as property_cost,
+                p.description as property_description,
+                p.postal_code as property_postal_code,
+                p.house_number as property_house_number,
+                p.house_letter as property_house_letter,
+                p.building_number as property_building_number,
+                p.apartment_number as property_apartment_number,
+                -- География
+                country.country_name,
+                region.name as region_name,
+                city.city_name,
+                district.district_name,
+                street.street_name,
+                -- Типы
+                pt.property_type_name,
+                dt.deal_type_name
+            FROM deals d
+            JOIN clients c ON d.id_client = c.id_client
+            JOIN realtors r ON d.id_realtor = r.id_realtor
+            JOIN properties p ON d.id_property = p.id_property
+            JOIN countries country ON p.id_country = country.id_country
+            JOIN regions region ON p.id_region = region.id_region
+            JOIN cities city ON p.id_city = city.id_city
+            JOIN districts district ON p.id_district = district.id_district
+            JOIN streets street ON p.id_street = street.id_street
+            JOIN property_types pt ON p.id_property_type = pt.id_property_type
+            JOIN deal_types dt ON d.id_deal_type = dt.id_deal_type
+            ORDER BY d.deal_date DESC
+            """;
+        return jdbcTemplate.query(sql, dealWithDetailsRowMapper);
+    }
+
+    /**
+     * Найти сделку с детальной информацией по идентификатору
+     * @param id идентификатор сделки
+     * @return сделка с полной информацией о связанных сущностях
+     * @throws org.springframework.dao.EmptyResultDataAccessException если сделка не найдена
+     */
+    public DealWithDetailsDto findByIdWithDetails(Long id) {
+        if (id == null) {
+            logger.error("Попытка поиска сделки с детальной информацией с null id");
+            throw new IllegalArgumentException("Идентификатор сделки не может быть null");
+        }
+        
+        logger.debug("Поиск сделки с детальной информацией по id: {}", id);
+        String sql = """
+            SELECT 
+                d.id_deal as deal_id,
+                d.deal_date,
+                d.deal_cost,
+                -- Клиент
+                c.id_client as client_id,
+                c.first_name as client_first_name,
+                c.last_name as client_last_name,
+                c.middle_name as client_middle_name,
+                c.phone_number as client_phone,
+                c.email as client_email,
+                -- Риелтор
+                r.id_realtor as realtor_id,
+                r.first_name as realtor_first_name,
+                r.last_name as realtor_last_name,
+                r.middle_name as realtor_middle_name,
+                r.phone_number as realtor_phone,
+                r.email as realtor_email,
+                r.experience_years as realtor_experience,
+                -- Недвижимость
+                p.id_property as property_id,
+                p.area as property_area,
+                p.cost as property_cost,
+                p.description as property_description,
+                p.postal_code as property_postal_code,
+                p.house_number as property_house_number,
+                p.house_letter as property_house_letter,
+                p.building_number as property_building_number,
+                p.apartment_number as property_apartment_number,
+                -- География
+                country.country_name,
+                region.name as region_name,
+                city.city_name,
+                district.district_name,
+                street.street_name,
+                -- Типы
+                pt.property_type_name,
+                dt.deal_type_name
+            FROM deals d
+            JOIN clients c ON d.id_client = c.id_client
+            JOIN realtors r ON d.id_realtor = r.id_realtor
+            JOIN properties p ON d.id_property = p.id_property
+            JOIN countries country ON p.id_country = country.id_country
+            JOIN regions region ON p.id_region = region.id_region
+            JOIN cities city ON p.id_city = city.id_city
+            JOIN districts district ON p.id_district = district.id_district
+            JOIN streets street ON p.id_street = street.id_street
+            JOIN property_types pt ON p.id_property_type = pt.id_property_type
+            JOIN deal_types dt ON d.id_deal_type = dt.id_deal_type
+            WHERE d.id_deal = ?
+            """;
+        return jdbcTemplate.queryForObject(sql, dealWithDetailsRowMapper, id);
+    }
+
+    /**
+     * Получить все сделки для табличного отображения (компактная информация)
+     * @return список сделок с компактной информацией
+     */
+    public List<DealTableDto> findAllForTable() {
+        logger.debug("Получение списка всех сделок для табличного отображения");
+        String sql = """
+            SELECT 
+                d.id_deal as deal_id,
+                d.deal_date,
+                d.deal_cost,
+                -- Клиент (полное имя)
+                CONCAT(c.last_name, ' ', c.first_name, 
+                       CASE WHEN c.middle_name IS NOT NULL THEN CONCAT(' ', c.middle_name) ELSE '' END) as client_name,
+                c.phone_number as client_phone,
+                -- Риелтор (полное имя)
+                CONCAT(r.last_name, ' ', r.first_name, 
+                       CASE WHEN r.middle_name IS NOT NULL THEN CONCAT(' ', r.middle_name) ELSE '' END) as realtor_name,
+                -- Адрес недвижимости (краткий)
+                CONCAT(street.street_name, ', ', p.house_number,
+                       CASE WHEN p.apartment_number IS NOT NULL THEN CONCAT('-', p.apartment_number) ELSE '' END) as property_address,
+                -- Типы
+                pt.property_type_name,
+                dt.deal_type_name
+            FROM deals d
+            JOIN clients c ON d.id_client = c.id_client
+            JOIN realtors r ON d.id_realtor = r.id_realtor
+            JOIN properties p ON d.id_property = p.id_property
+            JOIN streets street ON p.id_street = street.id_street
+            JOIN property_types pt ON p.id_property_type = pt.id_property_type
+            JOIN deal_types dt ON d.id_deal_type = dt.id_deal_type
+            ORDER BY d.deal_date DESC
+            """;
+        return jdbcTemplate.query(sql, dealTableRowMapper);
+    }
+
+    /**
+     * Найти сделки по дате с детальной информацией
+     * @param date дата сделки
+     * @return список сделок с полной информацией
+     */
+    public List<DealWithDetailsDto> findByDateWithDetails(LocalDate date) {
+        if (date == null) {
+            logger.error("Попытка поиска сделок с null датой");
+            throw new IllegalArgumentException("Дата не может быть null");
+        }
+        
+        logger.debug("Поиск сделок с детальной информацией по дате: {}", date);
+        String sql = """
+            SELECT 
+                d.id_deal as deal_id,
+                d.deal_date,
+                d.deal_cost,
+                -- Клиент
+                c.id_client as client_id,
+                c.first_name as client_first_name,
+                c.last_name as client_last_name,
+                c.middle_name as client_middle_name,
+                c.phone_number as client_phone,
+                c.email as client_email,
+                -- Риелтор
+                r.id_realtor as realtor_id,
+                r.first_name as realtor_first_name,
+                r.last_name as realtor_last_name,
+                r.middle_name as realtor_middle_name,
+                r.phone_number as realtor_phone,
+                r.email as realtor_email,
+                r.experience_years as realtor_experience,
+                -- Недвижимость
+                p.id_property as property_id,
+                p.area as property_area,
+                p.cost as property_cost,
+                p.description as property_description,
+                p.postal_code as property_postal_code,
+                p.house_number as property_house_number,
+                p.house_letter as property_house_letter,
+                p.building_number as property_building_number,
+                p.apartment_number as property_apartment_number,
+                -- География
+                country.country_name,
+                region.name as region_name,
+                city.city_name,
+                district.district_name,
+                street.street_name,
+                -- Типы
+                pt.property_type_name,
+                dt.deal_type_name
+            FROM deals d
+            JOIN clients c ON d.id_client = c.id_client
+            JOIN realtors r ON d.id_realtor = r.id_realtor
+            JOIN properties p ON d.id_property = p.id_property
+            JOIN countries country ON p.id_country = country.id_country
+            JOIN regions region ON p.id_region = region.id_region
+            JOIN cities city ON p.id_city = city.id_city
+            JOIN districts district ON p.id_district = district.id_district
+            JOIN streets street ON p.id_street = street.id_street
+            JOIN property_types pt ON p.id_property_type = pt.id_property_type
+            JOIN deal_types dt ON d.id_deal_type = dt.id_deal_type
+            WHERE d.deal_date = ?
+            ORDER BY d.deal_date DESC
+            """;
+        return jdbcTemplate.query(sql, dealWithDetailsRowMapper, date);
+    }
+
+    /**
+     * Найти сделки по диапазону дат с детальной информацией
+     * @param startDate начальная дата (включительно)
+     * @param endDate конечная дата (включительно)
+     * @return список сделок с полной информацией
+     */
+    public List<DealWithDetailsDto> findByDateRangeWithDetails(LocalDate startDate, LocalDate endDate) {
+        if (startDate == null || endDate == null) {
+            logger.error("Попытка поиска сделок с null датами: start={}, end={}", startDate, endDate);
+            throw new IllegalArgumentException("Даты не могут быть null");
+        }
+        
+        if (startDate.isAfter(endDate)) {
+            logger.error("Некорректный диапазон дат: start={}, end={}", startDate, endDate);
+            throw new IllegalArgumentException("Начальная дата не может быть позже конечной");
+        }
+        
+        logger.debug("Поиск сделок с детальной информацией по диапазону дат: {} - {}", startDate, endDate);
+        String sql = """
+            SELECT 
+                d.id_deal as deal_id,
+                d.deal_date,
+                d.deal_cost,
+                -- Клиент
+                c.id_client as client_id,
+                c.first_name as client_first_name,
+                c.last_name as client_last_name,
+                c.middle_name as client_middle_name,
+                c.phone_number as client_phone,
+                c.email as client_email,
+                -- Риелтор
+                r.id_realtor as realtor_id,
+                r.first_name as realtor_first_name,
+                r.last_name as realtor_last_name,
+                r.middle_name as realtor_middle_name,
+                r.phone_number as realtor_phone,
+                r.email as realtor_email,
+                r.experience_years as realtor_experience,
+                -- Недвижимость
+                p.id_property as property_id,
+                p.area as property_area,
+                p.cost as property_cost,
+                p.description as property_description,
+                p.postal_code as property_postal_code,
+                p.house_number as property_house_number,
+                p.house_letter as property_house_letter,
+                p.building_number as property_building_number,
+                p.apartment_number as property_apartment_number,
+                -- География
+                country.country_name,
+                region.name as region_name,
+                city.city_name,
+                district.district_name,
+                street.street_name,
+                -- Типы
+                pt.property_type_name,
+                dt.deal_type_name
+            FROM deals d
+            JOIN clients c ON d.id_client = c.id_client
+            JOIN realtors r ON d.id_realtor = r.id_realtor
+            JOIN properties p ON d.id_property = p.id_property
+            JOIN countries country ON p.id_country = country.id_country
+            JOIN regions region ON p.id_region = region.id_region
+            JOIN cities city ON p.id_city = city.id_city
+            JOIN districts district ON p.id_district = district.id_district
+            JOIN streets street ON p.id_street = street.id_street
+            JOIN property_types pt ON p.id_property_type = pt.id_property_type
+            JOIN deal_types dt ON d.id_deal_type = dt.id_deal_type
+            WHERE d.deal_date BETWEEN ? AND ?
+            ORDER BY d.deal_date DESC
+            """;
+        return jdbcTemplate.query(sql, dealWithDetailsRowMapper, startDate, endDate);
+    }
+
+    /**
+     * Найти сделки по риелтору с детальной информацией
+     * @param realtorId идентификатор риелтора
+     * @return список сделок с полной информацией
+     */
+    public List<DealWithDetailsDto> findByRealtorIdWithDetails(Long realtorId) {
+        if (realtorId == null) {
+            logger.error("Попытка поиска сделок с null id риелтора");
+            throw new IllegalArgumentException("Идентификатор риелтора не может быть null");
+        }
+        
+        logger.debug("Поиск сделок с детальной информацией по риелтору: {}", realtorId);
+        String sql = """
+            SELECT 
+                d.id_deal as deal_id,
+                d.deal_date,
+                d.deal_cost,
+                -- Клиент
+                c.id_client as client_id,
+                c.first_name as client_first_name,
+                c.last_name as client_last_name,
+                c.middle_name as client_middle_name,
+                c.phone_number as client_phone,
+                c.email as client_email,
+                -- Риелтор
+                r.id_realtor as realtor_id,
+                r.first_name as realtor_first_name,
+                r.last_name as realtor_last_name,
+                r.middle_name as realtor_middle_name,
+                r.phone_number as realtor_phone,
+                r.email as realtor_email,
+                r.experience_years as realtor_experience,
+                -- Недвижимость
+                p.id_property as property_id,
+                p.area as property_area,
+                p.cost as property_cost,
+                p.description as property_description,
+                p.postal_code as property_postal_code,
+                p.house_number as property_house_number,
+                p.house_letter as property_house_letter,
+                p.building_number as property_building_number,
+                p.apartment_number as property_apartment_number,
+                -- География
+                country.country_name,
+                region.name as region_name,
+                city.city_name,
+                district.district_name,
+                street.street_name,
+                -- Типы
+                pt.property_type_name,
+                dt.deal_type_name
+            FROM deals d
+            JOIN clients c ON d.id_client = c.id_client
+            JOIN realtors r ON d.id_realtor = r.id_realtor
+            JOIN properties p ON d.id_property = p.id_property
+            JOIN countries country ON p.id_country = country.id_country
+            JOIN regions region ON p.id_region = region.id_region
+            JOIN cities city ON p.id_city = city.id_city
+            JOIN districts district ON p.id_district = district.id_district
+            JOIN streets street ON p.id_street = street.id_street
+            JOIN property_types pt ON p.id_property_type = pt.id_property_type
+            JOIN deal_types dt ON d.id_deal_type = dt.id_deal_type
+            WHERE d.id_realtor = ?
+            ORDER BY d.deal_date DESC
+            """;
+        return jdbcTemplate.query(sql, dealWithDetailsRowMapper, realtorId);
+    }
+
+    /**
+     * Найти сделки по клиенту с детальной информацией
+     * @param clientId идентификатор клиента
+     * @return список сделок с полной информацией
+     */
+    public List<DealWithDetailsDto> findByClientIdWithDetails(Long clientId) {
+        if (clientId == null) {
+            logger.error("Попытка поиска сделок с null id клиента");
+            throw new IllegalArgumentException("Идентификатор клиента не может быть null");
+        }
+        
+        logger.debug("Поиск сделок с детальной информацией по клиенту: {}", clientId);
+        String sql = """
+            SELECT 
+                d.id_deal as deal_id,
+                d.deal_date,
+                d.deal_cost,
+                -- Клиент
+                c.id_client as client_id,
+                c.first_name as client_first_name,
+                c.last_name as client_last_name,
+                c.middle_name as client_middle_name,
+                c.phone_number as client_phone,
+                c.email as client_email,
+                -- Риелтор
+                r.id_realtor as realtor_id,
+                r.first_name as realtor_first_name,
+                r.last_name as realtor_last_name,
+                r.middle_name as realtor_middle_name,
+                r.phone_number as realtor_phone,
+                r.email as realtor_email,
+                r.experience_years as realtor_experience,
+                -- Недвижимость
+                p.id_property as property_id,
+                p.area as property_area,
+                p.cost as property_cost,
+                p.description as property_description,
+                p.postal_code as property_postal_code,
+                p.house_number as property_house_number,
+                p.house_letter as property_house_letter,
+                p.building_number as property_building_number,
+                p.apartment_number as property_apartment_number,
+                -- География
+                country.country_name,
+                region.name as region_name,
+                city.city_name,
+                district.district_name,
+                street.street_name,
+                -- Типы
+                pt.property_type_name,
+                dt.deal_type_name
+            FROM deals d
+            JOIN clients c ON d.id_client = c.id_client
+            JOIN realtors r ON d.id_realtor = r.id_realtor
+            JOIN properties p ON d.id_property = p.id_property
+            JOIN countries country ON p.id_country = country.id_country
+            JOIN regions region ON p.id_region = region.id_region
+            JOIN cities city ON p.id_city = city.id_city
+            JOIN districts district ON p.id_district = district.id_district
+            JOIN streets street ON p.id_street = street.id_street
+            JOIN property_types pt ON p.id_property_type = pt.id_property_type
+            JOIN deal_types dt ON d.id_deal_type = dt.id_deal_type
+            WHERE d.id_client = ?
+            ORDER BY d.deal_date DESC
+            """;
+        return jdbcTemplate.query(sql, dealWithDetailsRowMapper, clientId);
     }
 
     /**

@@ -11,6 +11,8 @@ import ru.realestate.realestate_app.exception.RealEstateException;
 import ru.realestate.realestate_app.exception.ValidationException;
 import ru.realestate.realestate_app.exception.handler.ExceptionHandler;
 import ru.realestate.realestate_app.model.Property;
+import ru.realestate.realestate_app.model.dto.PropertyWithDetailsDto;
+import ru.realestate.realestate_app.model.dto.PropertyTableDto;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -200,7 +202,7 @@ public class PropertyService {
             return propertyDao.getCount();
         } catch (Exception e) {
             RealEstateException re = ExceptionHandler.handleDatabaseException(e, "SELECT", "Property", null);
-            ExceptionHandler.logException(re, "Ошибка при получении количества объектов недвижимости");
+            ExceptionHandler.logException(re, "Ошибка при подсчете количества объектов недвижимости");
             throw re;
         }
     }
@@ -243,5 +245,107 @@ public class PropertyService {
             throw new ValidationException("updates", "Данные для обновления не могут быть пустыми");
         }
         // Остальная валидация выполняется в DAO
+    }
+
+    // ========== МЕТОДЫ ДЛЯ РАБОТЫ С DTO ==========
+
+    /**
+     * Получить все объекты недвижимости с детальной информацией (включая географические данные)
+     * Использует JOIN запросы для оптимизации производительности
+     * @return список всех объектов недвижимости с полной информацией, отсортированный по стоимости в убывающем порядке
+     * @throws DatabaseException если произошла ошибка при работе с базой данных
+     */
+    public List<PropertyWithDetailsDto> findAllWithDetails() {
+        try {
+            return propertyDao.findAllWithDetails();
+        } catch (Exception e) {
+            RealEstateException re = ExceptionHandler.handleDatabaseException(e, "SELECT", "Property", null);
+            ExceptionHandler.logException(re, "Ошибка при получении списка всех объектов недвижимости с детальной информацией");
+            throw re;
+        }
+    }
+
+    /**
+     * Найти объект недвижимости по идентификатору с детальной информацией
+     * Включает полную географическую иерархию и информацию о типе недвижимости
+     * @param id идентификатор объекта недвижимости
+     * @return объект недвижимости с детальной информацией
+     * @throws EntityNotFoundException если объект недвижимости не найден
+     * @throws DatabaseException если произошла ошибка при работе с базой данных
+     */
+    public PropertyWithDetailsDto findByIdWithDetails(Long id) {
+        try {
+            return propertyDao.findByIdWithDetails(id);
+        } catch (Exception e) {
+            RealEstateException re = ExceptionHandler.handleDatabaseException(e, "SELECT", "Property", id);
+            ExceptionHandler.logException(re, "Ошибка при поиске объекта недвижимости с детальной информацией по id: " + id);
+            throw re;
+        }
+    }
+
+    /**
+     * Получить все объекты недвижимости в табличном формате для отображения в каталоге
+     * Компактное представление с основной информацией
+     * @return список объектов недвижимости в табличном формате, отсортированный по стоимости в убывающем порядке
+     * @throws DatabaseException если произошла ошибка при работе с базой данных
+     */
+    public List<PropertyTableDto> findAllForTable() {
+        try {
+            return propertyDao.findAllForTable();
+        } catch (Exception e) {
+            RealEstateException re = ExceptionHandler.handleDatabaseException(e, "SELECT", "Property", null);
+            ExceptionHandler.logException(re, "Ошибка при получении списка всех объектов недвижимости в табличном формате");
+            throw re;
+        }
+    }
+
+    /**
+     * Найти объекты недвижимости по ценовому диапазону с детальной информацией
+     * @param minPrice минимальная цена
+     * @param maxPrice максимальная цена
+     * @return список объектов недвижимости с полной информацией в указанном ценовом диапазоне, отсортированный по цене
+     * @throws ValidationException если ценовой диапазон указан некорректно
+     * @throws DatabaseException если произошла ошибка при работе с базой данных
+     */
+    public List<PropertyWithDetailsDto> findByPriceRangeWithDetails(BigDecimal minPrice, BigDecimal maxPrice) {
+        try {
+            return propertyDao.findByPriceRangeWithDetails(minPrice, maxPrice);
+        } catch (Exception e) {
+            RealEstateException re = ExceptionHandler.handleDatabaseException(e, "SELECT", "Property", null);
+            ExceptionHandler.logException(re, "Ошибка при поиске объектов недвижимости с детальной информацией по ценовому диапазону: " + minPrice + " - " + maxPrice);
+            throw re;
+        }
+    }
+
+    /**
+     * Найти объекты недвижимости по городу с детальной информацией
+     * @param cityId идентификатор города
+     * @return список объектов недвижимости с полной информацией в указанном городе, отсортированный по цене
+     * @throws DatabaseException если произошла ошибка при работе с базой данных
+     */
+    public List<PropertyWithDetailsDto> findByCityIdWithDetails(Long cityId) {
+        try {
+            return propertyDao.findByCityIdWithDetails(cityId);
+        } catch (Exception e) {
+            RealEstateException re = ExceptionHandler.handleDatabaseException(e, "SELECT", "Property", null);
+            ExceptionHandler.logException(re, "Ошибка при поиске объектов недвижимости с детальной информацией по городу с id: " + cityId);
+            throw re;
+        }
+    }
+
+    /**
+     * Найти объекты недвижимости по типу с детальной информацией
+     * @param propertyTypeId идентификатор типа недвижимости
+     * @return список объектов недвижимости с полной информацией указанного типа, отсортированный по цене
+     * @throws DatabaseException если произошла ошибка при работе с базой данных
+     */
+    public List<PropertyWithDetailsDto> findByPropertyTypeIdWithDetails(Long propertyTypeId) {
+        try {
+            return propertyDao.findByPropertyTypeIdWithDetails(propertyTypeId);
+        } catch (Exception e) {
+            RealEstateException re = ExceptionHandler.handleDatabaseException(e, "SELECT", "Property", null);
+            ExceptionHandler.logException(re, "Ошибка при поиске объектов недвижимости с детальной информацией по типу с id: " + propertyTypeId);
+            throw re;
+        }
     }
 } 

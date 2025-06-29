@@ -8,7 +8,11 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 import ru.realestate.realestate_app.mapper.PropertyRowMapper;
+import ru.realestate.realestate_app.mapper.dto.PropertyWithDetailsRowMapper;
+import ru.realestate.realestate_app.mapper.dto.PropertyTableRowMapper;
 import ru.realestate.realestate_app.model.Property;
+import ru.realestate.realestate_app.model.dto.PropertyWithDetailsDto;
+import ru.realestate.realestate_app.model.dto.PropertyTableDto;
 
 import java.math.BigDecimal;
 import java.sql.PreparedStatement;
@@ -29,15 +33,23 @@ public class PropertyDao {
 
     private final JdbcTemplate jdbcTemplate;
     private final PropertyRowMapper propertyRowMapper;
+    private final PropertyWithDetailsRowMapper propertyWithDetailsRowMapper;
+    private final PropertyTableRowMapper propertyTableRowMapper;
 
     /**
      * Конструктор DAO с инжекцией зависимостей
      * @param jdbcTemplate шаблон для выполнения SQL запросов
      * @param propertyRowMapper маппер для преобразования строк результата в объекты Property
+     * @param propertyWithDetailsRowMapper маппер для PropertyWithDetailsDto
+     * @param propertyTableRowMapper маппер для PropertyTableDto
      */
-    public PropertyDao(JdbcTemplate jdbcTemplate, PropertyRowMapper propertyRowMapper) {
+    public PropertyDao(JdbcTemplate jdbcTemplate, PropertyRowMapper propertyRowMapper,
+                      PropertyWithDetailsRowMapper propertyWithDetailsRowMapper,
+                      PropertyTableRowMapper propertyTableRowMapper) {
         this.jdbcTemplate = jdbcTemplate;
         this.propertyRowMapper = propertyRowMapper;
+        this.propertyWithDetailsRowMapper = propertyWithDetailsRowMapper;
+        this.propertyTableRowMapper = propertyTableRowMapper;
     }
 
     /**
@@ -322,6 +334,282 @@ public class PropertyDao {
             Integer.class
         );
         return count != null ? count : 0;
+    }
+
+    // ========== МЕТОДЫ ДЛЯ РАБОТЫ С DTO ==========
+
+    /**
+     * Получить все объекты недвижимости с детальной информацией (JOIN запрос)
+     * @return список всех объектов недвижимости с полной географической информацией
+     */
+    public List<PropertyWithDetailsDto> findAllWithDetails() {
+        logger.debug("Получение списка всех объектов недвижимости с детальной информацией");
+        String sql = """
+            SELECT 
+                p.id_property as property_id,
+                p.area,
+                p.cost,
+                p.description,
+                p.postal_code,
+                p.house_number,
+                p.house_letter,
+                p.building_number,
+                p.apartment_number,
+                -- Тип недвижимости
+                pt.id_property_type as property_type_id,
+                pt.property_type_name,
+                -- География
+                country.id_country as country_id,
+                country.country_name,
+                region.id_region as region_id,
+                region.name as region_name,
+                region.code as region_code,
+                city.id_city as city_id,
+                city.city_name,
+                district.id_district as district_id,
+                district.district_name,
+                street.id_street as street_id,
+                street.street_name
+            FROM properties p
+            JOIN property_types pt ON p.id_property_type = pt.id_property_type
+            JOIN countries country ON p.id_country = country.id_country
+            JOIN regions region ON p.id_region = region.id_region
+            JOIN cities city ON p.id_city = city.id_city
+            JOIN districts district ON p.id_district = district.id_district
+            JOIN streets street ON p.id_street = street.id_street
+            ORDER BY p.cost DESC
+            """;
+        return jdbcTemplate.query(sql, propertyWithDetailsRowMapper);
+    }
+
+    /**
+     * Найти объект недвижимости с детальной информацией по идентификатору
+     * @param id идентификатор объекта недвижимости
+     * @return объект недвижимости с полной географической информацией
+     * @throws org.springframework.dao.EmptyResultDataAccessException если объект не найден
+     */
+    public PropertyWithDetailsDto findByIdWithDetails(Long id) {
+        if (id == null) {
+            logger.error("Попытка поиска объекта недвижимости с детальной информацией с null id");
+            throw new IllegalArgumentException("Идентификатор объекта недвижимости не может быть null");
+        }
+        
+        logger.debug("Поиск объекта недвижимости с детальной информацией по id: {}", id);
+        String sql = """
+            SELECT 
+                p.id_property as property_id,
+                p.area,
+                p.cost,
+                p.description,
+                p.postal_code,
+                p.house_number,
+                p.house_letter,
+                p.building_number,
+                p.apartment_number,
+                -- Тип недвижимости
+                pt.id_property_type as property_type_id,
+                pt.property_type_name,
+                -- География
+                country.id_country as country_id,
+                country.country_name,
+                region.id_region as region_id,
+                region.name as region_name,
+                region.code as region_code,
+                city.id_city as city_id,
+                city.city_name,
+                district.id_district as district_id,
+                district.district_name,
+                street.id_street as street_id,
+                street.street_name
+            FROM properties p
+            JOIN property_types pt ON p.id_property_type = pt.id_property_type
+            JOIN countries country ON p.id_country = country.id_country
+            JOIN regions region ON p.id_region = region.id_region
+            JOIN cities city ON p.id_city = city.id_city
+            JOIN districts district ON p.id_district = district.id_district
+            JOIN streets street ON p.id_street = street.id_street
+            WHERE p.id_property = ?
+            """;
+        return jdbcTemplate.queryForObject(sql, propertyWithDetailsRowMapper, id);
+    }
+
+    /**
+     * Получить все объекты недвижимости для табличного отображения (компактная информация)
+     * @return список объектов недвижимости с компактной информацией
+     */
+    public List<PropertyTableDto> findAllForTable() {
+        logger.debug("Получение списка всех объектов недвижимости для табличного отображения");
+        String sql = """
+            SELECT 
+                p.id_property as property_id,
+                p.area,
+                p.cost,
+                SUBSTRING(p.description, 1, 100) as short_description,
+                p.house_number,
+                p.apartment_number,
+                -- Тип недвижимости
+                pt.property_type_name,
+                -- География для адреса
+                city.city_name,
+                district.district_name,
+                street.street_name
+            FROM properties p
+            JOIN property_types pt ON p.id_property_type = pt.id_property_type
+            JOIN cities city ON p.id_city = city.id_city
+            JOIN districts district ON p.id_district = district.id_district
+            JOIN streets street ON p.id_street = street.id_street
+            ORDER BY p.cost DESC
+            """;
+        return jdbcTemplate.query(sql, propertyTableRowMapper);
+    }
+
+    /**
+     * Найти объекты недвижимости по ценовому диапазону с детальной информацией
+     * @param minPrice минимальная цена (включительно)
+     * @param maxPrice максимальная цена (включительно)
+     * @return список объектов недвижимости с полной информацией
+     */
+    public List<PropertyWithDetailsDto> findByPriceRangeWithDetails(BigDecimal minPrice, BigDecimal maxPrice) {
+        logger.debug("Поиск объектов недвижимости с детальной информацией по ценовому диапазону: {} - {}", minPrice, maxPrice);
+        String sql = """
+            SELECT 
+                p.id_property as property_id,
+                p.area,
+                p.cost,
+                p.description,
+                p.postal_code,
+                p.house_number,
+                p.house_letter,
+                p.building_number,
+                p.apartment_number,
+                -- Тип недвижимости
+                pt.id_property_type as property_type_id,
+                pt.property_type_name,
+                -- География
+                country.id_country as country_id,
+                country.country_name,
+                region.id_region as region_id,
+                region.name as region_name,
+                region.code as region_code,
+                city.id_city as city_id,
+                city.city_name,
+                district.id_district as district_id,
+                district.district_name,
+                street.id_street as street_id,
+                street.street_name
+            FROM properties p
+            JOIN property_types pt ON p.id_property_type = pt.id_property_type
+            JOIN countries country ON p.id_country = country.id_country
+            JOIN regions region ON p.id_region = region.id_region
+            JOIN cities city ON p.id_city = city.id_city
+            JOIN districts district ON p.id_district = district.id_district
+            JOIN streets street ON p.id_street = street.id_street
+            WHERE p.cost BETWEEN ? AND ?
+            ORDER BY p.cost
+            """;
+        return jdbcTemplate.query(sql, propertyWithDetailsRowMapper, minPrice, maxPrice);
+    }
+
+    /**
+     * Найти объекты недвижимости по городу с детальной информацией
+     * @param cityId идентификатор города
+     * @return список объектов недвижимости с полной информацией
+     */
+    public List<PropertyWithDetailsDto> findByCityIdWithDetails(Long cityId) {
+        if (cityId == null) {
+            logger.error("Попытка поиска объектов недвижимости с null id города");
+            throw new IllegalArgumentException("Идентификатор города не может быть null");
+        }
+        
+        logger.debug("Поиск объектов недвижимости с детальной информацией по городу: {}", cityId);
+        String sql = """
+            SELECT 
+                p.id_property as property_id,
+                p.area,
+                p.cost,
+                p.description,
+                p.postal_code,
+                p.house_number,
+                p.house_letter,
+                p.building_number,
+                p.apartment_number,
+                -- Тип недвижимости
+                pt.id_property_type as property_type_id,
+                pt.property_type_name,
+                -- География
+                country.id_country as country_id,
+                country.country_name,
+                region.id_region as region_id,
+                region.name as region_name,
+                region.code as region_code,
+                city.id_city as city_id,
+                city.city_name,
+                district.id_district as district_id,
+                district.district_name,
+                street.id_street as street_id,
+                street.street_name
+            FROM properties p
+            JOIN property_types pt ON p.id_property_type = pt.id_property_type
+            JOIN countries country ON p.id_country = country.id_country
+            JOIN regions region ON p.id_region = region.id_region
+            JOIN cities city ON p.id_city = city.id_city
+            JOIN districts district ON p.id_district = district.id_district
+            JOIN streets street ON p.id_street = street.id_street
+            WHERE p.id_city = ?
+            ORDER BY p.cost
+            """;
+        return jdbcTemplate.query(sql, propertyWithDetailsRowMapper, cityId);
+    }
+
+    /**
+     * Найти объекты недвижимости по типу с детальной информацией
+     * @param propertyTypeId идентификатор типа недвижимости
+     * @return список объектов недвижимости с полной информацией
+     */
+    public List<PropertyWithDetailsDto> findByPropertyTypeIdWithDetails(Long propertyTypeId) {
+        if (propertyTypeId == null) {
+            logger.error("Попытка поиска объектов недвижимости с null id типа");
+            throw new IllegalArgumentException("Идентификатор типа недвижимости не может быть null");
+        }
+        
+        logger.debug("Поиск объектов недвижимости с детальной информацией по типу: {}", propertyTypeId);
+        String sql = """
+            SELECT 
+                p.id_property as property_id,
+                p.area,
+                p.cost,
+                p.description,
+                p.postal_code,
+                p.house_number,
+                p.house_letter,
+                p.building_number,
+                p.apartment_number,
+                -- Тип недвижимости
+                pt.id_property_type as property_type_id,
+                pt.property_type_name,
+                -- География
+                country.id_country as country_id,
+                country.country_name,
+                region.id_region as region_id,
+                region.name as region_name,
+                region.code as region_code,
+                city.id_city as city_id,
+                city.city_name,
+                district.id_district as district_id,
+                district.district_name,
+                street.id_street as street_id,
+                street.street_name
+            FROM properties p
+            JOIN property_types pt ON p.id_property_type = pt.id_property_type
+            JOIN countries country ON p.id_country = country.id_country
+            JOIN regions region ON p.id_region = region.id_region
+            JOIN cities city ON p.id_city = city.id_city
+            JOIN districts district ON p.id_district = district.id_district
+            JOIN streets street ON p.id_street = street.id_street
+            WHERE p.id_property_type = ?
+            ORDER BY p.cost
+            """;
+        return jdbcTemplate.query(sql, propertyWithDetailsRowMapper, propertyTypeId);
     }
 
     /**

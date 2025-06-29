@@ -6,6 +6,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import ru.realestate.realestate_app.model.Deal;
+import ru.realestate.realestate_app.model.dto.DealWithDetailsDto;
+import ru.realestate.realestate_app.model.dto.DealTableDto;
 import ru.realestate.realestate_app.service.DealService;
 
 import jakarta.validation.Valid;
@@ -332,16 +334,133 @@ public class DealController {
      * HTTP метод: GET
      * URL: /api/deals/count
      * 
+     * Возвращает статистическую информацию о количестве сделок
+     * 
      * @return ResponseEntity с количеством сделок
      */
     @GetMapping("/count")
     public ResponseEntity<Map<String, Integer>> getDealsCount() {
         int count = dealService.getCount();
-        
         Map<String, Integer> response = Map.of(
-            "count", count
+            "totalDeals", count
         );
-        
         return ResponseEntity.ok(response);
+    }
+
+    // ========== ENDPOINTS ДЛЯ РАБОТЫ С DTO ==========
+
+    /**
+     * Получить все сделки с детальной информацией
+     * 
+     * HTTP метод: GET
+     * URL: /api/deals/with-details
+     * 
+     * Возвращает все сделки с полной информацией о клиенте, риелторе и объекте недвижимости.
+     * Использует JOIN запросы для оптимизации производительности (один запрос вместо N+1)
+     * 
+     * @return ResponseEntity со списком сделок с детальной информацией
+     */
+    @GetMapping("/with-details")
+    public ResponseEntity<List<DealWithDetailsDto>> getAllDealsWithDetails() {
+        List<DealWithDetailsDto> deals = dealService.findAllWithDetails();
+        return ResponseEntity.ok(deals);
+    }
+
+    /**
+     * Получить сделку с детальной информацией по идентификатору
+     * 
+     * HTTP метод: GET
+     * URL: /api/deals/{id}/with-details (например: /api/deals/123/with-details)
+     * 
+     * @param id идентификатор сделки
+     * @return ResponseEntity с детальной информацией о сделке
+     */
+    @GetMapping("/{id}/with-details")
+    public ResponseEntity<DealWithDetailsDto> getDealByIdWithDetails(@PathVariable Long id) {
+        DealWithDetailsDto deal = dealService.findByIdWithDetails(id);
+        return ResponseEntity.ok(deal);
+    }
+
+    /**
+     * Получить все сделки в табличном формате
+     * 
+     * HTTP метод: GET
+     * URL: /api/deals/for-table
+     * 
+     * Возвращает компактное представление сделок для отображения в таблицах.
+     * Содержит основную информацию в удобном для пользователя формате
+     * 
+     * @return ResponseEntity со списком сделок в табличном формате
+     */
+    @GetMapping("/for-table")
+    public ResponseEntity<List<DealTableDto>> getAllDealsForTable() {
+        List<DealTableDto> deals = dealService.findAllForTable();
+        return ResponseEntity.ok(deals);
+    }
+
+    /**
+     * Найти сделки по дате с детальной информацией
+     * 
+     * HTTP метод: GET
+     * URL: /api/deals/search/by-date-with-details?date=2024-01-15
+     * 
+     * @param date дата совершения сделки в формате YYYY-MM-DD
+     * @return ResponseEntity со списком сделок с детальной информацией, совершенных в указанную дату
+     */
+    @GetMapping("/search/by-date-with-details")
+    public ResponseEntity<List<DealWithDetailsDto>> getDealsByDateWithDetails(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+        
+        List<DealWithDetailsDto> deals = dealService.findByDateWithDetails(date);
+        return ResponseEntity.ok(deals);
+    }
+
+    /**
+     * Найти сделки в диапазоне дат с детальной информацией
+     * 
+     * HTTP метод: GET
+     * URL: /api/deals/search/by-date-range-with-details?startDate=2024-01-01&endDate=2024-01-31
+     * 
+     * @param startDate начальная дата диапазона в формате YYYY-MM-DD
+     * @param endDate конечная дата диапазона в формате YYYY-MM-DD
+     * @return ResponseEntity со списком сделок с детальной информацией в указанном диапазоне дат
+     */
+    @GetMapping("/search/by-date-range-with-details")
+    public ResponseEntity<List<DealWithDetailsDto>> getDealsByDateRangeWithDetails(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+        
+        List<DealWithDetailsDto> deals = dealService.findByDateRangeWithDetails(startDate, endDate);
+        return ResponseEntity.ok(deals);
+    }
+
+    /**
+     * Найти сделки риелтора с детальной информацией
+     * 
+     * HTTP метод: GET
+     * URL: /api/deals/search/by-realtor/{realtorId}/with-details (например: /api/deals/search/by-realtor/1/with-details)
+     * 
+     * @param realtorId идентификатор риелтора
+     * @return ResponseEntity со списком сделок с детальной информацией указанного риелтора
+     */
+    @GetMapping("/search/by-realtor/{realtorId}/with-details")
+    public ResponseEntity<List<DealWithDetailsDto>> getDealsByRealtorIdWithDetails(@PathVariable Long realtorId) {
+        List<DealWithDetailsDto> deals = dealService.findByRealtorIdWithDetails(realtorId);
+        return ResponseEntity.ok(deals);
+    }
+
+    /**
+     * Найти сделки клиента с детальной информацией
+     * 
+     * HTTP метод: GET
+     * URL: /api/deals/search/by-client/{clientId}/with-details (например: /api/deals/search/by-client/1/with-details)
+     * 
+     * @param clientId идентификатор клиента
+     * @return ResponseEntity со списком сделок с детальной информацией указанного клиента
+     */
+    @GetMapping("/search/by-client/{clientId}/with-details")
+    public ResponseEntity<List<DealWithDetailsDto>> getDealsByClientIdWithDetails(@PathVariable Long clientId) {
+        List<DealWithDetailsDto> deals = dealService.findByClientIdWithDetails(clientId);
+        return ResponseEntity.ok(deals);
     }
 } 

@@ -13,6 +13,8 @@ import ru.realestate.realestate_app.exception.ValidationException;
 import ru.realestate.realestate_app.exception.handler.ExceptionHandler;
 import ru.realestate.realestate_app.model.Deal;
 import ru.realestate.realestate_app.model.Property;
+import ru.realestate.realestate_app.model.dto.DealWithDetailsDto;
+import ru.realestate.realestate_app.model.dto.DealTableDto;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -283,7 +285,7 @@ public class DealService {
             return dealDao.getCount();
         } catch (Exception e) {
             RealEstateException re = ExceptionHandler.handleDatabaseException(e, "SELECT", "Deal", null);
-            ExceptionHandler.logException(re, "Ошибка при получении количества сделок");
+            ExceptionHandler.logException(re, "Ошибка при подсчете количества сделок");
             throw re;
         }
     }
@@ -374,6 +376,124 @@ public class DealService {
         } catch (Exception e) {
             RealEstateException re = ExceptionHandler.handleDatabaseException(e, "SELECT", "Deal", dealId);
             ExceptionHandler.logException(re, "Ошибка при проверке бизнес-правил для обновления сделки с id: " + dealId);
+            throw re;
+        }
+    }
+
+    // ========== МЕТОДЫ ДЛЯ РАБОТЫ С DTO ==========
+
+    /**
+     * Получить все сделки с детальной информацией (включая данные клиента, риелтора и недвижимости)
+     * Использует JOIN запросы для оптимизации производительности
+     * @return список всех сделок с полной информацией, отсортированный по дате в убывающем порядке
+     * @throws DatabaseException если произошла ошибка при работе с базой данных
+     */
+    public List<DealWithDetailsDto> findAllWithDetails() {
+        try {
+            return dealDao.findAllWithDetails();
+        } catch (Exception e) {
+            RealEstateException re = ExceptionHandler.handleDatabaseException(e, "SELECT", "Deal", null);
+            ExceptionHandler.logException(re, "Ошибка при получении списка всех сделок с детальной информацией");
+            throw re;
+        }
+    }
+
+    /**
+     * Найти сделку по идентификатору с детальной информацией
+     * Включает полную информацию о клиенте, риелторе и объекте недвижимости
+     * @param id идентификатор сделки
+     * @return объект сделки с детальной информацией
+     * @throws EntityNotFoundException если сделка не найдена
+     * @throws DatabaseException если произошла ошибка при работе с базой данных
+     */
+    public DealWithDetailsDto findByIdWithDetails(Long id) {
+        try {
+            return dealDao.findByIdWithDetails(id);
+        } catch (Exception e) {
+            RealEstateException re = ExceptionHandler.handleDatabaseException(e, "SELECT", "Deal", id);
+            ExceptionHandler.logException(re, "Ошибка при поиске сделки с детальной информацией по id: " + id);
+            throw re;
+        }
+    }
+
+    /**
+     * Получить все сделки в табличном формате для отображения в списках
+     * Компактное представление с основной информацией
+     * @return список сделок в табличном формате, отсортированный по дате в убывающем порядке
+     * @throws DatabaseException если произошла ошибка при работе с базой данных
+     */
+    public List<DealTableDto> findAllForTable() {
+        try {
+            return dealDao.findAllForTable();
+        } catch (Exception e) {
+            RealEstateException re = ExceptionHandler.handleDatabaseException(e, "SELECT", "Deal", null);
+            ExceptionHandler.logException(re, "Ошибка при получении списка всех сделок в табличном формате");
+            throw re;
+        }
+    }
+
+    /**
+     * Найти сделки по дате с детальной информацией
+     * @param date дата совершения сделки
+     * @return список сделок с полной информацией, отсортированный по убыванию стоимости
+     * @throws DatabaseException если произошла ошибка при работе с базой данных
+     */
+    public List<DealWithDetailsDto> findByDateWithDetails(LocalDate date) {
+        try {
+            return dealDao.findByDateWithDetails(date);
+        } catch (Exception e) {
+            RealEstateException re = ExceptionHandler.handleDatabaseException(e, "SELECT", "Deal", null);
+            ExceptionHandler.logException(re, "Ошибка при поиске сделок с детальной информацией по дате: " + date);
+            throw re;
+        }
+    }
+
+    /**
+     * Найти сделки в диапазоне дат с детальной информацией
+     * @param startDate начальная дата диапазона
+     * @param endDate конечная дата диапазона
+     * @return список сделок с полной информацией в указанном диапазоне дат, отсортированный по убыванию даты
+     * @throws ValidationException если диапазон дат указан некорректно
+     * @throws DatabaseException если произошла ошибка при работе с базой данных
+     */
+    public List<DealWithDetailsDto> findByDateRangeWithDetails(LocalDate startDate, LocalDate endDate) {
+        try {
+            return dealDao.findByDateRangeWithDetails(startDate, endDate);
+        } catch (Exception e) {
+            RealEstateException re = ExceptionHandler.handleDatabaseException(e, "SELECT", "Deal", null);
+            ExceptionHandler.logException(re, "Ошибка при поиске сделок с детальной информацией по диапазону дат: " + startDate + " - " + endDate);
+            throw re;
+        }
+    }
+
+    /**
+     * Найти сделки конкретного риелтора с детальной информацией
+     * @param realtorId идентификатор риелтора
+     * @return список сделок с полной информацией указанного риелтора, отсортированный по убыванию даты
+     * @throws DatabaseException если произошла ошибка при работе с базой данных
+     */
+    public List<DealWithDetailsDto> findByRealtorIdWithDetails(Long realtorId) {
+        try {
+            return dealDao.findByRealtorIdWithDetails(realtorId);
+        } catch (Exception e) {
+            RealEstateException re = ExceptionHandler.handleDatabaseException(e, "SELECT", "Deal", null);
+            ExceptionHandler.logException(re, "Ошибка при поиске сделок с детальной информацией по риелтору с id: " + realtorId);
+            throw re;
+        }
+    }
+
+    /**
+     * Найти сделки конкретного клиента с детальной информацией
+     * @param clientId идентификатор клиента
+     * @return список сделок с полной информацией указанного клиента, отсортированный по убыванию даты
+     * @throws DatabaseException если произошла ошибка при работе с базой данных
+     */
+    public List<DealWithDetailsDto> findByClientIdWithDetails(Long clientId) {
+        try {
+            return dealDao.findByClientIdWithDetails(clientId);
+        } catch (Exception e) {
+            RealEstateException re = ExceptionHandler.handleDatabaseException(e, "SELECT", "Deal", null);
+            ExceptionHandler.logException(re, "Ошибка при поиске сделок с детальной информацией по клиенту с id: " + clientId);
             throw re;
         }
     }

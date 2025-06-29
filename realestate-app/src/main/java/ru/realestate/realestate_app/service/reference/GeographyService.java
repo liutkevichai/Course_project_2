@@ -9,6 +9,10 @@ import ru.realestate.realestate_app.exception.RealEstateException;
 import ru.realestate.realestate_app.exception.ValidationException;
 import ru.realestate.realestate_app.exception.handler.ExceptionHandler;
 import ru.realestate.realestate_app.model.geography.*;
+import ru.realestate.realestate_app.model.dto.RegionWithDetailsDto;
+import ru.realestate.realestate_app.model.dto.CityWithDetailsDto;
+import ru.realestate.realestate_app.model.dto.DistrictWithDetailsDto;
+import ru.realestate.realestate_app.model.dto.StreetWithDetailsDto;
 
 import java.util.List;
 
@@ -452,7 +456,217 @@ public class GeographyService {
             return geographyDao.findStreetsByNamePattern(streetNamePattern);
         } catch (Exception e) {
             RealEstateException re = ExceptionHandler.handleDatabaseException(e, "SELECT", "Street", null);
-            ExceptionHandler.logException(re, "Ошибка при поиске улиц по паттерну названия: " + streetNamePattern);
+            ExceptionHandler.logException(re, "Ошибка при поиске улиц по шаблону названия: " + streetNamePattern);
+            throw re;
+        }
+    }
+
+    // ========== МЕТОДЫ ДЛЯ РАБОТЫ С DTO ==========
+
+    // ========== РЕГИОНЫ С ДЕТАЛЬНОЙ ИНФОРМАЦИЕЙ ==========
+
+    /**
+     * Получить все регионы с детальной информацией (включая данные о стране)
+     * Использует JOIN запросы для оптимизации производительности
+     * @return список всех регионов с полной информацией, отсортированный по названию
+     * @throws DatabaseException если произошла ошибка при работе с базой данных
+     */
+    public List<RegionWithDetailsDto> findAllRegionsWithDetails() {
+        try {
+            return geographyDao.findAllRegionsWithDetails();
+        } catch (Exception e) {
+            RealEstateException re = ExceptionHandler.handleDatabaseException(e, "SELECT", "Region", null);
+            ExceptionHandler.logException(re, "Ошибка при получении списка всех регионов с детальной информацией");
+            throw re;
+        }
+    }
+
+    /**
+     * Найти регион по идентификатору с детальной информацией
+     * Включает полную информацию о стране
+     * @param id идентификатор региона
+     * @return объект региона с детальной информацией
+     * @throws EntityNotFoundException если регион не найден
+     * @throws DatabaseException если произошла ошибка при работе с базой данных
+     */
+    public RegionWithDetailsDto findRegionByIdWithDetails(Long id) {
+        try {
+            return geographyDao.findRegionByIdWithDetails(id);
+        } catch (Exception e) {
+            RealEstateException re = ExceptionHandler.handleDatabaseException(e, "SELECT", "Region", id);
+            ExceptionHandler.logException(re, "Ошибка при поиске региона с детальной информацией по id: " + id);
+            throw re;
+        }
+    }
+
+    /**
+     * Найти регионы по стране с детальной информацией
+     * @param countryId идентификатор страны
+     * @return список регионов с полной информацией указанной страны, отсортированный по названию
+     * @throws DatabaseException если произошла ошибка при работе с базой данных
+     */
+    public List<RegionWithDetailsDto> findRegionsByCountryWithDetails(Long countryId) {
+        try {
+            return geographyDao.findRegionsByCountryWithDetails(countryId);
+        } catch (Exception e) {
+            RealEstateException re = ExceptionHandler.handleDatabaseException(e, "SELECT", "Region", null);
+            ExceptionHandler.logException(re, "Ошибка при поиске регионов с детальной информацией по стране с id: " + countryId);
+            throw re;
+        }
+    }
+
+    // ========== ГОРОДА С ДЕТАЛЬНОЙ ИНФОРМАЦИЕЙ ==========
+
+    /**
+     * Получить все города с детальной информацией (включая регион и страну)
+     * Использует JOIN запросы для оптимизации производительности
+     * @return список всех городов с полной географической иерархией, отсортированный по названию
+     * @throws DatabaseException если произошла ошибка при работе с базой данных
+     */
+    public List<CityWithDetailsDto> findAllCitiesWithDetails() {
+        try {
+            return geographyDao.findAllCitiesWithDetails();
+        } catch (Exception e) {
+            RealEstateException re = ExceptionHandler.handleDatabaseException(e, "SELECT", "City", null);
+            ExceptionHandler.logException(re, "Ошибка при получении списка всех городов с детальной информацией");
+            throw re;
+        }
+    }
+
+    /**
+     * Найти город по идентификатору с детальной информацией
+     * Включает полную географическую иерархию (регион и страна)
+     * @param id идентификатор города
+     * @return объект города с детальной информацией
+     * @throws EntityNotFoundException если город не найден
+     * @throws DatabaseException если произошла ошибка при работе с базой данных
+     */
+    public CityWithDetailsDto findCityByIdWithDetails(Long id) {
+        try {
+            return geographyDao.findCityByIdWithDetails(id);
+        } catch (Exception e) {
+            RealEstateException re = ExceptionHandler.handleDatabaseException(e, "SELECT", "City", id);
+            ExceptionHandler.logException(re, "Ошибка при поиске города с детальной информацией по id: " + id);
+            throw re;
+        }
+    }
+
+    /**
+     * Найти города по региону с детальной информацией
+     * @param regionId идентификатор региона
+     * @return список городов с полной информацией указанного региона, отсортированный по названию
+     * @throws DatabaseException если произошла ошибка при работе с базой данных
+     */
+    public List<CityWithDetailsDto> findCitiesByRegionWithDetails(Long regionId) {
+        try {
+            return geographyDao.findCitiesByRegionWithDetails(regionId);
+        } catch (Exception e) {
+            RealEstateException re = ExceptionHandler.handleDatabaseException(e, "SELECT", "City", null);
+            ExceptionHandler.logException(re, "Ошибка при поиске городов с детальной информацией по региону с id: " + regionId);
+            throw re;
+        }
+    }
+
+    // ========== РАЙОНЫ С ДЕТАЛЬНОЙ ИНФОРМАЦИЕЙ ==========
+
+    /**
+     * Получить все районы с детальной информацией (включая город, регион и страну)
+     * Использует JOIN запросы для оптимизации производительности
+     * @return список всех районов с полной географической иерархией, отсортированный по названию
+     * @throws DatabaseException если произошла ошибка при работе с базой данных
+     */
+    public List<DistrictWithDetailsDto> findAllDistrictsWithDetails() {
+        try {
+            return geographyDao.findAllDistrictsWithDetails();
+        } catch (Exception e) {
+            RealEstateException re = ExceptionHandler.handleDatabaseException(e, "SELECT", "District", null);
+            ExceptionHandler.logException(re, "Ошибка при получении списка всех районов с детальной информацией");
+            throw re;
+        }
+    }
+
+    /**
+     * Найти район по идентификатору с детальной информацией
+     * Включает полную географическую иерархию (город, регион и страна)
+     * @param id идентификатор района
+     * @return объект района с детальной информацией
+     * @throws EntityNotFoundException если район не найден
+     * @throws DatabaseException если произошла ошибка при работе с базой данных
+     */
+    public DistrictWithDetailsDto findDistrictByIdWithDetails(Long id) {
+        try {
+            return geographyDao.findDistrictByIdWithDetails(id);
+        } catch (Exception e) {
+            RealEstateException re = ExceptionHandler.handleDatabaseException(e, "SELECT", "District", id);
+            ExceptionHandler.logException(re, "Ошибка при поиске района с детальной информацией по id: " + id);
+            throw re;
+        }
+    }
+
+    /**
+     * Найти районы по городу с детальной информацией
+     * @param cityId идентификатор города
+     * @return список районов с полной информацией указанного города, отсортированный по названию
+     * @throws DatabaseException если произошла ошибка при работе с базой данных
+     */
+    public List<DistrictWithDetailsDto> findDistrictsByCityWithDetails(Long cityId) {
+        try {
+            return geographyDao.findDistrictsByCityWithDetails(cityId);
+        } catch (Exception e) {
+            RealEstateException re = ExceptionHandler.handleDatabaseException(e, "SELECT", "District", null);
+            ExceptionHandler.logException(re, "Ошибка при поиске районов с детальной информацией по городу с id: " + cityId);
+            throw re;
+        }
+    }
+
+    // ========== УЛИЦЫ С ДЕТАЛЬНОЙ ИНФОРМАЦИЕЙ ==========
+
+    /**
+     * Получить все улицы с детальной информацией (включая город, регион и страну)
+     * Использует JOIN запросы для оптимизации производительности
+     * @return список всех улиц с полной географической иерархией, отсортированный по названию
+     * @throws DatabaseException если произошла ошибка при работе с базой данных
+     */
+    public List<StreetWithDetailsDto> findAllStreetsWithDetails() {
+        try {
+            return geographyDao.findAllStreetsWithDetails();
+        } catch (Exception e) {
+            RealEstateException re = ExceptionHandler.handleDatabaseException(e, "SELECT", "Street", null);
+            ExceptionHandler.logException(re, "Ошибка при получении списка всех улиц с детальной информацией");
+            throw re;
+        }
+    }
+
+    /**
+     * Найти улицу по идентификатору с детальной информацией
+     * Включает полную географическую иерархию (город, регион и страна)
+     * @param id идентификатор улицы
+     * @return объект улицы с детальной информацией
+     * @throws EntityNotFoundException если улица не найдена
+     * @throws DatabaseException если произошла ошибка при работе с базой данных
+     */
+    public StreetWithDetailsDto findStreetByIdWithDetails(Long id) {
+        try {
+            return geographyDao.findStreetByIdWithDetails(id);
+        } catch (Exception e) {
+            RealEstateException re = ExceptionHandler.handleDatabaseException(e, "SELECT", "Street", id);
+            ExceptionHandler.logException(re, "Ошибка при поиске улицы с детальной информацией по id: " + id);
+            throw re;
+        }
+    }
+
+    /**
+     * Найти улицы по городу с детальной информацией
+     * @param cityId идентификатор города
+     * @return список улиц с полной информацией указанного города, отсортированный по названию
+     * @throws DatabaseException если произошла ошибка при работе с базой данных
+     */
+    public List<StreetWithDetailsDto> findStreetsByCityWithDetails(Long cityId) {
+        try {
+            return geographyDao.findStreetsByCityWithDetails(cityId);
+        } catch (Exception e) {
+            RealEstateException re = ExceptionHandler.handleDatabaseException(e, "SELECT", "Street", null);
+            ExceptionHandler.logException(re, "Ошибка при поиске улиц с детальной информацией по городу с id: " + cityId);
             throw re;
         }
     }

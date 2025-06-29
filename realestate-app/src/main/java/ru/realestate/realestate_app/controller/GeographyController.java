@@ -4,6 +4,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import ru.realestate.realestate_app.model.geography.*;
+import ru.realestate.realestate_app.model.dto.RegionWithDetailsDto;
+import ru.realestate.realestate_app.model.dto.CityWithDetailsDto;
+import ru.realestate.realestate_app.model.dto.DistrictWithDetailsDto;
+import ru.realestate.realestate_app.model.dto.StreetWithDetailsDto;
 import ru.realestate.realestate_app.service.reference.GeographyService;
 
 import java.util.List;
@@ -446,6 +450,208 @@ public class GeographyController {
     @GetMapping("/streets/search/by-name-pattern")
     public ResponseEntity<List<Street>> getStreetsByNamePattern(@RequestParam String pattern) {
         List<Street> streets = geographyService.findStreetsByNamePattern(pattern);
+        return ResponseEntity.ok(streets);
+    }
+
+    // ========== ENDPOINTS ДЛЯ РАБОТЫ С DTO ==========
+
+    // ========== РЕГИОНЫ С ДЕТАЛЬНОЙ ИНФОРМАЦИЕЙ ==========
+
+    /**
+     * Получить все регионы с детальной информацией (включая данные о стране)
+     * 
+     * HTTP метод: GET
+     * URL: /api/geography/regions/with-details
+     * 
+     * Возвращает регионы с полной информацией о стране.
+     * Использует JOIN запросы для оптимизации производительности
+     * 
+     * @return ResponseEntity со списком регионов с детальной информацией
+     */
+    @GetMapping("/regions/with-details")
+    public ResponseEntity<List<RegionWithDetailsDto>> getAllRegionsWithDetails() {
+        List<RegionWithDetailsDto> regions = geographyService.findAllRegionsWithDetails();
+        return ResponseEntity.ok(regions);
+    }
+
+    /**
+     * Получить регион с детальной информацией по идентификатору
+     * 
+     * HTTP метод: GET
+     * URL: /api/geography/regions/{id}/with-details (например: /api/geography/regions/1/with-details)
+     * 
+     * @param id идентификатор региона
+     * @return ResponseEntity с детальной информацией о регионе
+     */
+    @GetMapping("/regions/{id}/with-details")
+    public ResponseEntity<RegionWithDetailsDto> getRegionByIdWithDetails(@PathVariable Long id) {
+        RegionWithDetailsDto region = geographyService.findRegionByIdWithDetails(id);
+        return ResponseEntity.ok(region);
+    }
+
+    /**
+     * Получить регионы конкретной страны с детальной информацией
+     * 
+     * HTTP метод: GET
+     * URL: /api/geography/countries/{countryId}/regions/with-details
+     * (например: /api/geography/countries/1/regions/with-details)
+     * 
+     * @param countryId идентификатор страны
+     * @return ResponseEntity со списком регионов с детальной информацией указанной страны
+     */
+    @GetMapping("/countries/{countryId}/regions/with-details")
+    public ResponseEntity<List<RegionWithDetailsDto>> getRegionsByCountryWithDetails(@PathVariable Long countryId) {
+        List<RegionWithDetailsDto> regions = geographyService.findRegionsByCountryWithDetails(countryId);
+        return ResponseEntity.ok(regions);
+    }
+
+    // ========== ГОРОДА С ДЕТАЛЬНОЙ ИНФОРМАЦИЕЙ ==========
+
+    /**
+     * Получить все города с детальной информацией (включая регион и страну)
+     * 
+     * HTTP метод: GET
+     * URL: /api/geography/cities/with-details
+     * 
+     * Возвращает города с полной географической иерархией.
+     * Использует JOIN запросы для оптимизации производительности
+     * 
+     * @return ResponseEntity со списком городов с детальной информацией
+     */
+    @GetMapping("/cities/with-details")
+    public ResponseEntity<List<CityWithDetailsDto>> getAllCitiesWithDetails() {
+        List<CityWithDetailsDto> cities = geographyService.findAllCitiesWithDetails();
+        return ResponseEntity.ok(cities);
+    }
+
+    /**
+     * Получить город с детальной информацией по идентификатору
+     * 
+     * HTTP метод: GET
+     * URL: /api/geography/cities/{id}/with-details (например: /api/geography/cities/1/with-details)
+     * 
+     * @param id идентификатор города
+     * @return ResponseEntity с детальной информацией о городе
+     */
+    @GetMapping("/cities/{id}/with-details")
+    public ResponseEntity<CityWithDetailsDto> getCityByIdWithDetails(@PathVariable Long id) {
+        CityWithDetailsDto city = geographyService.findCityByIdWithDetails(id);
+        return ResponseEntity.ok(city);
+    }
+
+    /**
+     * Получить города конкретного региона с детальной информацией
+     * 
+     * HTTP метод: GET
+     * URL: /api/geography/regions/{regionId}/cities/with-details
+     * (например: /api/geography/regions/1/cities/with-details)
+     * 
+     * @param regionId идентификатор региона
+     * @return ResponseEntity со списком городов с детальной информацией указанного региона
+     */
+    @GetMapping("/regions/{regionId}/cities/with-details")
+    public ResponseEntity<List<CityWithDetailsDto>> getCitiesByRegionWithDetails(@PathVariable Long regionId) {
+        List<CityWithDetailsDto> cities = geographyService.findCitiesByRegionWithDetails(regionId);
+        return ResponseEntity.ok(cities);
+    }
+
+    // ========== РАЙОНЫ С ДЕТАЛЬНОЙ ИНФОРМАЦИЕЙ ==========
+
+    /**
+     * Получить все районы с детальной информацией (включая город, регион и страну)
+     * 
+     * HTTP метод: GET
+     * URL: /api/geography/districts/with-details
+     * 
+     * Возвращает районы с полной географической иерархией.
+     * Использует JOIN запросы для оптимизации производительности
+     * 
+     * @return ResponseEntity со списком районов с детальной информацией
+     */
+    @GetMapping("/districts/with-details")
+    public ResponseEntity<List<DistrictWithDetailsDto>> getAllDistrictsWithDetails() {
+        List<DistrictWithDetailsDto> districts = geographyService.findAllDistrictsWithDetails();
+        return ResponseEntity.ok(districts);
+    }
+
+    /**
+     * Получить район с детальной информацией по идентификатору
+     * 
+     * HTTP метод: GET
+     * URL: /api/geography/districts/{id}/with-details (например: /api/geography/districts/1/with-details)
+     * 
+     * @param id идентификатор района
+     * @return ResponseEntity с детальной информацией о районе
+     */
+    @GetMapping("/districts/{id}/with-details")
+    public ResponseEntity<DistrictWithDetailsDto> getDistrictByIdWithDetails(@PathVariable Long id) {
+        DistrictWithDetailsDto district = geographyService.findDistrictByIdWithDetails(id);
+        return ResponseEntity.ok(district);
+    }
+
+    /**
+     * Получить районы конкретного города с детальной информацией
+     * 
+     * HTTP метод: GET
+     * URL: /api/geography/cities/{cityId}/districts/with-details
+     * (например: /api/geography/cities/1/districts/with-details)
+     * 
+     * @param cityId идентификатор города
+     * @return ResponseEntity со списком районов с детальной информацией указанного города
+     */
+    @GetMapping("/cities/{cityId}/districts/with-details")
+    public ResponseEntity<List<DistrictWithDetailsDto>> getDistrictsByCityWithDetails(@PathVariable Long cityId) {
+        List<DistrictWithDetailsDto> districts = geographyService.findDistrictsByCityWithDetails(cityId);
+        return ResponseEntity.ok(districts);
+    }
+
+    // ========== УЛИЦЫ С ДЕТАЛЬНОЙ ИНФОРМАЦИЕЙ ==========
+
+    /**
+     * Получить все улицы с детальной информацией (включая город, регион и страну)
+     * 
+     * HTTP метод: GET
+     * URL: /api/geography/streets/with-details
+     * 
+     * Возвращает улицы с полной географической иерархией.
+     * Использует JOIN запросы для оптимизации производительности
+     * 
+     * @return ResponseEntity со списком улиц с детальной информацией
+     */
+    @GetMapping("/streets/with-details")
+    public ResponseEntity<List<StreetWithDetailsDto>> getAllStreetsWithDetails() {
+        List<StreetWithDetailsDto> streets = geographyService.findAllStreetsWithDetails();
+        return ResponseEntity.ok(streets);
+    }
+
+    /**
+     * Получить улицу с детальной информацией по идентификатору
+     * 
+     * HTTP метод: GET
+     * URL: /api/geography/streets/{id}/with-details (например: /api/geography/streets/1/with-details)
+     * 
+     * @param id идентификатор улицы
+     * @return ResponseEntity с детальной информацией об улице
+     */
+    @GetMapping("/streets/{id}/with-details")
+    public ResponseEntity<StreetWithDetailsDto> getStreetByIdWithDetails(@PathVariable Long id) {
+        StreetWithDetailsDto street = geographyService.findStreetByIdWithDetails(id);
+        return ResponseEntity.ok(street);
+    }
+
+    /**
+     * Получить улицы конкретного города с детальной информацией
+     * 
+     * HTTP метод: GET
+     * URL: /api/geography/cities/{cityId}/streets/with-details
+     * (например: /api/geography/cities/1/streets/with-details)
+     * 
+     * @param cityId идентификатор города
+     * @return ResponseEntity со списком улиц с детальной информацией указанного города
+     */
+    @GetMapping("/cities/{cityId}/streets/with-details")
+    public ResponseEntity<List<StreetWithDetailsDto>> getStreetsByCityWithDetails(@PathVariable Long cityId) {
+        List<StreetWithDetailsDto> streets = geographyService.findStreetsByCityWithDetails(cityId);
         return ResponseEntity.ok(streets);
     }
 } 

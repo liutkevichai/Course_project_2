@@ -2,7 +2,15 @@ package ru.realestate.realestate_app.dao.reference;
 
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
+import ru.realestate.realestate_app.mapper.dto.RegionWithDetailsRowMapper;
+import ru.realestate.realestate_app.mapper.dto.CityWithDetailsRowMapper;
+import ru.realestate.realestate_app.mapper.dto.DistrictWithDetailsRowMapper;
+import ru.realestate.realestate_app.mapper.dto.StreetWithDetailsRowMapper;
 import ru.realestate.realestate_app.model.geography.*;
+import ru.realestate.realestate_app.model.dto.RegionWithDetailsDto;
+import ru.realestate.realestate_app.model.dto.CityWithDetailsDto;
+import ru.realestate.realestate_app.model.dto.DistrictWithDetailsDto;
+import ru.realestate.realestate_app.model.dto.StreetWithDetailsDto;
 
 import java.util.List;
 
@@ -14,13 +22,29 @@ import java.util.List;
 public class GeographyDao {
 
     private final JdbcTemplate jdbcTemplate;
+    private final RegionWithDetailsRowMapper regionWithDetailsRowMapper;
+    private final CityWithDetailsRowMapper cityWithDetailsRowMapper;
+    private final DistrictWithDetailsRowMapper districtWithDetailsRowMapper;
+    private final StreetWithDetailsRowMapper streetWithDetailsRowMapper;
 
     /**
      * Конструктор DAO с инжекцией зависимостей
      * @param jdbcTemplate шаблон для выполнения SQL запросов
+     * @param regionWithDetailsRowMapper маппер для RegionWithDetailsDto
+     * @param cityWithDetailsRowMapper маппер для CityWithDetailsDto
+     * @param districtWithDetailsRowMapper маппер для DistrictWithDetailsDto
+     * @param streetWithDetailsRowMapper маппер для StreetWithDetailsDto
      */
-    public GeographyDao(JdbcTemplate jdbcTemplate) {
+    public GeographyDao(JdbcTemplate jdbcTemplate,
+                       RegionWithDetailsRowMapper regionWithDetailsRowMapper,
+                       CityWithDetailsRowMapper cityWithDetailsRowMapper,
+                       DistrictWithDetailsRowMapper districtWithDetailsRowMapper,
+                       StreetWithDetailsRowMapper streetWithDetailsRowMapper) {
         this.jdbcTemplate = jdbcTemplate;
+        this.regionWithDetailsRowMapper = regionWithDetailsRowMapper;
+        this.cityWithDetailsRowMapper = cityWithDetailsRowMapper;
+        this.districtWithDetailsRowMapper = districtWithDetailsRowMapper;
+        this.streetWithDetailsRowMapper = streetWithDetailsRowMapper;
     }
 
     // ========== СТРАНЫ ==========
@@ -468,6 +492,291 @@ public class GeographyDao {
             ),
             "%" + streetNamePattern + "%"
         );
+    }
+
+    // ========== МЕТОДЫ ДЛЯ РАБОТЫ С DTO ==========
+
+    /**
+     * Получить все регионы с детальной информацией (включая страну)
+     * @return список всех регионов с информацией о стране
+     */
+    public List<RegionWithDetailsDto> findAllRegionsWithDetails() {
+        String sql = """
+            SELECT 
+                r.id_region as region_id,
+                r.name as region_name,
+                r.code as region_code,
+                c.id_country as country_id,
+                c.country_name
+            FROM regions r
+            JOIN countries c ON r.id_country = c.id_country
+            ORDER BY r.name
+            """;
+        return jdbcTemplate.query(sql, regionWithDetailsRowMapper);
+    }
+
+    /**
+     * Найти регион с детальной информацией по идентификатору
+     * @param id идентификатор региона
+     * @return регион с информацией о стране
+     * @throws org.springframework.dao.EmptyResultDataAccessException если регион не найден
+     */
+    public RegionWithDetailsDto findRegionByIdWithDetails(Long id) {
+        String sql = """
+            SELECT 
+                r.id_region as region_id,
+                r.name as region_name,
+                r.code as region_code,
+                c.id_country as country_id,
+                c.country_name
+            FROM regions r
+            JOIN countries c ON r.id_country = c.id_country
+            WHERE r.id_region = ?
+            """;
+        return jdbcTemplate.queryForObject(sql, regionWithDetailsRowMapper, id);
+    }
+
+    /**
+     * Найти регионы по стране с детальной информацией
+     * @param countryId идентификатор страны
+     * @return список регионов с информацией о стране
+     */
+    public List<RegionWithDetailsDto> findRegionsByCountryWithDetails(Long countryId) {
+        String sql = """
+            SELECT 
+                r.id_region as region_id,
+                r.name as region_name,
+                r.code as region_code,
+                c.id_country as country_id,
+                c.country_name
+            FROM regions r
+            JOIN countries c ON r.id_country = c.id_country
+            WHERE r.id_country = ?
+            ORDER BY r.name
+            """;
+        return jdbcTemplate.query(sql, regionWithDetailsRowMapper, countryId);
+    }
+
+    /**
+     * Получить все города с детальной информацией (включая регион и страну)
+     * @return список всех городов с полной географической информацией
+     */
+    public List<CityWithDetailsDto> findAllCitiesWithDetails() {
+        String sql = """
+            SELECT 
+                c.id_city as city_id,
+                c.city_name,
+                r.id_region as region_id,
+                r.name as region_name,
+                r.code as region_code,
+                country.id_country as country_id,
+                country.country_name
+            FROM cities c
+            JOIN regions r ON c.id_region = r.id_region
+            JOIN countries country ON r.id_country = country.id_country
+            ORDER BY c.city_name
+            """;
+        return jdbcTemplate.query(sql, cityWithDetailsRowMapper);
+    }
+
+    /**
+     * Найти город с детальной информацией по идентификатору
+     * @param id идентификатор города
+     * @return город с полной географической информацией
+     * @throws org.springframework.dao.EmptyResultDataAccessException если город не найден
+     */
+    public CityWithDetailsDto findCityByIdWithDetails(Long id) {
+        String sql = """
+            SELECT 
+                c.id_city as city_id,
+                c.city_name,
+                r.id_region as region_id,
+                r.name as region_name,
+                r.code as region_code,
+                country.id_country as country_id,
+                country.country_name
+            FROM cities c
+            JOIN regions r ON c.id_region = r.id_region
+            JOIN countries country ON r.id_country = country.id_country
+            WHERE c.id_city = ?
+            """;
+        return jdbcTemplate.queryForObject(sql, cityWithDetailsRowMapper, id);
+    }
+
+    /**
+     * Найти города по региону с детальной информацией
+     * @param regionId идентификатор региона
+     * @return список городов с полной географической информацией
+     */
+    public List<CityWithDetailsDto> findCitiesByRegionWithDetails(Long regionId) {
+        String sql = """
+            SELECT 
+                c.id_city as city_id,
+                c.city_name,
+                r.id_region as region_id,
+                r.name as region_name,
+                r.code as region_code,
+                country.id_country as country_id,
+                country.country_name
+            FROM cities c
+            JOIN regions r ON c.id_region = r.id_region
+            JOIN countries country ON r.id_country = country.id_country
+            WHERE c.id_region = ?
+            ORDER BY c.city_name
+            """;
+        return jdbcTemplate.query(sql, cityWithDetailsRowMapper, regionId);
+    }
+
+    /**
+     * Получить все районы с детальной информацией (включая город, регион и страну)
+     * @return список всех районов с полной географической информацией
+     */
+    public List<DistrictWithDetailsDto> findAllDistrictsWithDetails() {
+        String sql = """
+            SELECT 
+                d.id_district as district_id,
+                d.district_name,
+                c.id_city as city_id,
+                c.city_name,
+                r.id_region as region_id,
+                r.name as region_name,
+                country.id_country as country_id,
+                country.country_name
+            FROM districts d
+            JOIN cities c ON d.id_city = c.id_city
+            JOIN regions r ON c.id_region = r.id_region
+            JOIN countries country ON r.id_country = country.id_country
+            ORDER BY d.district_name
+            """;
+        return jdbcTemplate.query(sql, districtWithDetailsRowMapper);
+    }
+
+    /**
+     * Найти район с детальной информацией по идентификатору
+     * @param id идентификатор района
+     * @return район с полной географической информацией
+     * @throws org.springframework.dao.EmptyResultDataAccessException если район не найден
+     */
+    public DistrictWithDetailsDto findDistrictByIdWithDetails(Long id) {
+        String sql = """
+            SELECT 
+                d.id_district as district_id,
+                d.district_name,
+                c.id_city as city_id,
+                c.city_name,
+                r.id_region as region_id,
+                r.name as region_name,
+                country.id_country as country_id,
+                country.country_name
+            FROM districts d
+            JOIN cities c ON d.id_city = c.id_city
+            JOIN regions r ON c.id_region = r.id_region
+            JOIN countries country ON r.id_country = country.id_country
+            WHERE d.id_district = ?
+            """;
+        return jdbcTemplate.queryForObject(sql, districtWithDetailsRowMapper, id);
+    }
+
+    /**
+     * Найти районы по городу с детальной информацией
+     * @param cityId идентификатор города
+     * @return список районов с полной географической информацией
+     */
+    public List<DistrictWithDetailsDto> findDistrictsByCityWithDetails(Long cityId) {
+        String sql = """
+            SELECT 
+                d.id_district as district_id,
+                d.district_name,
+                c.id_city as city_id,
+                c.city_name,
+                r.id_region as region_id,
+                r.name as region_name,
+                country.id_country as country_id,
+                country.country_name
+            FROM districts d
+            JOIN cities c ON d.id_city = c.id_city
+            JOIN regions r ON c.id_region = r.id_region
+            JOIN countries country ON r.id_country = country.id_country
+            WHERE d.id_city = ?
+            ORDER BY d.district_name
+            """;
+        return jdbcTemplate.query(sql, districtWithDetailsRowMapper, cityId);
+    }
+
+    /**
+     * Получить все улицы с детальной информацией (включая город, регион и страну)
+     * @return список всех улиц с полной географической информацией
+     */
+    public List<StreetWithDetailsDto> findAllStreetsWithDetails() {
+        String sql = """
+            SELECT 
+                s.id_street as street_id,
+                s.street_name,
+                c.id_city as city_id,
+                c.city_name,
+                r.id_region as region_id,
+                r.name as region_name,
+                country.id_country as country_id,
+                country.country_name
+            FROM streets s
+            JOIN cities c ON s.id_city = c.id_city
+            JOIN regions r ON c.id_region = r.id_region
+            JOIN countries country ON r.id_country = country.id_country
+            ORDER BY s.street_name
+            """;
+        return jdbcTemplate.query(sql, streetWithDetailsRowMapper);
+    }
+
+    /**
+     * Найти улицу с детальной информацией по идентификатору
+     * @param id идентификатор улицы
+     * @return улица с полной географической информацией
+     * @throws org.springframework.dao.EmptyResultDataAccessException если улица не найдена
+     */
+    public StreetWithDetailsDto findStreetByIdWithDetails(Long id) {
+        String sql = """
+            SELECT 
+                s.id_street as street_id,
+                s.street_name,
+                c.id_city as city_id,
+                c.city_name,
+                r.id_region as region_id,
+                r.name as region_name,
+                country.id_country as country_id,
+                country.country_name
+            FROM streets s
+            JOIN cities c ON s.id_city = c.id_city
+            JOIN regions r ON c.id_region = r.id_region
+            JOIN countries country ON r.id_country = country.id_country
+            WHERE s.id_street = ?
+            """;
+        return jdbcTemplate.queryForObject(sql, streetWithDetailsRowMapper, id);
+    }
+
+    /**
+     * Найти улицы по городу с детальной информацией
+     * @param cityId идентификатор города
+     * @return список улиц с полной географической информацией
+     */
+    public List<StreetWithDetailsDto> findStreetsByCityWithDetails(Long cityId) {
+        String sql = """
+            SELECT 
+                s.id_street as street_id,
+                s.street_name,
+                c.id_city as city_id,
+                c.city_name,
+                r.id_region as region_id,
+                r.name as region_name,
+                country.id_country as country_id,
+                country.country_name
+            FROM streets s
+            JOIN cities c ON s.id_city = c.id_city
+            JOIN regions r ON c.id_region = r.id_region
+            JOIN countries country ON r.id_country = country.id_country
+            WHERE s.id_city = ?
+            ORDER BY s.street_name
+            """;
+        return jdbcTemplate.query(sql, streetWithDetailsRowMapper, cityId);
     }
     
 } 
