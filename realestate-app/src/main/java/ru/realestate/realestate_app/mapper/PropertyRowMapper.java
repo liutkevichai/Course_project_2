@@ -27,12 +27,12 @@ public class PropertyRowMapper implements RowMapper<Property> {
         property.setApartmentNumber(rs.getString("apartment_number"));
         
         // Внешние ключи
-        property.setIdPropertyType(rs.getInt("id_property_type"));
-        property.setIdCountry(rs.getInt("id_country"));
-        property.setIdRegion(rs.getInt("id_region"));
-        property.setIdCity(rs.getInt("id_city"));
-        property.setIdDistrict(rs.getInt("id_district"));
-        property.setIdStreet(rs.getInt("id_street"));
+        property.setIdPropertyType(rs.getLong("id_property_type"));
+        property.setIdCountry(rs.getLong("id_country"));
+        property.setIdRegion(rs.getLong("id_region"));
+        property.setIdCity(rs.getLong("id_city"));
+        property.setIdDistrict(rs.getLong("id_district"));
+        property.setIdStreet(rs.getLong("id_street"));
         
         return property;
     }

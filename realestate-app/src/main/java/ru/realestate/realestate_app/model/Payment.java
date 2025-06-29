@@ -19,12 +19,12 @@ public class Payment {
     
     @NotNull(message = "Сделка обязательна для заполнения")
     @Positive(message = "ID сделки должен быть положительным")
-    private Integer idDeal;
+    private Long idDeal;
     
     // Конструкторы
     public Payment() {}
     
-    public Payment(Long idPayment, LocalDate paymentDate, BigDecimal amount, Integer idDeal) {
+    public Payment(Long idPayment, LocalDate paymentDate, BigDecimal amount, Long idDeal) {
         this.idPayment = idPayment;
         this.paymentDate = paymentDate;
         this.amount = amount;
@@ -56,11 +56,11 @@ public class Payment {
         this.amount = amount;
     }
     
-    public Integer getIdDeal() {
+    public Long getIdDeal() {
         return idDeal;
     }
     
-    public void setIdDeal(Integer idDeal) {
+    public void setIdDeal(Long idDeal) {
         this.idDeal = idDeal;
     }
     

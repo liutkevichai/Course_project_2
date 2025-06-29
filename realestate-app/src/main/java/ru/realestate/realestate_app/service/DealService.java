@@ -182,7 +182,7 @@ public class DealService {
      * @return список сделок указанного риелтора, отсортированный по убыванию даты
      * @throws DatabaseException если произошла ошибка при работе с базой данных
      */
-    public List<Deal> findByRealtorId(Integer realtorId) {
+    public List<Deal> findByRealtorId(Long realtorId) {
         try {
             return dealDao.findByRealtorId(realtorId);
         } catch (Exception e) {
@@ -198,7 +198,7 @@ public class DealService {
      * @return список сделок указанного клиента, отсортированный по убыванию даты
      * @throws DatabaseException если произошла ошибка при работе с базой данных
      */
-    public List<Deal> findByClientId(Integer clientId) {
+    public List<Deal> findByClientId(Long clientId) {
         try {
             return dealDao.findByClientId(clientId);
         } catch (Exception e) {
@@ -214,7 +214,7 @@ public class DealService {
      * @return список сделок по указанному объекту недвижимости, отсортированный по убыванию даты
      * @throws DatabaseException если произошла ошибка при работе с базой данных
      */
-    public List<Deal> findByPropertyId(Integer propertyId) {
+    public List<Deal> findByPropertyId(Long propertyId) {
         try {
             return dealDao.findByPropertyId(propertyId);
         } catch (Exception e) {
@@ -230,7 +230,7 @@ public class DealService {
      * @return список сделок указанного типа, отсортированный по убыванию даты
      * @throws DatabaseException если произошла ошибка при работе с базой данных
      */
-    public List<Deal> findByDealTypeId(Integer dealTypeId) {
+    public List<Deal> findByDealTypeId(Long dealTypeId) {
         try {
             return dealDao.findByDealTypeId(dealTypeId);
         } catch (Exception e) {
@@ -308,7 +308,7 @@ public class DealService {
     private void validateBusinessRules(Deal deal) {
         try {
             // Проверяем существование объекта недвижимости
-            Property property = propertyDao.findById(deal.getIdProperty().longValue());
+            Property property = propertyDao.findById(deal.getIdProperty());
             
             // Проверка: стоимость сделки ≤ стоимость объекта недвижимости
             if (deal.getDealCost().compareTo(property.getCost()) > 0) {
@@ -356,7 +356,7 @@ public class DealService {
             // Проверяем обновление стоимости
             if (updates.containsKey("dealCost")) {
                 BigDecimal newCost = (BigDecimal) updates.get("dealCost");
-                Property property = propertyDao.findById(currentDeal.getIdProperty().longValue());
+                Property property = propertyDao.findById(currentDeal.getIdProperty());
                 
                 if (newCost.compareTo(property.getCost()) > 0) {
                     throw new BusinessRuleException(

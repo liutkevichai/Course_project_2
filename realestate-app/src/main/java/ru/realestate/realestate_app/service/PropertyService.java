@@ -124,7 +124,7 @@ public class PropertyService {
      */
     public boolean deleteById(Long id) {
         // Проверяем, есть ли связанные сделки
-        if (hasRelatedDeals(id.intValue())) {
+        if (hasRelatedDeals(id)) {
             throw new BusinessRuleException(
                 "PROPERTY_HAS_RELATED_DEALS",
                 String.format("Нельзя удалить объект недвижимости с ID %d, так как у него есть связанные сделки", id)
@@ -164,7 +164,7 @@ public class PropertyService {
      * @return список объектов недвижимости в указанном городе, отсортированный по цене
      * @throws DatabaseException если произошла ошибка при работе с базой данных
      */
-    public List<Property> findByCityId(Integer cityId) {
+    public List<Property> findByCityId(Long cityId) {
         try {
             return propertyDao.findByCityId(cityId);
         } catch (Exception e) {
@@ -180,7 +180,7 @@ public class PropertyService {
      * @return список объектов недвижимости указанного типа, отсортированный по цене
      * @throws DatabaseException если произошла ошибка при работе с базой данных
      */
-    public List<Property> findByPropertyTypeId(Integer propertyTypeId) {
+    public List<Property> findByPropertyTypeId(Long propertyTypeId) {
         try {
             return propertyDao.findByPropertyTypeId(propertyTypeId);
         } catch (Exception e) {
@@ -211,7 +211,7 @@ public class PropertyService {
      * @return true если есть связанные сделки, false если нет
      * @throws DatabaseException если произошла ошибка при работе с базой данных
      */
-    public boolean hasRelatedDeals(Integer propertyId) {
+    public boolean hasRelatedDeals(Long propertyId) {
         try {
             return !dealDao.findByPropertyId(propertyId).isEmpty();
         } catch (Exception e) {

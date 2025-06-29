@@ -19,25 +19,25 @@ public class Deal {
     
     @NotNull(message = "Объект недвижимости обязателен для заполнения")
     @Positive(message = "ID объекта недвижимости должен быть положительным")
-    private Integer idProperty;
+    private Long idProperty;
     
     @NotNull(message = "Риелтор обязателен для заполнения")
     @Positive(message = "ID риелтора должен быть положительным")
-    private Integer idRealtor;
+    private Long idRealtor;
     
     @NotNull(message = "Клиент обязателен для заполнения")
     @Positive(message = "ID клиента должен быть положительным")
-    private Integer idClient;
+    private Long idClient;
     
     @NotNull(message = "Тип сделки обязателен для заполнения")
     @Positive(message = "ID типа сделки должен быть положительным")
-    private Integer idDealType;
+    private Long idDealType;
     
     // Конструкторы
     public Deal() {}
     
     public Deal(Long idDeal, LocalDate dealDate, BigDecimal dealCost, 
-               Integer idProperty, Integer idRealtor, Integer idClient, Integer idDealType) {
+               Long idProperty, Long idRealtor, Long idClient, Long idDealType) {
         this.idDeal = idDeal;
         this.dealDate = dealDate;
         this.dealCost = dealCost;
@@ -72,35 +72,35 @@ public class Deal {
         this.dealCost = dealCost;
     }
     
-    public Integer getIdProperty() {
+    public Long getIdProperty() {
         return idProperty;
     }
     
-    public void setIdProperty(Integer idProperty) {
+    public void setIdProperty(Long idProperty) {
         this.idProperty = idProperty;
     }
     
-    public Integer getIdRealtor() {
+    public Long getIdRealtor() {
         return idRealtor;
     }
     
-    public void setIdRealtor(Integer idRealtor) {
+    public void setIdRealtor(Long idRealtor) {
         this.idRealtor = idRealtor;
     }
     
-    public Integer getIdClient() {
+    public Long getIdClient() {
         return idClient;
     }
     
-    public void setIdClient(Integer idClient) {
+    public void setIdClient(Long idClient) {
         this.idClient = idClient;
     }
     
-    public Integer getIdDealType() {
+    public Long getIdDealType() {
         return idDealType;
     }
     
-    public void setIdDealType(Integer idDealType) {
+    public void setIdDealType(Long idDealType) {
         this.idDealType = idDealType;
     }
     

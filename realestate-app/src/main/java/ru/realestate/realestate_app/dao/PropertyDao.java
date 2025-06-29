@@ -16,7 +16,6 @@ import java.sql.Statement;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
-import java.lang.StringBuilder;
 
 /**
  * DAO класс для работы с объектами недвижимости
@@ -111,12 +110,12 @@ public class PropertyDao {
             ps.setString(6, property.getHouseLetter());
             ps.setString(7, property.getBuildingNumber());
             ps.setString(8, property.getApartmentNumber());
-            ps.setInt(9, property.getIdPropertyType());
-            ps.setInt(10, property.getIdCountry());
-            ps.setInt(11, property.getIdRegion());
-            ps.setInt(12, property.getIdCity());
-            ps.setInt(13, property.getIdDistrict());
-            ps.setInt(14, property.getIdStreet());
+            ps.setLong(9, property.getIdPropertyType());
+            ps.setLong(10, property.getIdCountry());
+            ps.setLong(11, property.getIdRegion());
+            ps.setLong(12, property.getIdCity());
+            ps.setLong(13, property.getIdDistrict());
+            ps.setLong(14, property.getIdStreet());
             
             return ps;
         }, keyHolder);
@@ -291,7 +290,7 @@ public class PropertyDao {
      * @param cityId идентификатор города
      * @return список объектов недвижимости в указанном городе, отсортированный по цене
      */
-    public List<Property> findByCityId(Integer cityId) {
+    public List<Property> findByCityId(Long cityId) {
         return jdbcTemplate.query(
             "SELECT * FROM properties WHERE id_city = ? ORDER BY cost",
             propertyRowMapper,
@@ -304,7 +303,7 @@ public class PropertyDao {
      * @param propertyTypeId идентификатор типа недвижимости
      * @return список объектов недвижимости указанного типа, отсортированный по цене
      */
-    public List<Property> findByPropertyTypeId(Integer propertyTypeId) {
+    public List<Property> findByPropertyTypeId(Long propertyTypeId) {
         return jdbcTemplate.query(
             "SELECT * FROM properties WHERE id_property_type = ? ORDER BY cost",
             propertyRowMapper,
@@ -465,7 +464,7 @@ public class PropertyDao {
     private void validateRelatedEntitiesForUpdate(Map<String, Object> updates) {
         // Проверка типа недвижимости
         if (updates.containsKey("idPropertyType")) {
-            Integer propertyTypeId = (Integer) updates.get("idPropertyType");
+            Long propertyTypeId = (Long) updates.get("idPropertyType");
             if (!propertyTypeExists(propertyTypeId)) {
                 logger.error("Попытка обновления объекта недвижимости с несуществующим типом: {}", propertyTypeId);
                 throw new DataIntegrityViolationException("Тип недвижимости с id " + propertyTypeId + " не найден");
@@ -474,7 +473,7 @@ public class PropertyDao {
         
         // Проверка страны
         if (updates.containsKey("idCountry")) {
-            Integer countryId = (Integer) updates.get("idCountry");
+            Long countryId = (Long) updates.get("idCountry");
             if (!countryExists(countryId)) {
                 logger.error("Попытка обновления объекта недвижимости с несуществующей страной: {}", countryId);
                 throw new DataIntegrityViolationException("Страна с id " + countryId + " не найдена");
@@ -483,7 +482,7 @@ public class PropertyDao {
         
         // Проверка региона
         if (updates.containsKey("idRegion")) {
-            Integer regionId = (Integer) updates.get("idRegion");
+            Long regionId = (Long) updates.get("idRegion");
             if (!regionExists(regionId)) {
                 logger.error("Попытка обновления объекта недвижимости с несуществующим регионом: {}", regionId);
                 throw new DataIntegrityViolationException("Регион с id " + regionId + " не найден");
@@ -492,7 +491,7 @@ public class PropertyDao {
         
         // Проверка города
         if (updates.containsKey("idCity")) {
-            Integer cityId = (Integer) updates.get("idCity");
+            Long cityId = (Long) updates.get("idCity");
             if (!cityExists(cityId)) {
                 logger.error("Попытка обновления объекта недвижимости с несуществующим городом: {}", cityId);
                 throw new DataIntegrityViolationException("Город с id " + cityId + " не найден");
@@ -501,7 +500,7 @@ public class PropertyDao {
         
         // Проверка района
         if (updates.containsKey("idDistrict")) {
-            Integer districtId = (Integer) updates.get("idDistrict");
+            Long districtId = (Long) updates.get("idDistrict");
             if (districtId != null && !districtExists(districtId)) {
                 logger.error("Попытка обновления объекта недвижимости с несуществующим районом: {}", districtId);
                 throw new DataIntegrityViolationException("Район с id " + districtId + " не найден");
@@ -510,7 +509,7 @@ public class PropertyDao {
         
         // Проверка улицы
         if (updates.containsKey("idStreet")) {
-            Integer streetId = (Integer) updates.get("idStreet");
+            Long streetId = (Long) updates.get("idStreet");
             if (!streetExists(streetId)) {
                 logger.error("Попытка обновления объекта недвижимости с несуществующей улицей: {}", streetId);
                 throw new DataIntegrityViolationException("Улица с id " + streetId + " не найдена");
@@ -523,7 +522,7 @@ public class PropertyDao {
      * @param propertyTypeId идентификатор типа недвижимости
      * @return true если тип недвижимости существует
      */
-    private boolean propertyTypeExists(Integer propertyTypeId) {
+    private boolean propertyTypeExists(Long propertyTypeId) {
         String sql = "SELECT COUNT(*) FROM property_types WHERE id_property_type = ?";
         Integer count = jdbcTemplate.queryForObject(sql, Integer.class, propertyTypeId);
         return count != null && count > 0;
@@ -534,7 +533,7 @@ public class PropertyDao {
      * @param countryId идентификатор страны
      * @return true если страна существует
      */
-    private boolean countryExists(Integer countryId) {
+    private boolean countryExists(Long countryId) {
         String sql = "SELECT COUNT(*) FROM countries WHERE id_country = ?";
         Integer count = jdbcTemplate.queryForObject(sql, Integer.class, countryId);
         return count != null && count > 0;
@@ -545,7 +544,7 @@ public class PropertyDao {
      * @param regionId идентификатор региона
      * @return true если регион существует
      */
-    private boolean regionExists(Integer regionId) {
+    private boolean regionExists(Long regionId) {
         String sql = "SELECT COUNT(*) FROM regions WHERE id_region = ?";
         Integer count = jdbcTemplate.queryForObject(sql, Integer.class, regionId);
         return count != null && count > 0;
@@ -556,7 +555,7 @@ public class PropertyDao {
      * @param cityId идентификатор города
      * @return true если город существует
      */
-    private boolean cityExists(Integer cityId) {
+    private boolean cityExists(Long cityId) {
         String sql = "SELECT COUNT(*) FROM cities WHERE id_city = ?";
         Integer count = jdbcTemplate.queryForObject(sql, Integer.class, cityId);
         return count != null && count > 0;
@@ -567,7 +566,7 @@ public class PropertyDao {
      * @param districtId идентификатор района
      * @return true если район существует
      */
-    private boolean districtExists(Integer districtId) {
+    private boolean districtExists(Long districtId) {
         String sql = "SELECT COUNT(*) FROM districts WHERE id_district = ?";
         Integer count = jdbcTemplate.queryForObject(sql, Integer.class, districtId);
         return count != null && count > 0;
@@ -578,7 +577,7 @@ public class PropertyDao {
      * @param streetId идентификатор улицы
      * @return true если улица существует
      */
-    private boolean streetExists(Integer streetId) {
+    private boolean streetExists(Long streetId) {
         String sql = "SELECT COUNT(*) FROM streets WHERE id_street = ?";
         Integer count = jdbcTemplate.queryForObject(sql, Integer.class, streetId);
         return count != null && count > 0;

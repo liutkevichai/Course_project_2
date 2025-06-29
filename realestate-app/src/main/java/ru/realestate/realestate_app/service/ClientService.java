@@ -130,7 +130,7 @@ public class ClientService {
      */
     public boolean deleteById(Long id) {
         // Проверяем, есть ли связанные сделки
-        if (hasRelatedDeals(id.intValue())) {
+        if (hasRelatedDeals(id)) {
             throw new BusinessRuleException(
                 "CLIENT_HAS_RELATED_DEALS",
                 String.format("Нельзя удалить клиента с ID %d, так как у него есть связанные сделки", id)
@@ -220,7 +220,7 @@ public class ClientService {
      * @return true если есть связанные сделки, false если нет
      * @throws DatabaseException если произошла ошибка при работе с базой данных
      */
-    public boolean hasRelatedDeals(Integer clientId) {
+    public boolean hasRelatedDeals(Long clientId) {
         try {
             return !dealDao.findByClientId(clientId).isEmpty();
         } catch (Exception e) {

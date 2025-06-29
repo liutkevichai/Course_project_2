@@ -199,7 +199,7 @@ public class PropertyController {
      * @return ResponseEntity со списком объектов недвижимости в указанном городе
      */
     @GetMapping("/search/by-city/{cityId}")
-    public ResponseEntity<List<Property>> getPropertiesByCityId(@PathVariable Integer cityId) {
+    public ResponseEntity<List<Property>> getPropertiesByCityId(@PathVariable Long cityId) {
         List<Property> properties = propertyService.findByCityId(cityId);
         return ResponseEntity.ok(properties);
     }
@@ -211,14 +211,14 @@ public class PropertyController {
      * URL: /api/properties/search/by-type/{propertyTypeId} 
      * (например: /api/properties/search/by-type/1 для поиска квартир)
      * 
-     * @PathVariable Integer propertyTypeId - извлекает значение {propertyTypeId} из URL
+     * @PathVariable Long propertyTypeId - извлекает значение {propertyTypeId} из URL
      * Результаты сортируются по цене в возрастающем порядке
      * 
      * @param propertyTypeId идентификатор типа недвижимости
      * @return ResponseEntity со списком объектов недвижимости указанного типа
      */
     @GetMapping("/search/by-type/{propertyTypeId}")
-    public ResponseEntity<List<Property>> getPropertiesByPropertyTypeId(@PathVariable Integer propertyTypeId) {
+    public ResponseEntity<List<Property>> getPropertiesByPropertyTypeId(@PathVariable Long propertyTypeId) {
         List<Property> properties = propertyService.findByPropertyTypeId(propertyTypeId);
         return ResponseEntity.ok(properties);
     }

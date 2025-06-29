@@ -25,7 +25,7 @@ public class PaymentRowMapper implements RowMapper<Payment> {
         payment.setPaymentDate(paymentDate.toLocalDate());
         
         payment.setAmount(rs.getBigDecimal("amount"));
-        payment.setIdDeal(rs.getInt("id_deal"));
+        payment.setIdDeal(rs.getLong("id_deal"));
         
         return payment;
     }

@@ -130,7 +130,7 @@ public class RealtorService {
      */
     public boolean deleteById(Long id) {
         // Проверяем, есть ли связанные сделки
-        if (hasRelatedDeals(id.intValue())) {
+        if (hasRelatedDeals(id)) {
             throw new BusinessRuleException(
                 "REALTOR_HAS_RELATED_DEALS",
                 String.format("Нельзя удалить риелтора с ID %d, так как у него есть связанные сделки", id)
@@ -237,7 +237,7 @@ public class RealtorService {
      * @return true если есть связанные сделки, false если нет
      * @throws DatabaseException если произошла ошибка при работе с базой данных
      */
-    public boolean hasRelatedDeals(Integer realtorId) {
+    public boolean hasRelatedDeals(Long realtorId) {
         try {
             return !dealDao.findByRealtorId(realtorId).isEmpty();
         } catch (Exception e) {

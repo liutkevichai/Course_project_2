@@ -45,27 +45,27 @@ public class Property {
     // Внешние ключи
     @NotNull(message = "Тип недвижимости обязателен для заполнения")
     @Positive(message = "ID типа недвижимости должен быть положительным")
-    private Integer idPropertyType;
+    private Long idPropertyType;
     
     @NotNull(message = "Страна обязательна для заполнения")
     @Positive(message = "ID страны должен быть положительным")
-    private Integer idCountry;
+    private Long idCountry;
     
     @NotNull(message = "Регион обязателен для заполнения")
     @Positive(message = "ID региона должен быть положительным")
-    private Integer idRegion;
+    private Long idRegion;
     
     @NotNull(message = "Город обязателен для заполнения")
     @Positive(message = "ID города должен быть положительным")
-    private Integer idCity;
+    private Long idCity;
     
     @NotNull(message = "Район обязателен для заполнения")
     @Positive(message = "ID района должен быть положительным")
-    private Integer idDistrict;
+    private Long idDistrict;
     
     @NotNull(message = "Улица обязательна для заполнения")
     @Positive(message = "ID улицы должен быть положительным")
-    private Integer idStreet;
+    private Long idStreet;
     
     // Конструкторы
     public Property() {}
@@ -157,51 +157,51 @@ public class Property {
         this.apartmentNumber = apartmentNumber;
     }
     
-    public Integer getIdPropertyType() {
+    public Long getIdPropertyType() {
         return idPropertyType;
     }
     
-    public void setIdPropertyType(Integer idPropertyType) {
+    public void setIdPropertyType(Long idPropertyType) {
         this.idPropertyType = idPropertyType;
     }
     
-    public Integer getIdCountry() {
+    public Long getIdCountry() {
         return idCountry;
     }
     
-    public void setIdCountry(Integer idCountry) {
+    public void setIdCountry(Long idCountry) {
         this.idCountry = idCountry;
     }
     
-    public Integer getIdRegion() {
+    public Long getIdRegion() {
         return idRegion;
     }
     
-    public void setIdRegion(Integer idRegion) {
+    public void setIdRegion(Long idRegion) {
         this.idRegion = idRegion;
     }
     
-    public Integer getIdCity() {
+    public Long getIdCity() {
         return idCity;
     }
     
-    public void setIdCity(Integer idCity) {
+    public void setIdCity(Long idCity) {
         this.idCity = idCity;
     }
     
-    public Integer getIdDistrict() {
+    public Long getIdDistrict() {
         return idDistrict;
     }
     
-    public void setIdDistrict(Integer idDistrict) {
+    public void setIdDistrict(Long idDistrict) {
         this.idDistrict = idDistrict;
     }
     
-    public Integer getIdStreet() {
+    public Long getIdStreet() {
         return idStreet;
     }
     
-    public void setIdStreet(Integer idStreet) {
+    public void setIdStreet(Long idStreet) {
         this.idStreet = idStreet;
     }
     

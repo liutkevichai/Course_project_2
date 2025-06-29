@@ -26,10 +26,10 @@ public class DealRowMapper implements RowMapper<Deal> {
         deal.setDealDate(dealDate.toLocalDate());
         
         deal.setDealCost(rs.getBigDecimal("deal_cost"));
-        deal.setIdProperty(rs.getInt("id_property"));
-        deal.setIdRealtor(rs.getInt("id_realtor"));
-        deal.setIdClient(rs.getInt("id_client"));
-        deal.setIdDealType(rs.getInt("id_deal_type"));
+        deal.setIdProperty(rs.getLong("id_property"));
+        deal.setIdRealtor(rs.getLong("id_realtor"));
+        deal.setIdClient(rs.getLong("id_client"));
+        deal.setIdDealType(rs.getLong("id_deal_type"));
         
         return deal;
     }

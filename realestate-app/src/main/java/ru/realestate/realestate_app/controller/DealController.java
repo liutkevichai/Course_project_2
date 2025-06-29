@@ -230,7 +230,7 @@ public class DealController {
      * @return ResponseEntity со списком сделок указанного риелтора
      */
     @GetMapping("/search/by-realtor/{realtorId}")
-    public ResponseEntity<List<Deal>> getDealsByRealtorId(@PathVariable Integer realtorId) {
+    public ResponseEntity<List<Deal>> getDealsByRealtorId(@PathVariable Long realtorId) {
         List<Deal> deals = dealService.findByRealtorId(realtorId);
         return ResponseEntity.ok(deals);
     }
@@ -247,7 +247,7 @@ public class DealController {
      * @return ResponseEntity со списком сделок указанного клиента
      */
     @GetMapping("/search/by-client/{clientId}")
-    public ResponseEntity<List<Deal>> getDealsByClientId(@PathVariable Integer clientId) {
+    public ResponseEntity<List<Deal>> getDealsByClientId(@PathVariable Long clientId) {
         List<Deal> deals = dealService.findByClientId(clientId);
         return ResponseEntity.ok(deals);
     }
@@ -264,7 +264,7 @@ public class DealController {
      * @return ResponseEntity со списком сделок по указанному объекту недвижимости
      */
     @GetMapping("/search/by-property/{propertyId}")
-    public ResponseEntity<List<Deal>> getDealsByPropertyId(@PathVariable Integer propertyId) {
+    public ResponseEntity<List<Deal>> getDealsByPropertyId(@PathVariable Long propertyId) {
         List<Deal> deals = dealService.findByPropertyId(propertyId);
         return ResponseEntity.ok(deals);
     }
@@ -281,7 +281,7 @@ public class DealController {
      * @return ResponseEntity со списком сделок указанного типа
      */
     @GetMapping("/search/by-type/{dealTypeId}")
-    public ResponseEntity<List<Deal>> getDealsByDealTypeId(@PathVariable Integer dealTypeId) {
+    public ResponseEntity<List<Deal>> getDealsByDealTypeId(@PathVariable Long dealTypeId) {
         List<Deal> deals = dealService.findByDealTypeId(dealTypeId);
         return ResponseEntity.ok(deals);
     }

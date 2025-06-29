@@ -101,10 +101,10 @@ public class DealDao {
             
             ps.setDate(1, java.sql.Date.valueOf(deal.getDealDate()));
             ps.setBigDecimal(2, deal.getDealCost());
-            ps.setInt(3, deal.getIdProperty());
-            ps.setInt(4, deal.getIdRealtor());
-            ps.setInt(5, deal.getIdClient());
-            ps.setInt(6, deal.getIdDealType());
+            ps.setLong(3, deal.getIdProperty());
+            ps.setLong(4, deal.getIdRealtor());
+            ps.setLong(5, deal.getIdClient());
+            ps.setLong(6, deal.getIdDealType());
             
             return ps;
         }, keyHolder);
@@ -279,7 +279,7 @@ public class DealDao {
      * @return список сделок указанного риелтора, отсортированный по убыванию даты
      * @throws IllegalArgumentException если realtorId равен null
      */
-    public List<Deal> findByRealtorId(Integer realtorId) {
+    public List<Deal> findByRealtorId(Long realtorId) {
         // Валидация входного параметра
         if (realtorId == null) {
             logger.error("Попытка поиска сделок с null id риелтора");
@@ -299,7 +299,7 @@ public class DealDao {
      * @param clientId идентификатор клиента
      * @return список сделок указанного клиента, отсортированный по убыванию даты
      */
-    public List<Deal> findByClientId(Integer clientId) {
+    public List<Deal> findByClientId(Long clientId) {
         return jdbcTemplate.query(
             "SELECT * FROM deals WHERE id_client = ? ORDER BY deal_date DESC",
             dealRowMapper,
@@ -312,7 +312,7 @@ public class DealDao {
      * @param propertyId идентификатор объекта недвижимости
      * @return список сделок по указанному объекту недвижимости, отсортированный по убыванию даты
      */
-    public List<Deal> findByPropertyId(Integer propertyId) {
+    public List<Deal> findByPropertyId(Long propertyId) {
         return jdbcTemplate.query(
             "SELECT * FROM deals WHERE id_property = ? ORDER BY deal_date DESC",
             dealRowMapper,
@@ -325,7 +325,7 @@ public class DealDao {
      * @param dealTypeId идентификатор типа сделки
      * @return список сделок указанного типа, отсортированный по убыванию даты
      */
-    public List<Deal> findByDealTypeId(Integer dealTypeId) {
+    public List<Deal> findByDealTypeId(Long dealTypeId) {
         return jdbcTemplate.query(
             "SELECT * FROM deals WHERE id_deal_type = ? ORDER BY deal_date DESC",
             dealRowMapper,
@@ -491,7 +491,7 @@ public class DealDao {
     private void validateRelatedEntitiesForUpdate(Map<String, Object> updates) {
         // Проверка объекта недвижимости
         if (updates.containsKey("idProperty")) {
-            Integer propertyId = (Integer) updates.get("idProperty");
+            Long propertyId = (Long) updates.get("idProperty");
             if (!propertyExists(propertyId)) {
                 logger.error("Попытка обновления сделки с несуществующим объектом недвижимости: {}", propertyId);
                 throw new DataIntegrityViolationException("Объект недвижимости с id " + propertyId + " не найден");
@@ -500,7 +500,7 @@ public class DealDao {
         
         // Проверка риелтора
         if (updates.containsKey("idRealtor")) {
-            Integer realtorId = (Integer) updates.get("idRealtor");
+            Long realtorId = (Long) updates.get("idRealtor");
             if (!realtorExists(realtorId)) {
                 logger.error("Попытка обновления сделки с несуществующим риелтором: {}", realtorId);
                 throw new DataIntegrityViolationException("Риелтор с id " + realtorId + " не найден");
@@ -509,7 +509,7 @@ public class DealDao {
         
         // Проверка клиента
         if (updates.containsKey("idClient")) {
-            Integer clientId = (Integer) updates.get("idClient");
+            Long clientId = (Long) updates.get("idClient");
             if (!clientExists(clientId)) {
                 logger.error("Попытка обновления сделки с несуществующим клиентом: {}", clientId);
                 throw new DataIntegrityViolationException("Клиент с id " + clientId + " не найден");
@@ -518,7 +518,7 @@ public class DealDao {
         
         // Проверка типа сделки
         if (updates.containsKey("idDealType")) {
-            Integer dealTypeId = (Integer) updates.get("idDealType");
+            Long dealTypeId = (Long) updates.get("idDealType");
             if (!dealTypeExists(dealTypeId)) {
                 logger.error("Попытка обновления сделки с несуществующим типом: {}", dealTypeId);
                 throw new DataIntegrityViolationException("Тип сделки с id " + dealTypeId + " не найден");
@@ -531,7 +531,7 @@ public class DealDao {
      * @param propertyId идентификатор объекта недвижимости
      * @return true если объект недвижимости существует
      */
-    private boolean propertyExists(Integer propertyId) {
+    private boolean propertyExists(Long propertyId) {
         String sql = "SELECT COUNT(*) FROM properties WHERE id_property = ?";
         Integer count = jdbcTemplate.queryForObject(sql, Integer.class, propertyId);
         return count != null && count > 0;
@@ -542,7 +542,7 @@ public class DealDao {
      * @param realtorId идентификатор риелтора
      * @return true если риелтор существует
      */
-    private boolean realtorExists(Integer realtorId) {
+    private boolean realtorExists(Long realtorId) {
         String sql = "SELECT COUNT(*) FROM realtors WHERE id_realtor = ?";
         Integer count = jdbcTemplate.queryForObject(sql, Integer.class, realtorId);
         return count != null && count > 0;
@@ -553,7 +553,7 @@ public class DealDao {
      * @param clientId идентификатор клиента
      * @return true если клиент существует
      */
-    private boolean clientExists(Integer clientId) {
+    private boolean clientExists(Long clientId) {
         String sql = "SELECT COUNT(*) FROM clients WHERE id_client = ?";
         Integer count = jdbcTemplate.queryForObject(sql, Integer.class, clientId);
         return count != null && count > 0;
@@ -564,7 +564,7 @@ public class DealDao {
      * @param dealTypeId идентификатор типа сделки
      * @return true если тип сделки существует
      */
-    private boolean dealTypeExists(Integer dealTypeId) {
+    private boolean dealTypeExists(Long dealTypeId) {
         String sql = "SELECT COUNT(*) FROM deal_types WHERE id_deal_type = ?";
         Integer count = jdbcTemplate.queryForObject(sql, Integer.class, dealTypeId);
         return count != null && count > 0;
