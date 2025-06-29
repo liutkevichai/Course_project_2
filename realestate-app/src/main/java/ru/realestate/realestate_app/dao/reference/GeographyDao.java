@@ -1,4 +1,4 @@
-package ru.realestate.realestate_app.dao;
+package ru.realestate.realestate_app.dao.reference;
 
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;

@@ -1,8 +1,8 @@
-package ru.realestate.realestate_app.service;
+package ru.realestate.realestate_app.service.reference;
 
 import org.springframework.stereotype.Service;
 
-import ru.realestate.realestate_app.dao.DealTypeDao;
+import ru.realestate.realestate_app.dao.reference.DealTypeDao;
 import ru.realestate.realestate_app.exception.DatabaseException;
 import ru.realestate.realestate_app.exception.EntityNotFoundException;
 import ru.realestate.realestate_app.exception.RealEstateException;
