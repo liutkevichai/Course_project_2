@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>БД Агентство недвижимости</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/style.css}">
+</head>
+<body>
+    <!-- Фрагмент заголовка -->
+    <header th:fragment="header">
+        <h1>БД Агентство недвижимости</h1>
+    </header>
+
+    <!-- Фрагмент боковой панели -->
+    <aside th:fragment="sidebar">
+        <nav>
+            <ul>
+                <li><a th:href="@{/clients}">Клиенты</a></li>
+                <li><a th:href="@{/properties}">Недвижимость</a></li>
+                <li><a th:href="@{/realtors}">Риелторы</a></li>
+                <li><a th:href="@{/deals}">Сделки</a></li>
+                <li><a th:href="@{/references}">Справочники</a></li>
+            </ul>
+        </nav>
+    </aside>
+
+    <!-- Основное содержиме -->
+    <main th:fragment="content-placeholder">
+        <!-- Здесь будет вставлено содержимое, специфичное для страницы -->
+    </main>
+</body>
+</html>
