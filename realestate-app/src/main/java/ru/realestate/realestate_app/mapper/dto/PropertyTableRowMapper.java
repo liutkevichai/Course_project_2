@@ -35,6 +35,8 @@ public class PropertyTableRowMapper implements RowMapper<PropertyTableDto> {
         dto.setCost(rs.getBigDecimal("cost"));
         dto.setShortDescription(rs.getString("short_description"));
         dto.setHouseNumber(rs.getString("house_number"));
+        dto.setHouseLetter(rs.getString("house_letter"));
+        dto.setBuildingNumber(rs.getString("building_number"));
         dto.setApartmentNumber(rs.getString("apartment_number"));
         
         // Тип недвижимости

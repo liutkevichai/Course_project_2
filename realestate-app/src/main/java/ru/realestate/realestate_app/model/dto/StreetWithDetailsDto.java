@@ -108,7 +108,7 @@ public class StreetWithDetailsDto {
         }
         
         if (regionName != null) {
-            if (locationInfo.length() > 0) locationInfo.append(", ");
+            if (!locationInfo.isEmpty()) locationInfo.append(", ");
             
             // Сокращаем название региона
             String regionShort = regionName;
@@ -121,8 +121,8 @@ public class StreetWithDetailsDto {
             locationInfo.append(regionShort);
         }
         
-        if (locationInfo.length() > 0) {
-            if (fullName.length() > 0) fullName.append(" ");
+        if (!locationInfo.isEmpty()) {
+            if (!fullName.isEmpty()) fullName.append(" ");
             fullName.append("(").append(locationInfo).append(")");
         }
         
@@ -200,7 +200,7 @@ public class StreetWithDetailsDto {
         }
         
         if (regionName != null) {
-            if (cityInfo.length() > 0) cityInfo.append(" ");
+            if (!cityInfo.isEmpty()) cityInfo.append(" ");
             
             // Сокращаем название региона
             String regionShort = regionName;
@@ -213,7 +213,7 @@ public class StreetWithDetailsDto {
             cityInfo.append("(").append(regionShort).append(")");
         }
         
-        return cityInfo.length() > 0 ? cityInfo.toString() : "Город не указан";
+        return !cityInfo.isEmpty() ? cityInfo.toString() : "Город не указан";
     }
     
     /**
@@ -229,17 +229,17 @@ public class StreetWithDetailsDto {
         }
         
         if (regionName != null) {
-            if (path.length() > 0) path.append(" / ");
+            if (!path.isEmpty()) path.append(" / ");
             path.append(regionName);
         }
         
         if (cityName != null) {
-            if (path.length() > 0) path.append(" / ");
+            if (!path.isEmpty()) path.append(" / ");
             path.append(cityName);
         }
         
         if (streetName != null) {
-            if (path.length() > 0) path.append(" / ");
+            if (!path.isEmpty()) path.append(" / ");
             path.append(getShortName());
         }
         
@@ -259,7 +259,7 @@ public class StreetWithDetailsDto {
         }
         
         if (streetName != null) {
-            if (path.length() > 0) path.append(" / ");
+            if (!path.isEmpty()) path.append(" / ");
             path.append(getShortName());
         }
         
@@ -279,7 +279,7 @@ public class StreetWithDetailsDto {
         }
         
         if (cityName != null) {
-            if (mapName.length() > 0) mapName.append(", ");
+            if (!mapName.isEmpty()) mapName.append(", ");
             mapName.append(cityName);
         }
         
@@ -299,12 +299,12 @@ public class StreetWithDetailsDto {
         }
         
         if (cityName != null) {
-            if (searchName.length() > 0) searchName.append(", ");
+            if (!searchName.isEmpty()) searchName.append(", ");
             searchName.append(cityName);
         }
         
         if (regionName != null && !regionName.equals(cityName)) {
-            if (searchName.length() > 0) searchName.append(", ");
+            if (!searchName.isEmpty()) searchName.append(", ");
             
             // Сокращаем название региона для экономии места
             String regionShort = regionName;

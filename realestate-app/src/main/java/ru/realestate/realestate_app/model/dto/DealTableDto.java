@@ -165,12 +165,12 @@ public class DealTableDto {
         for (String part : parts) {
             part = part.trim();
             if (part.startsWith("ул.") || part.startsWith("д.")) {
-                if (shortAddress.length() > 0) shortAddress.append(", ");
+                if (!shortAddress.isEmpty()) shortAddress.append(", ");
                 shortAddress.append(part);
             }
         }
         
-        return shortAddress.length() > 0 ? shortAddress.toString() : propertyAddress;
+        return !shortAddress.isEmpty() ? shortAddress.toString() : propertyAddress;
     }
     
     /**

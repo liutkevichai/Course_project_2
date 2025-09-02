@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{_layout :: head}">
+</head>
+<body>
+    <div th:replace="~{_layout :: header}"></div>
+    <div th:replace="~{_layout :: sidebar}"></div>
+    
+    <main>
+        <h1 th:text="${pageTitle}">Риелторы</h1>
+        
+        <!-- Форма "Добавить запись" -->
+        <section>
+            <h2>Добавить запись</h2>
+            <form th:action="@{/realtors/add}" method="post">
+                <div>
+                    <label for="firstName">Имя:</label>
+                    <input type="text" id="firstName" name="firstName" required>
+                </div>
+                <div>
+                    <label for="lastName">Фамилия:</label>
+                    <input type="text" id="lastName" name="lastName" required>
+                </div>
+                <div>
+                    <label for="middleName">Отчество:</label>
+                    <input type="text" id="middleName" name="middleName">
+                </div>
+                <div>
+                    <label for="phone">Телефон:</label>
+                    <input type="text" id="phone" name="phone" required>
+                </div>
+                <div>
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" name="email">
+                </div>
+                <div>
+                    <label for="experienceYears">Опыт работы (лет):</label>
+                    <input type="number" id="experienceYears" name="experienceYears" min="0" max="50" required>
+                </div>
+                <button type="submit">Добавить</button>
+            </form>
+        </section>
+        
+        <!-- Форма "Найти запись" -->
+        <section>
+            <h2>Найти запись</h2>
+            <form th:action="@{/realtors/search}" method="get">
+                <div>
+                    <label for="searchLastName">Фамилия:</label>
+                    <input type="text" id="searchLastName" name="lastName">
+                </div>
+                <div>
+                    <label for="searchPhone">Телефон:</label>
+                    <input type="text" id="searchPhone" name="phone">
+                </div>
+                <div>
+                    <label for="searchEmail">Email:</label>
+                    <input type="text" id="searchEmail" name="email">
+                </div>
+                <div>
+                    <label for="searchExperienceYears">Опыт работы (лет):</label>
+                    <input type="number" id="searchExperienceYears" name="experienceYears" min="0" max="50">
+                </div>
+                <button type="submit">Поиск</button>
+            </form>
+        </section>
+        
+        <!-- Таблица риелторов -->
+        <section>
+            <h2>Список риелторов</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Имя</th>
+                        <th>Фамилия</th>
+                        <th>Телефон</th>
+                        <th>Email</th>
+                        <th>Опыт (лет)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="realtor : ${realtors}">
+                        <td th:text="${realtor.idRealtor}"></td>
+                        <td th:text="${realtor.firstName}"></td>
+                        <td th:text="${realtor.lastName}"></td>
+                        <td th:text="${realtor.phone}"></td>
+                        <td th:text="${realtor.email}"></td>
+                        <td th:text="${realtor.experienceYears}"></td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <!-- Количество записей -->
+            <p>Всего записей: <span th:text="${#lists.size(realtors)}">0</span></p>
+        </section>
+    </main>
+    
+    <div th:replace="~{_layout :: footer}"></div>
+</body>
+</html>

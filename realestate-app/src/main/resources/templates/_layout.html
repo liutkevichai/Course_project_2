@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head>
+<head th:fragment="head">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>БД Агентство недвижимости</title>
@@ -9,7 +9,7 @@
 <body>
     <!-- Фрагмент заголовка -->
     <header th:fragment="header">
-        <h1>БД Агентство недвижимости</h1>
+        <h1><a th:href="@{/}">БД Агентство недвижимости</a></h1>
     </header>
 
     <!-- Фрагмент боковой панели -->
@@ -20,7 +20,18 @@
                 <li><a th:href="@{/properties}">Недвижимость</a></li>
                 <li><a th:href="@{/realtors}">Риелторы</a></li>
                 <li><a th:href="@{/deals}">Сделки</a></li>
-                <li><a th:href="@{/references}">Справочники</a></li>
+                <li>
+                    <div class="dropdown">
+                        <button class="dropdown-toggle">Справочники</button>
+                        <div class="dropdown-menu">
+                            <a th:href="@{/reference/deal-types}">Типы сделок</a>
+                            <a th:href="@{/reference/property-types}">Типы недвижимости</a>
+                            <a th:href="@{/reference/countries}">Страны</a>
+                            <a th:href="@{/reference/regions}">Регионы</a>
+                            <a th:href="@{/reference/cities}">Города</a>
+                        </div>
+                    </div>
+                </li>
             </ul>
         </nav>
     </aside>
@@ -29,5 +40,10 @@
     <main th:fragment="content-placeholder">
         <!-- Здесь будет вставлено содержимое, специфичное для страницы -->
     </main>
+    
+    <!-- Фрагмент подвала с подключением JavaScript -->
+    <footer th:fragment="footer">
+        <script th:src="@{/js/main.js}"></script>
+    </footer>
 </body>
 </html>

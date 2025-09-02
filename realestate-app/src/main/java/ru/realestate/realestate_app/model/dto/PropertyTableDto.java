@@ -63,6 +63,16 @@ public class PropertyTableDto {
      * Номер квартиры (может быть null для домов)
      */
     private String apartmentNumber;
+
+    /**
+     * Литера дома (может быть null)
+     */
+    private String houseLetter;
+
+    /**
+     * Номер корпуса (может быть null)
+     */
+    private String buildingNumber;
     
     // ========== КОНСТРУКТОРЫ ==========
     
@@ -86,8 +96,8 @@ public class PropertyTableDto {
      * @param apartmentNumber номер квартиры
      */
     public PropertyTableDto(Long propertyId, String propertyTypeName, BigDecimal area, BigDecimal cost,
-                           String shortDescription, String cityName, String districtName, 
-                           String streetName, String houseNumber, String apartmentNumber) {
+                           String shortDescription, String cityName, String districtName,
+                           String streetName, String houseNumber, String houseLetter, String buildingNumber, String apartmentNumber) {
         this.propertyId = propertyId;
         this.propertyTypeName = propertyTypeName;
         this.area = area;
@@ -97,6 +107,8 @@ public class PropertyTableDto {
         this.districtName = districtName;
         this.streetName = streetName;
         this.houseNumber = houseNumber;
+        this.houseLetter = houseLetter;
+        this.buildingNumber = buildingNumber;
         this.apartmentNumber = apartmentNumber;
     }
     
@@ -117,16 +129,26 @@ public class PropertyTableDto {
         
         // Добавляем номер дома
         if (houseNumber != null) {
-            if (address.length() > 0) address.append(", ");
+            if (!address.isEmpty()) address.append(", ");
             address.append(houseNumber);
-            
+
+            // Добавляем литеру дома если есть
+            if (houseLetter != null) {
+                address.append(houseLetter);
+            }
+
+            // Добавляем корпус если есть
+            if (buildingNumber != null) {
+                address.append("к").append(buildingNumber);
+            }
+
             // Добавляем квартиру через дефис для компактности
             if (apartmentNumber != null) {
                 address.append("-").append(apartmentNumber);
             }
         }
         
-        return address.length() > 0 ? address.toString() : "Адрес не указан";
+        return !address.isEmpty() ? address.toString() : "Адрес не указан";
     }
     
     /**
@@ -142,11 +164,11 @@ public class PropertyTableDto {
         }
         
         if (districtName != null) {
-            if (location.length() > 0) location.append(", ");
+            if (!location.isEmpty()) location.append(", ");
             location.append(districtName).append(" р-н");
         }
         
-        return location.length() > 0 ? location.toString() : "Местоположение не указано";
+        return !location.isEmpty() ? location.toString() : "Местоположение не указано";
     }
     
     /**
@@ -213,12 +235,12 @@ public class PropertyTableDto {
         }
         
         if (area != null) {
-            if (summary.length() > 0) summary.append(", ");
+            if (!summary.isEmpty()) summary.append(", ");
             summary.append(getAreaFormatted());
         }
         
         if (cost != null) {
-            if (summary.length() > 0) summary.append(", ");
+            if (!summary.isEmpty()) summary.append(", ");
             summary.append(getCostFormatted());
         }
         
@@ -241,42 +263,6 @@ public class PropertyTableDto {
         }
         
         return description.substring(0, 47) + "...";
-    }
-    
-    /**
-     * Получить CSS класс для типа недвижимости (для стилизации в веб-интерфейсе)
-     * 
-     * @return CSS класс в зависимости от типа недвижимости
-     */
-    public String getPropertyTypeClass() {
-        if (propertyTypeName == null) return "property-unknown";
-        
-        return switch (propertyTypeName.toLowerCase()) {
-            case "квартира" -> "property-apartment";
-            case "дом" -> "property-house";
-            case "офис" -> "property-office";
-            case "склад" -> "property-warehouse";
-            case "магазин" -> "property-shop";
-            case "гараж" -> "property-garage";
-            case "участок" -> "property-land";
-            default -> "property-other";
-        };
-    }
-    
-    /**
-     * Получить цветовую категорию цены (для визуализации)
-     * 
-     * @return категория цены: "low", "medium", "high", "premium"
-     */
-    public String getPriceCategory() {
-        if (cost == null) return "unknown";
-        
-        long costLong = cost.longValue();
-        
-        if (costLong < 3_000_000) return "low";           // до 3 млн
-        if (costLong < 7_000_000) return "medium";        // 3-7 млн
-        if (costLong < 15_000_000) return "high";         // 7-15 млн
-        return "premium";                                  // свыше 15 млн
     }
     
     // ========== ГЕТТЕРЫ И СЕТТЕРЫ ==========
@@ -360,4 +346,20 @@ public class PropertyTableDto {
     public void setApartmentNumber(String apartmentNumber) {
         this.apartmentNumber = apartmentNumber;
     }
-} 
+
+    public String getHouseLetter() {
+        return houseLetter;
+    }
+
+    public void setHouseLetter(String houseLetter) {
+        this.houseLetter = houseLetter;
+    }
+
+    public String getBuildingNumber() {
+        return buildingNumber;
+    }
+
+    public void setBuildingNumber(String buildingNumber) {
+        this.buildingNumber = buildingNumber;
+    }
+}

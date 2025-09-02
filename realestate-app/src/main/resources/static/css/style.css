@@ -25,6 +25,18 @@ header h1 {
     text-align: center;
 }
 
+header h1 a {
+    color: white;
+    text-decoration: none;
+}
+
+header h1 a:hover,
+header h1 a:active,
+header h1 a:visited {
+    color: white;
+    text-decoration: none;
+}
+
 /* Стили боковой панели */
 aside {
     background-color: #34495e;
@@ -184,4 +196,53 @@ button.danger:hover, .btn.danger:hover {
         margin-left: 0;
         margin-top: 0;
     }
+}
+
+/* Стили для выпадающего меню */
+.dropdown {
+    position: relative;
+}
+
+.dropdown-toggle {
+    display: block;
+    color: white;
+    text-decoration: none;
+    padding: 1rem;
+    background-color: #34495e;
+    border: none;
+    width: 100%;
+    text-align: left;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 1rem;
+}
+
+.dropdown-toggle:hover {
+    background-color: #2c3e50;
+}
+
+.dropdown-menu {
+    display: none;
+    background-color: #2c3e50;
+    min-width: 160px;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+    z-index: 1;
+    position: relative;
+}
+
+.dropdown-menu a {
+    color: white;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+    transition: background-color 0.3s;
+}
+
+.dropdown-menu a:hover {
+    background-color: #34495e;
+}
+
+.dropdown-menu.show {
+    display: block;
 }

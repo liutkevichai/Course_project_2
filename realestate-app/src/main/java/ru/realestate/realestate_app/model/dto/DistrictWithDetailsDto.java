@@ -107,7 +107,7 @@ public class DistrictWithDetailsDto {
         }
         
         if (regionName != null) {
-            if (locationInfo.length() > 0) locationInfo.append(", ");
+            if (!locationInfo.isEmpty()) locationInfo.append(", ");
             
             // Сокращаем название региона
             String regionShort = regionName;
@@ -120,8 +120,8 @@ public class DistrictWithDetailsDto {
             locationInfo.append(regionShort);
         }
         
-        if (locationInfo.length() > 0) {
-            if (fullName.length() > 0) fullName.append(" ");
+        if (!locationInfo.isEmpty()) {
+            if (!fullName.isEmpty()) fullName.append(" ");
             fullName.append("(").append(locationInfo).append(")");
         }
         
@@ -156,7 +156,7 @@ public class DistrictWithDetailsDto {
         }
         
         if (regionName != null) {
-            if (cityInfo.length() > 0) cityInfo.append(" ");
+            if (!cityInfo.isEmpty()) cityInfo.append(" ");
             
             // Сокращаем название региона
             String regionShort = regionName;
@@ -169,7 +169,7 @@ public class DistrictWithDetailsDto {
             cityInfo.append("(").append(regionShort).append(")");
         }
         
-        return cityInfo.length() > 0 ? cityInfo.toString() : "Город не указан";
+        return !cityInfo.isEmpty() ? cityInfo.toString() : "Город не указан";
     }
     
     /**
@@ -185,17 +185,17 @@ public class DistrictWithDetailsDto {
         }
         
         if (regionName != null) {
-            if (path.length() > 0) path.append(" / ");
+            if (!path.isEmpty()) path.append(" / ");
             path.append(regionName);
         }
         
         if (cityName != null) {
-            if (path.length() > 0) path.append(" / ");
+            if (!path.isEmpty()) path.append(" / ");
             path.append(cityName);
         }
         
         if (districtName != null) {
-            if (path.length() > 0) path.append(" / ");
+            if (!path.isEmpty()) path.append(" / ");
             path.append(districtName);
             if (!districtName.toLowerCase().contains("район")) {
                 path.append(" район");
@@ -218,7 +218,7 @@ public class DistrictWithDetailsDto {
         }
         
         if (districtName != null) {
-            if (path.length() > 0) path.append(" / ");
+            if (!path.isEmpty()) path.append(" / ");
             path.append(districtName);
             if (!districtName.toLowerCase().contains("район")) {
                 path.append(" р-н");
@@ -226,29 +226,6 @@ public class DistrictWithDetailsDto {
         }
         
         return path.toString();
-    }
-    
-    /**
-     * Получить название для карты или навигации
-     * 
-     * @return название в формате "Центральный район, Москва"
-     */
-    public String getMapDisplayName() {
-        StringBuilder mapName = new StringBuilder();
-        
-        if (districtName != null) {
-            mapName.append(districtName);
-            if (!districtName.toLowerCase().contains("район")) {
-                mapName.append(" район");
-            }
-        }
-        
-        if (cityName != null) {
-            if (mapName.length() > 0) mapName.append(", ");
-            mapName.append(cityName);
-        }
-        
-        return mapName.toString();
     }
     
     // ========== ГЕТТЕРЫ И СЕТТЕРЫ ==========

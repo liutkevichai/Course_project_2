@@ -198,27 +198,11 @@ public class CityWithDetailsDto {
         }
         
         if (cityName != null) {
-            if (path.length() > 0) path.append(" / ");
+            if (!path.isEmpty()) path.append(" / ");
             path.append(cityName);
         }
         
         return path.toString();
-    }
-    
-    /**
-     * Проверить, является ли город столицей региона
-     * (Упрощенная проверка по названию)
-     * 
-     * @return true если название города похоже на название региона
-     */
-    public boolean isRegionalCapital() {
-        if (cityName == null || regionName == null) return false;
-        
-        // Упрощенная проверка: если название города содержится в названии региона
-        String cityLower = cityName.toLowerCase();
-        String regionLower = regionName.toLowerCase();
-        
-        return regionLower.contains(cityLower) || cityLower.contains(regionLower.split("\\s+")[0]);
     }
     
     // ========== ГЕТТЕРЫ И СЕТТЕРЫ ==========

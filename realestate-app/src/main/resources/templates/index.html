@@ -1,9 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>База данных недвижимости</title>
+<head th:replace="~{_layout :: head}">
 </head>
 <body>
     <div th:replace="~{_layout :: header}"></div>
@@ -13,5 +10,6 @@
         <h1>Добро пожаловать</h1>
         <p>Это главная страница приложения "База данных недвижимости".</p>
     </main>
+    <div th:replace="~{_layout :: footer}"></div>
 </body>
 </html>

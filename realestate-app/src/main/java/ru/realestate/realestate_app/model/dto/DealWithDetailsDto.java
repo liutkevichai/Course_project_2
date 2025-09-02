@@ -288,11 +288,11 @@ public class DealWithDetailsDto {
         StringBuilder fullName = new StringBuilder();
         if (clientLastName != null) fullName.append(clientLastName);
         if (clientFirstName != null) {
-            if (fullName.length() > 0) fullName.append(" ");
+            if (!fullName.isEmpty()) fullName.append(" ");
             fullName.append(clientFirstName);
         }
         if (clientMiddleName != null) {
-            if (fullName.length() > 0) fullName.append(" ");
+            if (!fullName.isEmpty()) fullName.append(" ");
             fullName.append(clientMiddleName);
         }
         return fullName.toString();
@@ -307,11 +307,11 @@ public class DealWithDetailsDto {
         StringBuilder fullName = new StringBuilder();
         if (realtorLastName != null) fullName.append(realtorLastName);
         if (realtorFirstName != null) {
-            if (fullName.length() > 0) fullName.append(" ");
+            if (!fullName.isEmpty()) fullName.append(" ");
             fullName.append(realtorFirstName);
         }
         if (realtorMiddleName != null) {
-            if (fullName.length() > 0) fullName.append(" ");
+            if (!fullName.isEmpty()) fullName.append(" ");
             fullName.append(realtorMiddleName);
         }
         return fullName.toString();
@@ -332,13 +332,13 @@ public class DealWithDetailsDto {
         
         // Добавляем улицу
         if (streetName != null) {
-            if (address.length() > 0) address.append(", ");
+            if (!address.isEmpty()) address.append(", ");
             address.append("ул. ").append(streetName);
         }
         
         // Добавляем номер дома
         if (propertyHouseNumber != null) {
-            if (address.length() > 0) address.append(", ");
+            if (!address.isEmpty()) address.append(", ");
             address.append("д. ").append(propertyHouseNumber);
             
             // Добавляем литеру дома если есть

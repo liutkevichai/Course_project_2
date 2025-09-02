@@ -446,6 +446,8 @@ public class PropertyDao {
                 p.cost,
                 SUBSTRING(p.description, 1, 100) as short_description,
                 p.house_number,
+                p.house_letter,
+                p.building_number,
                 p.apartment_number,
                 -- Тип недвижимости
                 pt.property_type_name,

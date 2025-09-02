@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{_layout :: head}">
+</head>
+<body>
+    <div th:replace="~{_layout :: header}"></div>
+    <div th:replace="~{_layout :: sidebar}"></div>
+    
+    <main>
+        <h1 th:text="${pageTitle}">Недвижимость</h1>
+        
+        <!-- Форма "Добавить запись" -->
+        <section>
+            <h2>Добавить запись</h2>
+            <form th:action="@{/properties/add}" method="post">
+                <!-- Основные данные -->
+                <div>
+                    <label for="area">Площадь (м²):</label>
+                    <input type="number" id="area" name="area" step="0.1" min="0" max="10000.00" required>
+                </div>
+                <div>
+                    <label for="cost">Стоимость (₽):</label>
+                    <input type="number" id="cost" name="cost" step="1000" min="0" max="999999999.9999" required>
+                </div>
+                <div>
+                    <label for="description">Описание:</label>
+                    <textarea id="description" name="description" maxlength="1000"></textarea>
+                </div>
+                
+                <!-- Адресные данные -->
+                <div>
+                    <label for="postalCode">Почтовый индекс:</label>
+                    <input type="text" id="postalCode" name="postalCode" maxlength="20" pattern="\d{6}">
+                </div>
+                <div>
+                    <label for="houseNumber">Номер дома:</label>
+                    <input type="text" id="houseNumber" name="houseNumber" maxlength="10" required>
+                </div>
+                <div>
+                    <label for="houseLetter">Литера дома:</label>
+                    <input type="text" id="houseLetter" name="houseLetter" maxlength="5">
+                </div>
+                <div>
+                    <label for="buildingNumber">Номер корпуса:</label>
+                    <input type="text" id="buildingNumber" name="buildingNumber" maxlength="10">
+                </div>
+                <div>
+                    <label for="apartmentNumber">Номер квартиры:</label>
+                    <input type="text" id="apartmentNumber" name="apartmentNumber" maxlength="10">
+                </div>
+                
+                <!-- Справочные данные -->
+                <div>
+                    <label for="propertyTypeId">Тип недвижимости:</label>
+                    <select id="propertyTypeId" name="propertyTypeId" required>
+                        <option value="">Выберите тип недвижимости</option>
+                        <option th:each="type : ${propertyTypes}"
+                                th:value="${type.idPropertyType}"
+                                th:text="${type.propertyTypeName}">
+                        </option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label for="cityId">Город:</label>
+                    <select id="cityId" name="cityId" required>
+                        <option value="">Выберите город</option>
+                        <option th:each="city : ${cities}"
+                                th:value="${city.idCity}"
+                                th:text="${city.cityName}">
+                        </option>
+                    </select>
+                </div>
+                
+                <!-- Поля для региона, района и улицы будут заполняться динамически на стороне сервера -->
+                <input type="hidden" id="regionId" name="regionId">
+                <input type="hidden" id="districtId" name="districtId">
+                <input type="hidden" id="streetId" name="streetId">
+                <input type="hidden" id="countryId" name="countryId">
+                
+                <button type="submit">Добавить</button>
+            </form>
+        </section>
+        
+        <!-- Форма "Найти запись" -->
+        <section>
+            <h2>Найти запись</h2>
+            <form th:action="@{/properties/search}" method="get">
+                <div>
+                    <label for="minPrice">Минимальная цена (₽):</label>
+                    <input type="number" id="minPrice" name="minPrice" step="0.01" min="0">
+                </div>
+                <div>
+                    <label for="maxPrice">Максимальная цена (₽):</label>
+                    <input type="number" id="maxPrice" name="maxPrice" step="0.01" min="0">
+                </div>
+                
+                <div>
+                    <label for="searchCityId">Город:</label>
+                    <select id="searchCityId" name="cityId">
+                        <option value="">Все города</option>
+                        <option th:each="city : ${cities}"
+                                th:value="${city.idCity}"
+                                th:text="${city.cityName}">
+                        </option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label for="searchPropertyTypeId">Тип недвижимости:</label>
+                    <select id="searchPropertyTypeId" name="propertyTypeId">
+                        <option value="">Все типы</option>
+                        <option th:each="type : ${propertyTypes}"
+                                th:value="${type.idPropertyType}"
+                                th:text="${type.propertyTypeName}">
+                        </option>
+                    </select>
+                </div>
+                
+                <button type="submit">Поиск</button>
+            </form>
+        </section>
+        
+        <!-- Таблица недвижимости -->
+        <section>
+            <h2>Список недвижимости</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Адрес</th>
+                        <th>Город</th>
+                        <th>Площадь</th>
+                        <th>Стоимость</th>
+                        <th>Тип</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="property : ${properties}">
+                        <td th:text="${property.propertyId}"></td>
+                        <td th:text="${property.getTableAddress()}"></td>
+                        <td th:text="${property.cityName}"></td>
+                        <td th:text="${property.getAreaFormatted()}"></td>
+                        <td th:text="${property.getCostFormatted()}"></td>
+                        <td th:text="${property.propertyTypeName}"></td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <!-- Количество записей -->
+            <p>Всего записей: <span th:text="${#lists.size(properties)}">0</span></p>
+        </section>
+    </main>
+    
+    <div th:replace="~{_layout :: footer}"></div>
+</body>
+</html>

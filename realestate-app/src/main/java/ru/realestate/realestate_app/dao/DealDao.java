@@ -402,14 +402,14 @@ public class DealDao {
                 c.first_name as client_first_name,
                 c.last_name as client_last_name,
                 c.middle_name as client_middle_name,
-                c.phone_number as client_phone,
+                c.phone as client_phone,
                 c.email as client_email,
                 -- Риелтор
                 r.id_realtor as realtor_id,
                 r.first_name as realtor_first_name,
                 r.last_name as realtor_last_name,
                 r.middle_name as realtor_middle_name,
-                r.phone_number as realtor_phone,
+                r.phone as realtor_phone,
                 r.email as realtor_email,
                 r.experience_years as realtor_experience,
                 -- Недвижимость
@@ -470,14 +470,14 @@ public class DealDao {
                 c.first_name as client_first_name,
                 c.last_name as client_last_name,
                 c.middle_name as client_middle_name,
-                c.phone_number as client_phone,
+                c.phone as client_phone,
                 c.email as client_email,
                 -- Риелтор
                 r.id_realtor as realtor_id,
                 r.first_name as realtor_first_name,
                 r.last_name as realtor_last_name,
                 r.middle_name as realtor_middle_name,
-                r.phone_number as realtor_phone,
+                r.phone as realtor_phone,
                 r.email as realtor_email,
                 r.experience_years as realtor_experience,
                 -- Недвижимость
@@ -529,9 +529,9 @@ public class DealDao {
                 -- Клиент (полное имя)
                 CONCAT(c.last_name, ' ', c.first_name, 
                        CASE WHEN c.middle_name IS NOT NULL THEN CONCAT(' ', c.middle_name) ELSE '' END) as client_name,
-                c.phone_number as client_phone,
+                c.phone as client_phone,
                 -- Риелтор (полное имя)
-                CONCAT(r.last_name, ' ', r.first_name, 
+                CONCAT(r.last_name, ' ', r.first_name,
                        CASE WHEN r.middle_name IS NOT NULL THEN CONCAT(' ', r.middle_name) ELSE '' END) as realtor_name,
                 -- Адрес недвижимости (краткий)
                 CONCAT(street.street_name, ', ', p.house_number,
@@ -573,14 +573,14 @@ public class DealDao {
                 c.first_name as client_first_name,
                 c.last_name as client_last_name,
                 c.middle_name as client_middle_name,
-                c.phone_number as client_phone,
+                c.phone as client_phone,
                 c.email as client_email,
                 -- Риелтор
                 r.id_realtor as realtor_id,
                 r.first_name as realtor_first_name,
                 r.last_name as realtor_last_name,
                 r.middle_name as realtor_middle_name,
-                r.phone_number as realtor_phone,
+                r.phone as realtor_phone,
                 r.email as realtor_email,
                 r.experience_years as realtor_experience,
                 -- Недвижимость
@@ -647,14 +647,14 @@ public class DealDao {
                 c.first_name as client_first_name,
                 c.last_name as client_last_name,
                 c.middle_name as client_middle_name,
-                c.phone_number as client_phone,
+                c.phone as client_phone,
                 c.email as client_email,
                 -- Риелтор
                 r.id_realtor as realtor_id,
                 r.first_name as realtor_first_name,
                 r.last_name as realtor_last_name,
                 r.middle_name as realtor_middle_name,
-                r.phone_number as realtor_phone,
+                r.phone as realtor_phone,
                 r.email as realtor_email,
                 r.experience_years as realtor_experience,
                 -- Недвижимость
@@ -715,14 +715,14 @@ public class DealDao {
                 c.first_name as client_first_name,
                 c.last_name as client_last_name,
                 c.middle_name as client_middle_name,
-                c.phone_number as client_phone,
+                c.phone as client_phone,
                 c.email as client_email,
                 -- Риелтор
                 r.id_realtor as realtor_id,
                 r.first_name as realtor_first_name,
                 r.last_name as realtor_last_name,
                 r.middle_name as realtor_middle_name,
-                r.phone_number as realtor_phone,
+                r.phone as realtor_phone,
                 r.email as realtor_email,
                 r.experience_years as realtor_experience,
                 -- Недвижимость
@@ -783,14 +783,14 @@ public class DealDao {
                 c.first_name as client_first_name,
                 c.last_name as client_last_name,
                 c.middle_name as client_middle_name,
-                c.phone_number as client_phone,
+                c.phone as client_phone,
                 c.email as client_email,
                 -- Риелтор
                 r.id_realtor as realtor_id,
                 r.first_name as realtor_first_name,
                 r.last_name as realtor_last_name,
                 r.middle_name as realtor_middle_name,
-                r.phone_number as realtor_phone,
+                r.phone as realtor_phone,
                 r.email as realtor_email,
                 r.experience_years as realtor_experience,
                 -- Недвижимость

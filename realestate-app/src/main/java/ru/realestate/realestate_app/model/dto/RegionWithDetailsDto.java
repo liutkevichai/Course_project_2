@@ -74,7 +74,7 @@ public class RegionWithDetailsDto {
         }
         
         if (countryName != null) {
-            if (fullName.length() > 0) fullName.append(" ");
+            if (!fullName.isEmpty()) fullName.append(" ");
             fullName.append("(").append(countryName).append(")");
         }
         
@@ -131,7 +131,7 @@ public class RegionWithDetailsDto {
         }
         
         if (regionName != null) {
-            if (path.length() > 0) path.append(" / ");
+            if (!path.isEmpty()) path.append(" / ");
             path.append(regionName);
         }
         

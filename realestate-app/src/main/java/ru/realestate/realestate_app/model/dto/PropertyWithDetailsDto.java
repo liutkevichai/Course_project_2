@@ -217,7 +217,7 @@ public class PropertyWithDetailsDto {
         
         // Добавляем регион
         if (regionName != null) {
-            if (address.length() > 0) address.append(", ");
+            if (!address.isEmpty()) address.append(", ");
             address.append(regionName);
             
             // Добавляем сокращение для регионов
@@ -232,25 +232,25 @@ public class PropertyWithDetailsDto {
         
         // Добавляем город
         if (cityName != null) {
-            if (address.length() > 0) address.append(", ");
+            if (!address.isEmpty()) address.append(", ");
             address.append("г. ").append(cityName);
         }
         
         // Добавляем район
         if (districtName != null) {
-            if (address.length() > 0) address.append(", ");
+            if (!address.isEmpty()) address.append(", ");
             address.append(districtName).append(" р-н");
         }
         
         // Добавляем улицу
         if (streetName != null) {
-            if (address.length() > 0) address.append(", ");
+            if (!address.isEmpty()) address.append(", ");
             address.append("ул. ").append(streetName);
         }
         
         // Добавляем номер дома
         if (houseNumber != null) {
-            if (address.length() > 0) address.append(", ");
+            if (!address.isEmpty()) address.append(", ");
             address.append("д. ").append(houseNumber);
             
             // Добавляем литеру дома если есть
@@ -287,13 +287,13 @@ public class PropertyWithDetailsDto {
         
         // Добавляем улицу
         if (streetName != null) {
-            if (address.length() > 0) address.append(", ");
+            if (!address.isEmpty()) address.append(", ");
             address.append("ул. ").append(streetName);
         }
         
         // Добавляем номер дома
         if (houseNumber != null) {
-            if (address.length() > 0) address.append(", ");
+            if (!address.isEmpty()) address.append(", ");
             address.append("д. ").append(houseNumber);
             
             // Добавляем литеру дома если есть
@@ -394,26 +394,6 @@ public class PropertyWithDetailsDto {
             case "гараж" -> "Гараж";
             case "участок" -> "Земельный участок";
             default -> propertyTypeName;
-        };
-    }
-    
-    /**
-     * Получить иконку для типа недвижимости (для веб-интерфейса)
-     * 
-     * @return название иконки
-     */
-    public String getPropertyTypeIcon() {
-        if (propertyTypeName == null) return "home";
-        
-        return switch (propertyTypeName.toLowerCase()) {
-            case "квартира" -> "apartment";
-            case "дом" -> "house";
-            case "офис" -> "business";
-            case "склад" -> "warehouse";
-            case "магазин" -> "store";
-            case "гараж" -> "garage";
-            case "участок" -> "landscape";
-            default -> "home";
         };
     }
     
