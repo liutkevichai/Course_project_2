@@ -112,7 +112,7 @@ public class RealtorDao {
             PreparedStatement ps = connection.prepareStatement(
                 "INSERT INTO realtors (first_name, last_name, middle_name, phone, email, experience_years) " +
                 "VALUES (?, ?, ?, ?, ?, ?)",
-                Statement.RETURN_GENERATED_KEYS
+                new String[]{"id_realtor"}
             );
             
             ps.setString(1, realtor.getFirstName());

@@ -12,7 +12,6 @@ import ru.realestate.realestate_app.mapper.ClientRowMapper;
 import ru.realestate.realestate_app.model.Client;
 
 import java.sql.PreparedStatement;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -108,7 +107,7 @@ public class ClientDao {
             PreparedStatement ps = connection.prepareStatement(
                 "INSERT INTO clients (first_name, last_name, middle_name, phone, email) " +
                 "VALUES (?, ?, ?, ?, ?)",
-                Statement.RETURN_GENERATED_KEYS
+                new String[]{"id_client"}
             );
             
             ps.setString(1, client.getFirstName());

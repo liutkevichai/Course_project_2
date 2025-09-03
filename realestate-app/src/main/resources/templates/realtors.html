@@ -12,30 +12,30 @@
         <!-- Форма "Добавить запись" -->
         <section>
             <h2>Добавить запись</h2>
-            <form th:action="@{/realtors/add}" method="post">
+            <form th:action="@{/realtors/add}" th:object="${newRealtor}" method="post">
                 <div>
                     <label for="firstName">Имя:</label>
-                    <input type="text" id="firstName" name="firstName" required>
+                    <input type="text" id="firstName" th:field="*{firstName}" required>
                 </div>
                 <div>
                     <label for="lastName">Фамилия:</label>
-                    <input type="text" id="lastName" name="lastName" required>
+                    <input type="text" id="lastName" th:field="*{lastName}" required>
                 </div>
                 <div>
                     <label for="middleName">Отчество:</label>
-                    <input type="text" id="middleName" name="middleName">
+                    <input type="text" id="middleName" th:field="*{middleName}">
                 </div>
                 <div>
                     <label for="phone">Телефон:</label>
-                    <input type="text" id="phone" name="phone" required>
+                    <input type="text" id="phone" th:field="*{phone}" required>
                 </div>
                 <div>
                     <label for="email">Email:</label>
-                    <input type="email" id="email" name="email">
+                    <input type="email" id="email" th:field="*{email}">
                 </div>
                 <div>
                     <label for="experienceYears">Опыт работы (лет):</label>
-                    <input type="number" id="experienceYears" name="experienceYears" min="0" max="50" required>
+                    <input type="number" id="experienceYears" th:field="*{experienceYears}" min="0" max="50" required>
                 </div>
                 <button type="submit">Добавить</button>
             </form>

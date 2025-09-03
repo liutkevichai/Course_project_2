@@ -85,6 +85,16 @@ GET    /api/property-types/{id}
 GET    /api/property-types/search/by-name
 ```
 
+## Платежи (/api/payments)
+```
+GET    /api/payments
+GET    /api/payments/{id}
+POST   /api/payments
+PUT    /api/payments/{id}
+DELETE /api/payments/{id}
+GET    /api/payments/deal/{dealId}
+```
+
 ## География (/api/geography)
 
 ### Страны
@@ -146,7 +156,7 @@ GET    /api/geography/cities/{cityId}/streets/with-details
 
 ---
 
-**Всего endpoints: 84**
-- **CRUD операции**: 28
-- **Поиск и фильтрация**: 32  
-- **DTO с детальной информацией**: 24 
+**Всего endpoints: 90**
+- **CRUD операции**: 33
+- **Поиск и фильтрация**: 33
+- **DTO с детальной информацией**: 24

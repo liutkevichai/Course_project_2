@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{_layout :: head}">
+</head>
+<body>
+    <div th:replace="~{_layout :: header}"></div>
+    <div th:replace="~{_layout :: sidebar}"></div>
+    
+    <main>
+        <h1 th:text="${pageTitle}">Платежи</h1>
+        
+        <!-- Форма "Добавить запись" -->
+                <section>
+                    <h2>Добавить запись</h2>
+                    <form th:action="@{/payments/add}" th:object="${newPayment}" method="post">
+                        <div>
+                            <label for="dealId">Сделка:</label>
+                            <select id="dealId" th:field="*{idDeal}" required>
+                                <option value="">Выберите сделку</option>
+                                <option th:each="deal : ${deals}"
+                                        th:value="${deal.dealId}"
+                                        th:text="${'ID: ' + deal.dealId + ' - ' + deal.getDealDateFormatted() + ' - ' + deal.getClientNameShort()}">
+                                </option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label for="paymentDate">Дата платежа:</label>
+                            <input type="date" id="paymentDate" th:field="*{paymentDate}" required>
+                        </div>
+                        
+                        <div>
+                            <label for="amount">Сумма (₽):</label>
+                            <input type="number" id="amount" th:field="*{amount}" step="1000" min="0" max="999999999.9999" required>
+                        </div>
+                        
+                        <button type="submit">Добавить</button>
+                    </form>
+                </section>
+        
+        <!-- Форма "Найти запись" -->
+        <section>
+            <h2>Найти запись</h2>
+            <form th:action="@{/web/payments/search}" method="get">
+                <div>
+                    <label for="searchDealId">ID сделки:</label>
+                    <input type="number" id="searchDealId" name="dealId" min="1">
+                </div>
+                
+                <div>
+                    <label for="startDate">Дата с:</label>
+                    <input type="date" id="startDate" name="startDate">
+                </div>
+                
+                <div>
+                    <label for="endDate">Дата по:</label>
+                    <input type="date" id="endDate" name="endDate">
+                </div>
+                
+                <button type="submit">Поиск</button>
+            </form>
+        </section>
+        
+        <!-- Таблица платежей -->
+        <section>
+            <h2>Список платежей</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID платежа</th>
+                        <th>Дата платежа</th>
+                        <th>Сумма</th>
+                        <th>Сделка (ID)</th>
+                        <th>Дата сделки</th>
+                        <th>Клиент</th>
+                        <th>Адрес объекта</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="payment : ${payments}">
+                        <td th:text="${payment.idPayment}"></td>
+                        <td th:text="${payment.getPaymentDateFormatted()}"></td>
+                        <td th:text="${payment.getAmountFormatted()}"></td>
+                        <td th:text="${payment.idDeal}"></td>
+                        <td th:text="${payment.getDealDateFormatted()}"></td>
+                        <td th:text="${payment.getClientFioShort()}"></td>
+                        <td th:text="${payment.getPropertyAddressShort()}"></td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <!-- Количество записей -->
+            <p>Всего записей: <span th:text="${#lists.size(payments)}">0</span></p>
+        </section>
+    </main>
+    
+    <div th:replace="~{_layout :: footer}"></div>
+</body>
+</html>

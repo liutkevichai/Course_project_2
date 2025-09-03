@@ -108,7 +108,7 @@ public class DealDao {
             PreparedStatement ps = connection.prepareStatement(
                 "INSERT INTO deals (deal_date, deal_cost, id_property, id_realtor, id_client, id_deal_type) " +
                 "VALUES (?, ?, ?, ?, ?, ?)",
-                Statement.RETURN_GENERATED_KEYS
+                new String[]{"id_deal"}
             );
             
             ps.setDate(1, java.sql.Date.valueOf(deal.getDealDate()));

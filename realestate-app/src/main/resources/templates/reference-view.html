@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{_layout :: head}">
+</head>
+<body>
+    <div th:replace="~{_layout :: header}"></div>
+    <div th:replace="~{_layout :: sidebar}"></div>
+    
+    <main>
+        <h1 th:text="${pageTitle}">Справочная таблица</h1>
+        
+        <!-- Таблица данных -->
+        <section>
+            <table>
+                <thead>
+                    <tr>
+                        <th th:each="header : ${headers}" th:text="${header}"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="item : ${items}">
+                        <td th:each="field : ${fields}" th:text="${item[field]}"></td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <!-- Количество записей -->
+            <p>Всего записей: <span th:text="${#lists.size(items)}">0</span></p>
+        </section>
+    </main>
+    
+    <div th:replace="~{_layout :: footer}"></div>
+</body>
+</html>

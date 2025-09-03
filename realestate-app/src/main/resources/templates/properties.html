@@ -12,47 +12,47 @@
         <!-- Форма "Добавить запись" -->
         <section>
             <h2>Добавить запись</h2>
-            <form th:action="@{/properties/add}" method="post">
+            <form id="propertyAddForm" th:action="@{/properties/add}" th:object="${newProperty}" method="post">
                 <!-- Основные данные -->
                 <div>
                     <label for="area">Площадь (м²):</label>
-                    <input type="number" id="area" name="area" step="0.1" min="0" max="10000.00" required>
+                    <input type="number" id="area" th:field="*{area}" step="0.1" min="0" max="10000.00" required>
                 </div>
                 <div>
                     <label for="cost">Стоимость (₽):</label>
-                    <input type="number" id="cost" name="cost" step="1000" min="0" max="999999999.9999" required>
+                    <input type="number" id="cost" th:field="*{cost}" step="1000" min="0" max="999999999.9999" required>
                 </div>
                 <div>
                     <label for="description">Описание:</label>
-                    <textarea id="description" name="description" maxlength="1000"></textarea>
+                    <textarea id="description" th:field="*{description}" maxlength="1000"></textarea>
                 </div>
                 
                 <!-- Адресные данные -->
                 <div>
                     <label for="postalCode">Почтовый индекс:</label>
-                    <input type="text" id="postalCode" name="postalCode" maxlength="20" pattern="\d{6}">
+                    <input type="text" id="postalCode" th:field="*{postalCode}" maxlength="20" pattern="\d{6}">
                 </div>
                 <div>
                     <label for="houseNumber">Номер дома:</label>
-                    <input type="text" id="houseNumber" name="houseNumber" maxlength="10" required>
+                    <input type="text" id="houseNumber" th:field="*{houseNumber}" maxlength="10" required>
                 </div>
                 <div>
                     <label for="houseLetter">Литера дома:</label>
-                    <input type="text" id="houseLetter" name="houseLetter" maxlength="5">
+                    <input type="text" id="houseLetter" th:field="*{houseLetter}" maxlength="5">
                 </div>
                 <div>
                     <label for="buildingNumber">Номер корпуса:</label>
-                    <input type="text" id="buildingNumber" name="buildingNumber" maxlength="10">
+                    <input type="text" id="buildingNumber" th:field="*{buildingNumber}" maxlength="10">
                 </div>
                 <div>
                     <label for="apartmentNumber">Номер квартиры:</label>
-                    <input type="text" id="apartmentNumber" name="apartmentNumber" maxlength="10">
+                    <input type="text" id="apartmentNumber" th:field="*{apartmentNumber}" maxlength="10">
                 </div>
                 
                 <!-- Справочные данные -->
                 <div>
-                    <label for="propertyTypeId">Тип недвижимости:</label>
-                    <select id="propertyTypeId" name="propertyTypeId" required>
+                    <label for="idPropertyType">Тип недвижимости:</label>
+                    <select id="idPropertyType" th:field="*{idPropertyType}" required>
                         <option value="">Выберите тип недвижимости</option>
                         <option th:each="type : ${propertyTypes}"
                                 th:value="${type.idPropertyType}"
@@ -62,21 +62,43 @@
                 </div>
                 
                 <div>
-                    <label for="cityId">Город:</label>
-                    <select id="cityId" name="cityId" required>
-                        <option value="">Выберите город</option>
-                        <option th:each="city : ${cities}"
-                                th:value="${city.idCity}"
-                                th:text="${city.cityName}">
+                    <label for="idCountry">Страна:</label>
+                    <select id="idCountry" th:field="*{idCountry}" required>
+                        <option value="">Выберите страну</option>
+                        <option th:each="country : ${countries}"
+                                th:value="${country.idCountry}"
+                                th:text="${country.countryName}">
                         </option>
                     </select>
                 </div>
+
+                <div>
+                    <label for="idRegion">Регион:</label>
+                    <select id="idRegion" th:field="*{idRegion}" required disabled>
+                        <option value="">Выберите регион</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label for="idCity">Город:</label>
+                    <select id="idCity" th:field="*{idCity}" required disabled>
+                        <option value="">Выберите город</option>
+                    </select>
+                </div>
                 
-                <!-- Поля для региона, района и улицы будут заполняться динамически на стороне сервера -->
-                <input type="hidden" id="regionId" name="regionId">
-                <input type="hidden" id="districtId" name="districtId">
-                <input type="hidden" id="streetId" name="streetId">
-                <input type="hidden" id="countryId" name="countryId">
+                <div>
+                    <label for="idDistrict">Район:</label>
+                    <select id="idDistrict" th:field="*{idDistrict}" required disabled>
+                        <option value="">Выберите район</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label for="idStreet">Улица:</label>
+                    <select id="idStreet" th:field="*{idStreet}" required disabled>
+                        <option value="">Выберите улицу</option>
+                    </select>
+                </div>
                 
                 <button type="submit">Добавить</button>
             </form>

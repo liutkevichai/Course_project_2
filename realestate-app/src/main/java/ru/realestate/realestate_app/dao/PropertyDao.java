@@ -111,7 +111,7 @@ public class PropertyDao {
                 "INSERT INTO properties (area, cost, description, postal_code, house_number, " +
                 "house_letter, building_number, apartment_number, id_property_type, id_country, " +
                 "id_region, id_city, id_district, id_street) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                Statement.RETURN_GENERATED_KEYS
+                new String[]{"id_property"}
             );
             
             ps.setBigDecimal(1, property.getArea());
