@@ -40,20 +40,11 @@
         <!-- Форма "Найти запись" -->
         <section>
             <h2>Найти запись</h2>
-            <form th:action="@{/clients/search}" method="get">
-                <div>
-                    <label for="searchLastName">Фамилия:</label>
-                    <input type="text" id="searchLastName" name="lastName">
-                </div>
-                <div>
-                    <label for="searchPhone">Телефон:</label>
-                    <input type="text" id="searchPhone" name="phone">
-                </div>
-                <div>
-                    <label for="searchEmail">Email:</label>
-                    <input type="text" id="searchEmail" name="email">
-                </div>
-                <button type="submit">Поиск</button>
+            <form th:action="@{/clients}" method="get" class="form-inline mb-3">
+                <input type="text" name="lastName" th:value="${lastName}" placeholder="Фамилия" class="form-control mb-2 mr-sm-2">
+                <input type="text" name="email" th:value="${email}" placeholder="Email" class="form-control mb-2 mr-sm-2">
+                <input type="text" name="phone" th:value="${phone}" placeholder="Телефон" class="form-control mb-2 mr-sm-2">
+                <button type="submit" class="btn btn-primary mb-2">Поиск</button>
             </form>
         </section>
         

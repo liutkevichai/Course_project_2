@@ -41,19 +41,19 @@
         <!-- Форма "Найти запись" -->
         <section>
             <h2>Найти запись</h2>
-            <form th:action="@{/web/payments/search}" method="get">
+            <form th:action="@{/payments}" method="get">
                 <div>
                     <label for="searchDealId">ID сделки:</label>
                     <input type="number" id="searchDealId" name="dealId" min="1">
                 </div>
                 
                 <div>
-                    <label for="startDate">Дата с:</label>
+                    <label for="startDate">Дата с (дата сделки):</label>
                     <input type="date" id="startDate" name="startDate">
                 </div>
                 
                 <div>
-                    <label for="endDate">Дата по:</label>
+                    <label for="endDate">Дата по (дата сделки):</label>
                     <input type="date" id="endDate" name="endDate">
                 </div>
                 

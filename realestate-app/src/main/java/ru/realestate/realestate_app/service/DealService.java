@@ -497,4 +497,24 @@ public class DealService {
             throw re;
         }
     }
+
+    /**
+     * Осуществляет поиск сделок по заданным критериям
+     * @param startDate  Начальная дата для поиска (может быть null)
+     * @param endDate    Конечная дата для поиска (может быть null)
+     * @param realtorId  ID риелтора для фильтрации (может быть null)
+     * @param clientId   ID клиента для фильтрации (может быть null)
+     * @param dealTypeId ID типа сделки для фильтрации (может быть null)
+     * @return список отфильтрованных сделок в формате DealTableDto
+     * @throws DatabaseException если произошла ошибка при работе с базой данных
+     */
+    public List<DealTableDto> searchDeals(LocalDate startDate, LocalDate endDate, Long realtorId, Long clientId, Long dealTypeId) {
+        try {
+            return dealDao.searchDeals(startDate, endDate, realtorId, clientId, dealTypeId);
+        } catch (Exception e) {
+            RealEstateException re = ExceptionHandler.handleDatabaseException(e, "SELECT", "Deal", null);
+            ExceptionHandler.logException(re, "Ошибка при поиске сделок по критериям");
+            throw re;
+        }
+    }
 }

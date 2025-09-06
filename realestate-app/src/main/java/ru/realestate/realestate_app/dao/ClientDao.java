@@ -402,6 +402,39 @@ public class ClientDao {
     }
 
     /**
+     * Поиск клиентов по заданным критериям
+     * 
+     * @param lastName фамилия клиента (частичное совпадение)
+     * @param email    email клиента (точное совпадение)
+     * @param phone    телефон клиента (точное совпадение)
+     * @return список клиентов, соответствующих всем указанным критериям
+     */
+    public List<Client> search(String lastName, String email, String phone) {
+        StringBuilder sql = new StringBuilder("SELECT * FROM clients WHERE 1=1");
+        List<Object> params = new ArrayList<>();
+
+        // Добавляем условия поиска только для непустых параметров
+        if (lastName != null && !lastName.trim().isEmpty()) {
+            sql.append(" AND last_name ILIKE ?");
+            params.add("%" + lastName.trim() + "%");
+        }
+
+        if (email != null && !email.trim().isEmpty()) {
+            sql.append(" AND email = ?");
+            params.add(email.trim());
+        }
+
+        if (phone != null && !phone.trim().isEmpty()) {
+            sql.append(" AND phone = ?");
+            params.add(phone.trim());
+        }
+
+        sql.append(" ORDER BY last_name, first_name");
+
+        return jdbcTemplate.query(sql.toString(), clientRowMapper, params.toArray());
+    }
+    
+    /**
      * Валидация обновляемых данных клиента
      * @param updates карта с полями для обновления
      * @throws IllegalArgumentException если данные некорректны

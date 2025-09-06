@@ -312,5 +312,22 @@ public class ClientService {
         }
         // Остальная валидация выполняется в DAO
     }
-
+/**
+ * Находит клиентов по одному или нескольким критериям.
+ * Логика поиска оптимизирована для минимизации запросов к БД.
+ *
+ * @param lastName Фамилия для поиска (частичное совпадение).
+ * @param email Email для поиска (точное совпадение).
+ * @param phone Телефон для поиска (точное совпадение).
+ * @return Список клиентов, удовлетворяющих ВСЕМ предоставленным критериям.
+ */
+public List<Client> searchClients(String lastName, String email, String phone) {
+    try {
+        return clientDao.search(lastName, email, phone);
+    } catch (Exception e) {
+        RealEstateException re = ExceptionHandler.handleDatabaseException(e, "SELECT", "Client", null);
+        ExceptionHandler.logException(re, "Ошибка при поиске клиентов по критериям");
+        throw re;
+    }
+}
 }

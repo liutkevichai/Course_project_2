@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{_layout :: head}">
+    <link href="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/css/tom-select.css" rel="stylesheet">
 </head>
 <body>
     <div th:replace="~{_layout :: header}"></div>
@@ -20,7 +21,7 @@
                 </div>
                 <div>
                     <label for="cost">Стоимость (₽):</label>
-                    <input type="number" id="cost" th:field="*{cost}" step="1000" min="0" max="999999999.9999" required>
+                    <input type="number" id="cost" th:field="*{cost}" step="1000" min="0" max="999999.9999" required>
                 </div>
                 <div>
                     <label for="description">Описание:</label>
@@ -104,42 +105,43 @@
             </form>
         </section>
         
-        <!-- Форма "Найти запись" -->
+        <!-- Форма "Найти недвижимость" -->
         <section>
-            <h2>Найти запись</h2>
-            <form th:action="@{/properties/search}" method="get">
-                <div>
-                    <label for="minPrice">Минимальная цена (₽):</label>
-                    <input type="number" id="minPrice" name="minPrice" step="0.01" min="0">
-                </div>
-                <div>
-                    <label for="maxPrice">Максимальная цена (₽):</label>
-                    <input type="number" id="maxPrice" name="maxPrice" step="0.01" min="0">
-                </div>
+            <h2>Найти недвижимость</h2>
+            <!-- Присваиваем форме ID, чтобы JS мог ее найти -->
+            <form th:action="@{/properties}" method="get" class="form-inline mb-3" id="propertySearchForm">
                 
-                <div>
-                    <label for="searchCityId">Город:</label>
-                    <select id="searchCityId" name="cityId">
-                        <option value="">Все города</option>
-                        <option th:each="city : ${cities}"
-                                th:value="${city.idCity}"
-                                th:text="${city.cityName}">
-                        </option>
-                    </select>
-                </div>
+                <input type="number" name="minPrice" th:value="${minPrice}" placeholder="Мин. цена" step="1000" min="0" max="999999.9999" class="form-control mb-2 mr-sm-2">
+                <input type="number" name="maxPrice" th:value="${maxPrice}" placeholder="Макс. цена" step="1000" min="0" max="999999.9999" class="form-control mb-2 mr-sm-2">
                 
-                <div>
-                    <label for="searchPropertyTypeId">Тип недвижимости:</label>
-                    <select id="searchPropertyTypeId" name="propertyTypeId">
-                        <option value="">Все типы</option>
-                        <option th:each="type : ${propertyTypes}"
-                                th:value="${type.idPropertyType}"
-                                th:text="${type.propertyTypeName}">
-                        </option>
-                    </select>
-                </div>
+                <select id="searchCityId" name="cityId" class="form-control mb-2 mr-sm-2">
+                    <!-- th:selected используется для сохранения выбранного значения после отправки формы -->
+                    <option value="">Город</option>
+                    <option th:each="city : ${citiesWithDetails}"
+                            th:value="${city.cityId}"
+                            th:text="${city.getFullName()}"
+                            th:selected="${city.cityId == cityId}">
+                    </option>
+                </select>
+
+                <select id="searchDistrictId" name="districtId" class="form-control mb-2 mr-sm-2" disabled>
+                    <option value="">Район</option>
+                </select>
+
+                <select id="searchStreetId" name="streetId" class="form-control mb-2 mr-sm-2" disabled>
+                    <option value="">Улица</option>
+                </select>
                 
-                <button type="submit">Поиск</button>
+                <select name="propertyTypeId" class="form-control mb-2 mr-sm-2">
+                    <option value="">Тип недвижимости</option>
+                    <option th:each="type : ${propertyTypes}" 
+                            th:value="${type.idPropertyType}" 
+                            th:text="${type.propertyTypeName}"
+                            th:selected="${type.idPropertyType == propertyTypeId}">
+                    </option>
+                </select>
+
+                <button type="submit" class="btn btn-primary mb-2">Поиск</button>
             </form>
         </section>
         
@@ -174,6 +176,9 @@
         </section>
     </main>
     
-    <div th:replace="~{_layout :: footer}"></div>
+    <div th:replace="~{_layout :: footer}">
+        <script src="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/js/tom-select.complete.min.js"></script>
+        <script th:src="@{/js/property-search.js}"></script>
+    </div>
 </body>
 </html>

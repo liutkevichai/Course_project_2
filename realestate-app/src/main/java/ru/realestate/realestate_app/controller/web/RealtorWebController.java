@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestParam;
 import ru.realestate.realestate_app.model.Realtor;
 import ru.realestate.realestate_app.service.RealtorService;
 
@@ -20,8 +21,13 @@ public class RealtorWebController {
     }
 
     @GetMapping
-    public String getRealtorsPage(Model model) {
-        model.addAttribute("realtors", realtorService.findAll());
+    public String getRealtorsPage(
+            @RequestParam(required = false) String lastName,
+            @RequestParam(required = false) String email,
+            @RequestParam(required = false) String phone,
+            @RequestParam(required = false) Integer minExperience,
+            Model model) {
+        model.addAttribute("realtors", realtorService.searchRealtors(lastName, email, phone, minExperience));
         model.addAttribute("newRealtor", new Realtor());
         model.addAttribute("pageTitle", "Риелторы");
         return "realtors";

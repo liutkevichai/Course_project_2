@@ -16,7 +16,6 @@ import ru.realestate.realestate_app.model.dto.DealTableDto;
 
 import java.math.BigDecimal;
 import java.sql.PreparedStatement;
-import java.sql.Statement;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.ArrayList;
@@ -1026,4 +1025,77 @@ public class DealDao {
         Integer count = jdbcTemplate.queryForObject(sql, Integer.class, dealTypeId);
         return count != null && count > 0;
     }
-} 
+    
+    /**
+     * Осуществляет поиск сделок по заданным критериям с помощью динамического SQL-запроса.
+     *
+     * @param startDate  Начальная дата для поиска (может быть null).
+     * @param endDate    Конечная дата для поиска (может быть null).
+     * @param realtorId  ID риелтора для фильтрации (может быть null).
+     * @param clientId   ID клиента для фильтрации (может быть null).
+     * @param dealTypeId ID типа сделки для фильтрации (может быть null).
+     * @return Список отфильтрованных сделок в формате DealTableDto.
+     */
+    public List<DealTableDto> searchDeals(LocalDate startDate, LocalDate endDate, Long realtorId, Long clientId, Long dealTypeId) {
+        // Базовый SQL-запрос, который мы будем расширять
+        String baseSql = """
+            SELECT 
+                d.id_deal as deal_id,
+                d.deal_date,
+                d.deal_cost,
+                CONCAT(c.last_name, ' ', c.first_name, CASE WHEN c.middle_name IS NOT NULL THEN CONCAT(' ', c.middle_name) ELSE '' END) as client_name,
+                c.phone as client_phone,
+                CONCAT(r.last_name, ' ', r.first_name, CASE WHEN r.middle_name IS NOT NULL THEN CONCAT(' ', r.middle_name) ELSE '' END) as realtor_name,
+                CONCAT(street.street_name, ', ', p.house_number, CASE WHEN p.apartment_number IS NOT NULL THEN CONCAT('-', p.apartment_number) ELSE '' END) as property_address,
+                pt.property_type_name,
+                dt.deal_type_name
+            FROM deals d
+            JOIN clients c ON d.id_client = c.id_client
+            JOIN realtors r ON d.id_realtor = r.id_realtor
+            JOIN properties p ON d.id_property = p.id_property
+            JOIN streets street ON p.id_street = street.id_street
+            JOIN property_types pt ON p.id_property_type = pt.id_property_type
+            JOIN deal_types dt ON d.id_deal_type = dt.id_deal_type
+            """;
+        
+        StringBuilder whereClause = new StringBuilder();
+        List<Object> params = new ArrayList<>();
+        
+        // Динамически добавляем условия в WHERE
+        if (startDate != null) {
+            if (!whereClause.isEmpty()) whereClause.append(" AND ");
+            whereClause.append("d.deal_date >= ?");
+            params.add(startDate);
+        }
+        if (endDate != null) {
+            if (!whereClause.isEmpty()) whereClause.append(" AND ");
+            // Изменяем условие на строгое "меньше" и добавляем один день к конечной дате.
+            // Это гарантирует, что все сделки до конца дня endDate будут включены в выборку.
+            whereClause.append("d.deal_date < ?");
+            params.add(endDate.plusDays(1));
+        }
+        if (realtorId != null) {
+            if (!whereClause.isEmpty()) whereClause.append(" AND ");
+            whereClause.append("d.id_realtor = ?");
+            params.add(realtorId);
+        }
+        if (clientId != null) {
+            if (!whereClause.isEmpty()) whereClause.append(" AND ");
+            whereClause.append("d.id_client = ?");
+            params.add(clientId);
+        }
+        if (dealTypeId != null) {
+            if (!whereClause.isEmpty()) whereClause.append(" AND ");
+            whereClause.append("d.id_deal_type = ?");
+            params.add(dealTypeId);
+        }
+        
+        String finalSql = baseSql;
+        if (!whereClause.isEmpty()) {
+            finalSql += " WHERE " + whereClause.toString();
+        }
+        finalSql += " ORDER BY d.deal_date DESC";
+        
+        return jdbcTemplate.query(finalSql, dealTableRowMapper, params.toArray());
+    }
+}

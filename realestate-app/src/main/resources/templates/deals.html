@@ -74,15 +74,15 @@
         <!-- Форма "Найти запись" -->
         <section>
             <h2>Найти запись</h2>
-            <form th:action="@{/deals/search}" method="get">
+            <form th:action="@{/deals}" method="get">
                 <div>
                     <label for="startDate">Дата с:</label>
-                    <input type="date" id="startDate" name="startDate">
+                    <input type="date" id="startDate" name="startDate" th:value="${searchStartDate}">
                 </div>
                 
                 <div>
                     <label for="endDate">Дата по:</label>
-                    <input type="date" id="endDate" name="endDate">
+                    <input type="date" id="endDate" name="endDate" th:value="${searchEndDate}">
                 </div>
                 
                 <div>
@@ -91,7 +91,8 @@
                         <option value="">Все риелторы</option>
                         <option th:each="realtor : ${realtors}"
                                 th:value="${realtor.idRealtor}"
-                                th:text="${realtor.getFullName()}">
+                                th:text="${realtor.getFullName()}"
+                                th:selected="${realtor.idRealtor == searchRealtorId}">
                         </option>
                     </select>
                 </div>
@@ -102,7 +103,8 @@
                         <option value="">Все клиенты</option>
                         <option th:each="client : ${clients}"
                                 th:value="${client.idClient}"
-                                th:text="${client.getFullName()}">
+                                th:text="${client.getFullName()}"
+                                th:selected="${client.idClient == searchClientId}">
                         </option>
                     </select>
                 </div>
@@ -113,7 +115,8 @@
                         <option value="">Все типы</option>
                         <option th:each="type : ${dealTypes}"
                                 th:value="${type.idDealType}"
-                                th:text="${type.dealTypeName}">
+                                th:text="${type.dealTypeName}"
+                                th:selected="${type.idDealType == searchDealTypeId}">
                         </option>
                     </select>
                 </div>

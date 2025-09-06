@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import ru.realestate.realestate_app.model.Client;
 import ru.realestate.realestate_app.service.ClientService;
 
@@ -22,12 +23,31 @@ public class ClientWebController {
     }
 
     @GetMapping
-    public String getClientsPage(Model model) {
-        // Получаем список всех клиентов
-        List<Client> clients = clientService.findAll();
+    public String getClientsPage(Model model,
+                                 @RequestParam(required = false) String lastName,
+                                 @RequestParam(required = false) String email,
+                                 @RequestParam(required = false) String phone) {
+        // 1. Проверяем, присутствует ли хотя бы один параметр поиска.
+        boolean hasSearchParams = (lastName != null && !lastName.isEmpty()) ||
+                                  (email != null && !email.isEmpty()) ||
+                                  (phone != null && !phone.isEmpty());
+
+        List<Client> clients;
+        if (hasSearchParams) {
+            // 2. Вызываем новый метод сервиса для сложного поиска.
+            clients = clientService.searchClients(lastName, email, phone);
+        } else {
+            // 3. Если параметры не предоставлены, получаем всех клиентов.
+            clients = clientService.findAll();
+        }
+
         model.addAttribute("clients", clients);
         model.addAttribute("newClient", new Client()); // Передаем пустой объект для формы добавления
         model.addAttribute("pageTitle", "Клиенты");
+        // Добавляем параметры поиска обратно в модель, чтобы сохранить их в форме после отправки.
+        model.addAttribute("lastName", lastName);
+        model.addAttribute("email", email);
+        model.addAttribute("phone", phone);
         return "clients";
     }
     

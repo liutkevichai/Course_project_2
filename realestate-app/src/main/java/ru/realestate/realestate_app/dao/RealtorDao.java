@@ -12,7 +12,6 @@ import ru.realestate.realestate_app.model.Realtor;
 
 
 import java.sql.PreparedStatement;
-import java.sql.Statement;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
@@ -299,6 +298,45 @@ public class RealtorDao {
             realtorRowMapper,
             minExperience
         );
+    }
+
+    /**
+     * Поиск риелторов по заданным критериям
+     *
+     * @param lastName фамилия риелтора (частичное совпадение)
+     * @param email email риелтора (точное совпадение)
+     * @param phone телефон риелтора (точное совпадение)
+     * @param minExperience минимальный опыт работы риелтора
+     * @return список риелторов, соответствующих всем указанным критериям
+     */
+    public List<Realtor> search(String lastName, String email, String phone, Integer minExperience) {
+        StringBuilder sql = new StringBuilder("SELECT * FROM realtors WHERE 1=1");
+        List<Object> params = new ArrayList<>();
+
+        // Добавляем условия поиска только для непустых параметров
+        if (lastName != null && !lastName.trim().isEmpty()) {
+            sql.append(" AND last_name ILIKE ?");
+            params.add("%" + lastName.trim() + "%");
+        }
+
+        if (email != null && !email.trim().isEmpty()) {
+            sql.append(" AND email = ?");
+            params.add(email.trim());
+        }
+
+        if (phone != null && !phone.trim().isEmpty()) {
+            sql.append(" AND phone = ?");
+            params.add(phone.trim());
+        }
+
+        if (minExperience != null) {
+            sql.append(" AND experience_years >= ?");
+            params.add(minExperience);
+        }
+
+        sql.append(" ORDER BY last_name, first_name");
+
+        return jdbcTemplate.query(sql.toString(), realtorRowMapper, params.toArray());
     }
 
     /**

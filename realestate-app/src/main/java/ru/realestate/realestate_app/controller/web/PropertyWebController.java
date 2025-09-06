@@ -6,11 +6,15 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import ru.realestate.realestate_app.model.Property;
+import ru.realestate.realestate_app.model.dto.PropertyTableDto;
 import ru.realestate.realestate_app.service.PropertyService;
 import ru.realestate.realestate_app.service.reference.PropertyTypeService;
 import ru.realestate.realestate_app.service.reference.GeographyService;
 
+import java.math.BigDecimal;
+import java.util.List;
 
 @Controller
 @RequestMapping("/properties")
@@ -29,13 +33,27 @@ public class PropertyWebController {
     }
 
     @GetMapping
-    public String getPropertiesPage(Model model) {
-        model.addAttribute("properties", propertyService.findAllForTable());
+    public String getPropertiesPage(Model model,
+                                @RequestParam(required = false) BigDecimal minPrice,
+                                @RequestParam(required = false) BigDecimal maxPrice,
+                                @RequestParam(required = false) Long cityId,
+                                @RequestParam(required = false) Long propertyTypeId,
+                                @RequestParam(required = false) Long districtId,
+                                @RequestParam(required = false) Long streetId) {
+        
+        // Логика поиска передается в сервис
+        List<PropertyTableDto> properties = propertyService.searchProperties(minPrice, maxPrice, cityId, propertyTypeId, districtId, streetId);
+        model.addAttribute("properties", properties);
+        
+        // Добавляем в модель все необходимое для рендеринга страницы, включая параметры поиска для формы
+        model.addAttribute("minPrice", minPrice);
+        model.addAttribute("maxPrice", maxPrice);
+        model.addAttribute("cityId", cityId);
+        model.addAttribute("propertyTypeId", propertyTypeId);
+        model.addAttribute("districtId", districtId);
+        model.addAttribute("streetId", streetId);
         model.addAttribute("propertyTypes", propertyTypeService.findAll());
-        model.addAttribute("cities", geographyService.findAllCities());
-        model.addAttribute("regions", geographyService.findAllRegions());
-        model.addAttribute("districts", geographyService.findAllDistricts());
-        model.addAttribute("streets", geographyService.findAllStreets());
+        model.addAttribute("citiesWithDetails", geographyService.findAllCitiesWithDetails());
         model.addAttribute("countries", geographyService.findAllCountries());
         Property newProperty = new Property();
         newProperty.setIdRegion(null);
@@ -44,6 +62,7 @@ public class PropertyWebController {
         newProperty.setIdCountry(null);
         model.addAttribute("newProperty", newProperty); // Для формы добавления
         model.addAttribute("pageTitle", "Недвижимость");
+
         return "properties";
     }
 

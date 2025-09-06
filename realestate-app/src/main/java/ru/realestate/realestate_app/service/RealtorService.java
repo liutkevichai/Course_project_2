@@ -15,6 +15,7 @@ import ru.realestate.realestate_app.model.Realtor;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Сервис для работы с риелторами
@@ -257,6 +258,25 @@ public class RealtorService {
             throw new ValidationException("realtor", "Объект риелтора не может быть null");
         }
         // Остальная валидация выполняется в DAO
+    }
+
+    /**
+     * Расширенный поиск риелторов по нескольким критериям
+     * @param lastName фамилия риелтора (может быть null)
+     * @param email email риелтора (может быть null)
+     * @param phone телефон риелтора (может быть null)
+     * @param experience опыт работы риелтора (может быть null)
+     * @return список риелторов, соответствующих критериям поиска
+     * @throws DatabaseException если произошла ошибка при работе с базой данных
+     */
+    public List<Realtor> searchRealtors(String lastName, String email, String phone, Integer experience) {
+        try {
+            return realtorDao.search(lastName, email, phone, experience);
+        } catch (Exception e) {
+            RealEstateException re = ExceptionHandler.handleDatabaseException(e, "SELECT", "Realtor", null);
+            ExceptionHandler.logException(re, "Ошибка при расширенном поиске риелторов");
+            throw re;
+        }
     }
 
     /**

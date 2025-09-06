@@ -348,4 +348,25 @@ public class PropertyService {
             throw re;
         }
     }
-} 
+
+    /**
+     * Поиск объектов недвижимости по заданным критериям
+     * @param minPrice минимальная цена
+     * @param maxPrice максимальная цена
+     * @param cityId идентификатор города
+     * @param propertyTypeId идентификатор типа недвижимости
+     * @param districtId идентификатор района
+     * @param streetId идентификатор улицы
+     * @return список объектов недвижимости, соответствующих критериям поиска
+     * @throws DatabaseException если произошла ошибка при работе с базой данных
+     */
+    public List<PropertyTableDto> searchProperties(BigDecimal minPrice, BigDecimal maxPrice, Long cityId, Long propertyTypeId, Long districtId, Long streetId) {
+        try {
+            return propertyDao.search(minPrice, maxPrice, cityId, propertyTypeId, districtId, streetId);
+        } catch (Exception e) {
+            RealEstateException re = ExceptionHandler.handleDatabaseException(e, "SELECT", "Property", null);
+            ExceptionHandler.logException(re, "Ошибка при поиске объектов недвижимости по заданным критериям");
+            throw re;
+        }
+    }
+}

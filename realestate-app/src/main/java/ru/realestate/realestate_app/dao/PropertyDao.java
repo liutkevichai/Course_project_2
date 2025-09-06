@@ -16,7 +16,6 @@ import ru.realestate.realestate_app.model.dto.PropertyTableDto;
 
 import java.math.BigDecimal;
 import java.sql.PreparedStatement;
-import java.sql.Statement;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
@@ -110,7 +109,7 @@ public class PropertyDao {
             PreparedStatement ps = connection.prepareStatement(
                 "INSERT INTO properties (area, cost, description, postal_code, house_number, " +
                 "house_letter, building_number, apartment_number, id_property_type, id_country, " +
-                "id_region, id_city, id_district, id_street) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                "id_region, id_city, id_district, id_street) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                 new String[]{"id_property"}
             );
             
@@ -615,6 +614,61 @@ public class PropertyDao {
     }
 
     /**
+     * Поиск объектов недвижимости по заданным критериям
+     * @param minPrice минимальная цена
+     * @param maxPrice максимальная цена
+     * @param cityId идентификатор города
+     * @param propertyTypeId идентификатор типа недвижимости
+     * @param districtId идентификатор района
+     * @param streetId идентификатор улицы
+     * @return список объектов недвижимости, соответствующих критериям поиска
+     */
+    public List<PropertyTableDto> search(BigDecimal minPrice, BigDecimal maxPrice, Long cityId, Long propertyTypeId, Long districtId, Long streetId) {
+        StringBuilder sql = new StringBuilder(
+            "SELECT p.id_property as property_id, p.area, p.cost, SUBSTRING(p.description, 1, 100) as short_description, " +
+            "p.house_number, p.house_letter, p.building_number, p.apartment_number, pt.property_type_name, " +
+            "city.city_name, district.district_name, street.street_name " +
+            "FROM properties p " +
+            "JOIN property_types pt ON p.id_property_type = pt.id_property_type " +
+            "JOIN cities city ON p.id_city = city.id_city " +
+            "LEFT JOIN districts district ON p.id_district = district.id_district " +
+            "JOIN streets street ON p.id_street = street.id_street " +
+            "WHERE 1=1"
+        );
+
+        List<Object> params = new ArrayList<>();
+
+        if (minPrice != null) {
+            sql.append(" AND p.cost >= ?");
+            params.add(minPrice);
+        }
+        if (maxPrice != null) {
+            sql.append(" AND p.cost <= ?");
+            params.add(maxPrice);
+        }
+        if (cityId != null) {
+            sql.append(" AND p.id_city = ?");
+            params.add(cityId);
+        }
+        if (propertyTypeId != null) {
+            sql.append(" AND p.id_property_type = ?");
+            params.add(propertyTypeId);
+        }
+        if (districtId != null) {
+            sql.append(" AND p.id_district = ?");
+            params.add(districtId);
+        }
+        if (streetId != null) {
+            sql.append(" AND p.id_street = ?");
+            params.add(streetId);
+        }
+
+        sql.append(" ORDER BY p.cost DESC");
+
+        return jdbcTemplate.query(sql.toString(), new PropertyTableRowMapper(), params.toArray());
+    }
+
+    /**
      * Валидация объекта недвижимости для сохранения
      * @param property объект недвижимости для валидации
      * @throws IllegalArgumentException если данные некорректны
@@ -872,4 +926,4 @@ public class PropertyDao {
         Integer count = jdbcTemplate.queryForObject(sql, Integer.class, streetId);
         return count != null && count > 0;
     }
-} 
+}

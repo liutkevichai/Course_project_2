@@ -178,5 +178,68 @@ document.addEventListener('DOMContentLoaded', function () {
         };
 
         initializeForm();
+    // Обработчики для формы поиска недвижимости
+    const propertySearchForm = document.getElementById('propertySearchForm');
+    if (propertySearchForm) {
+        const citySelect = propertySearchForm.querySelector('#searchCityId');
+        const districtSelect = propertySearchForm.querySelector('#searchDistrictId');
+        const streetSelect = propertySearchForm.querySelector('#searchStreetId');
+
+        const resetAndDisable = (selectElement, defaultOptionText) => {
+            if (selectElement) {
+                selectElement.innerHTML = `<option value="">${defaultOptionText}</option>`;
+                selectElement.disabled = true;
+            }
+        };
+
+        const updateDistrictsAndStreets = (cityId, selectedDistrictId, selectedStreetId) => {
+            resetAndDisable(districtSelect, 'Все районы');
+            resetAndDisable(streetSelect, 'Все улицы');
+
+            if (!cityId) return;
+
+            // Загружаем районы
+            fetch(`/api/geography/cities/${cityId}/districts`)
+                .then(response => response.json())
+                .then(districts => {
+                    districts.forEach(district => {
+                        const option = document.createElement('option');
+                        option.value = district.idDistrict;
+                        option.textContent = district.districtName;
+                        if (district.idDistrict == selectedDistrictId) {
+                            option.selected = true;
+                        }
+                        districtSelect.appendChild(option);
+                    });
+                    districtSelect.disabled = false;
+                });
+
+            // Загружаем улицы
+            fetch(`/api/geography/cities/${cityId}/streets`)
+                .then(response => response.json())
+                .then(streets => {
+                    streets.forEach(street => {
+                        const option = document.createElement('option');
+                        option.value = street.idStreet;
+                        option.textContent = street.streetName;
+                        if (street.idStreet == selectedStreetId) {
+                            option.selected = true;
+                        }
+                        streetSelect.appendChild(option);
+                    });
+                    streetSelect.disabled = false;
+                });
+        };
+
+        citySelect.addEventListener('change', () => {
+            updateDistrictsAndStreets(citySelect.value, null, null);
+        });
+
+        if (citySelect.value) {
+            const selectedDistrictId = new URLSearchParams(window.location.search).get('districtId');
+            const selectedStreetId = new URLSearchParams(window.location.search).get('streetId');
+            updateDistrictsAndStreets(citySelect.value, selectedDistrictId, selectedStreetId);
+        }
+    }
     }
 });

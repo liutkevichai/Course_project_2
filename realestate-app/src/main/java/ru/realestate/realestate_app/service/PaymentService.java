@@ -3,9 +3,12 @@ package ru.realestate.realestate_app.service;
 import org.springframework.stereotype.Service;
 import ru.realestate.realestate_app.dao.PaymentDao;
 import ru.realestate.realestate_app.exception.EntityNotFoundException;
+import ru.realestate.realestate_app.exception.RealEstateException;
+import ru.realestate.realestate_app.exception.handler.ExceptionHandler;
 import ru.realestate.realestate_app.model.Payment;
 import ru.realestate.realestate_app.model.dto.PaymentTableDto;
 
+import java.time.LocalDate;
 import java.util.List;
 
 /**
@@ -58,5 +61,23 @@ public class PaymentService {
      */
     public List<PaymentTableDto> findAllWithDetails() {
         return paymentDao.findAllWithDetails();
+    }
+
+    /**
+     * Осуществляет поиск платежей по заданным критериям.
+     *
+     * @param dealId     ID сделки для фильтрации.
+     * @param startDate  Начальная дата для поиска.
+     * @param endDate    Конечная дата для поиска.
+     * @return Список найденных платежей в формате PaymentTableDto.
+     */
+    public List<PaymentTableDto> searchPayments(Long dealId, LocalDate startDate, LocalDate endDate) {
+        try {
+            return paymentDao.searchPayments(dealId, startDate, endDate);
+        } catch (Exception e) {
+            RealEstateException re = ExceptionHandler.handleDatabaseException(e, "SELECT", "Payment", null);
+            ExceptionHandler.logException(re, "Ошибка при поиске платежей");
+            throw re;
+        }
     }
 }
