@@ -15,23 +15,23 @@
             <form th:action="@{/clients/add}" th:object="${newClient}" method="post">
                 <div>
                     <label for="firstName">Имя:</label>
-                    <input type="text" id="firstName" th:field="*{firstName}" required>
+                    <input type="text" id="firstName" th:field="*{firstName}" required placeholder="Имя">
                 </div>
                 <div>
                     <label for="lastName">Фамилия:</label>
-                    <input type="text" id="lastName" th:field="*{lastName}" required>
+                    <input type="text" id="lastName" th:field="*{lastName}" required placeholder="Фамилия">
                 </div>
                 <div>
                     <label for="middleName">Отчество:</label>
-                    <input type="text" id="middleName" th:field="*{middleName}">
+                    <input type="text" id="middleName" th:field="*{middleName}" placeholder="Отчество">
                 </div>
                 <div>
                     <label for="phone">Телефон:</label>
-                    <input type="text" id="phone" th:field="*{phone}" required>
+                    <input type="text" id="phone" th:field="*{phone}" required placeholder="Телефон">
                 </div>
                 <div>
                     <label for="email">Email:</label>
-                    <input type="email" id="email" th:field="*{email}">
+                    <input type="email" id="email" th:field="*{email}" placeholder="Email">
                 </div>
                 <button type="submit">Добавить</button>
             </form>
@@ -40,11 +40,20 @@
         <!-- Форма "Найти запись" -->
         <section>
             <h2>Найти запись</h2>
-            <form th:action="@{/clients}" method="get" class="form-inline mb-3">
-                <input type="text" name="lastName" th:value="${lastName}" placeholder="Фамилия" class="form-control mb-2 mr-sm-2">
-                <input type="text" name="email" th:value="${email}" placeholder="Email" class="form-control mb-2 mr-sm-2">
-                <input type="text" name="phone" th:value="${phone}" placeholder="Телефон" class="form-control mb-2 mr-sm-2">
-                <button type="submit" class="btn btn-primary mb-2">Поиск</button>
+            <form th:action="@{/clients}" method="get">
+                <div>
+                    <label for="searchLastName">Фамилия:</label>
+                    <input type="text" id="searchLastName" name="lastName" th:value="${lastName}" placeholder="Фамилия">
+                </div>
+                <div>
+                    <label for="searchEmail">Email:</label>
+                    <input type="text" id="searchEmail" name="email" th:value="${email}" placeholder="Email">
+                </div>
+                <div>
+                    <label for="searchPhone">Телефон:</label>
+                    <input type="text" id="searchPhone" name="phone" th:value="${phone}" placeholder="Телефон">
+                </div>
+                <button type="submit">Поиск</button>
             </form>
         </section>
         

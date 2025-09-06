@@ -15,7 +15,7 @@
                     <form th:action="@{/payments/add}" th:object="${newPayment}" method="post">
                         <div>
                             <label for="dealId">Сделка:</label>
-                            <select id="dealId" th:field="*{idDeal}" required>
+                            <select id="dealId" th:field="*{idDeal}" placeholder="Сделка" required>
                                 <option value="">Выберите сделку</option>
                                 <option th:each="deal : ${deals}"
                                         th:value="${deal.dealId}"
@@ -26,12 +26,12 @@
                         
                         <div>
                             <label for="paymentDate">Дата платежа:</label>
-                            <input type="date" id="paymentDate" th:field="*{paymentDate}" required>
+                            <input type="date" id="paymentDate" th:field="*{paymentDate}" placeholder="Дата платежа" required>
                         </div>
                         
                         <div>
                             <label for="amount">Сумма (₽):</label>
-                            <input type="number" id="amount" th:field="*{amount}" step="1000" min="0" max="999999999.9999" required>
+                            <input type="number" id="amount" th:field="*{amount}" step="1000" min="0" max="999999999.9999" placeholder="Сумма (₽)" required>
                         </div>
                         
                         <button type="submit">Добавить</button>
@@ -44,17 +44,17 @@
             <form th:action="@{/payments}" method="get">
                 <div>
                     <label for="searchDealId">ID сделки:</label>
-                    <input type="number" id="searchDealId" name="dealId" min="1">
+                    <input type="number" id="searchDealId" name="dealId" min="1" placeholder="ID сделки">
                 </div>
                 
                 <div>
                     <label for="startDate">Дата с (дата сделки):</label>
-                    <input type="date" id="startDate" name="startDate">
+                    <input type="date" id="startDate" name="startDate" placeholder="Дата с (дата сделки)">
                 </div>
                 
                 <div>
                     <label for="endDate">Дата по (дата сделки):</label>
-                    <input type="date" id="endDate" name="endDate">
+                    <input type="date" id="endDate" name="endDate" placeholder="Дата по (дата сделки)">
                 </div>
                 
                 <button type="submit">Поиск</button>

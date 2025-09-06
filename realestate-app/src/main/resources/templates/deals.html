@@ -15,7 +15,7 @@
             <form th:action="@{/deals/add}" th:object="${newDeal}" method="post">
                 <div>
                     <label for="clientId">Клиент:</label>
-                    <select id="clientId" th:field="*{idClient}" required>
+                    <select id="clientId" th:field="*{idClient}" required placeholder="Выберите клиента">
                         <option value="">Выберите клиента</option>
                         <option th:each="client : ${clients}"
                                 th:value="${client.idClient}"
@@ -26,7 +26,7 @@
                 
                 <div>
                     <label for="realtorId">Риелтор:</label>
-                    <select id="realtorId" th:field="*{idRealtor}" required>
+                    <select id="realtorId" th:field="*{idRealtor}" required placeholder="Выберите риелтора">
                         <option value="">Выберите риелтора</option>
                         <option th:each="realtor : ${realtors}"
                                 th:value="${realtor.idRealtor}"
@@ -37,7 +37,7 @@
                 
                 <div>
                     <label for="propertyId">Недвижимость:</label>
-                    <select id="propertyId" th:field="*{idProperty}" required>
+                    <select id="propertyId" th:field="*{idProperty}" required placeholder="Выберите недвижимость">
                         <option value="">Выберите недвижимость</option>
                         <option th:each="property : ${properties}"
                                 th:value="${property.propertyId}"
@@ -48,7 +48,7 @@
                 
                 <div>
                     <label for="dealTypeId">Тип сделки:</label>
-                    <select id="dealTypeId" th:field="*{idDealType}" required>
+                    <select id="dealTypeId" th:field="*{idDealType}" required placeholder="Выберите тип сделки">
                         <option value="">Выберите тип сделки</option>
                         <option th:each="type : ${dealTypes}"
                                 th:value="${type.idDealType}"
@@ -59,12 +59,12 @@
                 
                 <div>
                     <label for="dealDate">Дата сделки:</label>
-                    <input type="date" id="dealDate" th:field="*{dealDate}" required>
+                    <input type="date" id="dealDate" th:field="*{dealDate}" required placeholder="Дата сделки">
                 </div>
                 
                 <div>
                     <label for="dealCost">Стоимость (₽):</label>
-                    <input type="number" id="dealCost" th:field="*{dealCost}" step="1000" min="0" max="999999999.9999" required>
+                    <input type="number" id="dealCost" th:field="*{dealCost}" step="1000" min="0" max="99999999.9999" required placeholder="Стоимость (₽)">
                 </div>
                 
                 <button type="submit">Добавить</button>
@@ -77,17 +77,17 @@
             <form th:action="@{/deals}" method="get">
                 <div>
                     <label for="startDate">Дата с:</label>
-                    <input type="date" id="startDate" name="startDate" th:value="${searchStartDate}">
+                    <input type="date" id="startDate" name="startDate" th:value="${searchStartDate}" placeholder="Дата с">
                 </div>
                 
                 <div>
                     <label for="endDate">Дата по:</label>
-                    <input type="date" id="endDate" name="endDate" th:value="${searchEndDate}">
+                    <input type="date" id="endDate" name="endDate" th:value="${searchEndDate}" placeholder="Дата по">
                 </div>
                 
                 <div>
                     <label for="searchRealtorId">Риелтор:</label>
-                    <select id="searchRealtorId" name="realtorId">
+                    <select id="searchRealtorId" name="realtorId" placeholder="Все риелторы">
                         <option value="">Все риелторы</option>
                         <option th:each="realtor : ${realtors}"
                                 th:value="${realtor.idRealtor}"
@@ -99,7 +99,7 @@
                 
                 <div>
                     <label for="searchClientId">Клиент:</label>
-                    <select id="searchClientId" name="clientId">
+                    <select id="searchClientId" name="clientId" placeholder="Все клиенты">
                         <option value="">Все клиенты</option>
                         <option th:each="client : ${clients}"
                                 th:value="${client.idClient}"
@@ -111,7 +111,7 @@
                 
                 <div>
                     <label for="searchDealTypeId">Тип сделки:</label>
-                    <select id="searchDealTypeId" name="dealTypeId">
+                    <select id="searchDealTypeId" name="dealTypeId" placeholder="Все типы">
                         <option value="">Все типы</option>
                         <option th:each="type : ${dealTypes}"
                                 th:value="${type.idDealType}"

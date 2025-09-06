@@ -17,37 +17,37 @@
                 <!-- Основные данные -->
                 <div>
                     <label for="area">Площадь (м²):</label>
-                    <input type="number" id="area" th:field="*{area}" step="0.1" min="0" max="10000.00" required>
+                    <input type="number" id="area" th:field="*{area}" step="0.1" min="0" max="10000.00" required placeholder="Площадь (м²)">
                 </div>
                 <div>
                     <label for="cost">Стоимость (₽):</label>
-                    <input type="number" id="cost" th:field="*{cost}" step="1000" min="0" max="999999.9999" required>
+                    <input type="number" id="cost" th:field="*{cost}" step="1000" min="0" max="99999999.99" required placeholder="Стоимость (₽)">
                 </div>
                 <div>
                     <label for="description">Описание:</label>
-                    <textarea id="description" th:field="*{description}" maxlength="1000"></textarea>
+                    <textarea id="description" th:field="*{description}" maxlength="1000" placeholder="Описание"></textarea>
                 </div>
                 
                 <!-- Адресные данные -->
                 <div>
                     <label for="postalCode">Почтовый индекс:</label>
-                    <input type="text" id="postalCode" th:field="*{postalCode}" maxlength="20" pattern="\d{6}">
+                    <input type="text" id="postalCode" th:field="*{postalCode}" maxlength="20" pattern="\d{6}" placeholder="Почтовый индекс">
                 </div>
                 <div>
                     <label for="houseNumber">Номер дома:</label>
-                    <input type="text" id="houseNumber" th:field="*{houseNumber}" maxlength="10" required>
+                    <input type="text" id="houseNumber" th:field="*{houseNumber}" maxlength="10" required placeholder="Номер дома">
                 </div>
                 <div>
                     <label for="houseLetter">Литера дома:</label>
-                    <input type="text" id="houseLetter" th:field="*{houseLetter}" maxlength="5">
+                    <input type="text" id="houseLetter" th:field="*{houseLetter}" maxlength="5" placeholder="Литера дома">
                 </div>
                 <div>
                     <label for="buildingNumber">Номер корпуса:</label>
-                    <input type="text" id="buildingNumber" th:field="*{buildingNumber}" maxlength="10">
+                    <input type="text" id="buildingNumber" th:field="*{buildingNumber}" maxlength="10" placeholder="Номер корпуса">
                 </div>
                 <div>
                     <label for="apartmentNumber">Номер квартиры:</label>
-                    <input type="text" id="apartmentNumber" th:field="*{apartmentNumber}" maxlength="10">
+                    <input type="text" id="apartmentNumber" th:field="*{apartmentNumber}" maxlength="10" placeholder="Номер квартиры">
                 </div>
                 
                 <!-- Справочные данные -->
@@ -110,36 +110,53 @@
             <h2>Найти недвижимость</h2>
             <!-- Присваиваем форме ID, чтобы JS мог ее найти -->
             <form th:action="@{/properties}" method="get" class="form-inline mb-3" id="propertySearchForm">
+                <div>
+                    <label for="minPrice">Мин. цена:</label>
+                    <input type="number" id="minPrice" name="minPrice" th:value="${minPrice}" placeholder="Мин. цена" step="1000" min="0" max="99999999.99">
+                </div>
+                <div>
+                    <label for="maxPrice">Макс. цена:</label>
+                    <input type="number" id="maxPrice" name="maxPrice" th:value="${maxPrice}" placeholder="Макс. цена" step="1000" min="0" max="99999999.99">
+                </div>
                 
-                <input type="number" name="minPrice" th:value="${minPrice}" placeholder="Мин. цена" step="1000" min="0" max="999999.9999" class="form-control mb-2 mr-sm-2">
-                <input type="number" name="maxPrice" th:value="${maxPrice}" placeholder="Макс. цена" step="1000" min="0" max="999999.9999" class="form-control mb-2 mr-sm-2">
-                
-                <select id="searchCityId" name="cityId" class="form-control mb-2 mr-sm-2">
-                    <!-- th:selected используется для сохранения выбранного значения после отправки формы -->
-                    <option value="">Город</option>
-                    <option th:each="city : ${citiesWithDetails}"
-                            th:value="${city.cityId}"
-                            th:text="${city.getFullName()}"
-                            th:selected="${city.cityId == cityId}">
-                    </option>
-                </select>
+                <div>
+                    <label for="searchCityId">Город:</label>
+                    <select id="searchCityId" name="cityId">
+                        <!-- th:selected используется для сохранения выбранного значения после отправки формы -->
+                        <option value="">Город</option>
+                        <option th:each="city : ${citiesWithDetails}"
+                                th:value="${city.cityId}"
+                                th:text="${city.getFullName()}"
+                                th:selected="${city.cityId == cityId}">
+                        </option>
+                    </select>
+                </div>
 
-                <select id="searchDistrictId" name="districtId" class="form-control mb-2 mr-sm-2" disabled>
-                    <option value="">Район</option>
-                </select>
+                <div>
+                    <label for="searchDistrictId">Район:</label>
+                    <select id="searchDistrictId" name="districtId" disabled>
+                        <option value="">Район</option>
+                    </select>
+                </div>
 
-                <select id="searchStreetId" name="streetId" class="form-control mb-2 mr-sm-2" disabled>
-                    <option value="">Улица</option>
-                </select>
+                <div>
+                    <label for="searchStreetId">Улица:</label>
+                    <select id="searchStreetId" name="streetId" disabled>
+                        <option value="">Улица</option>
+                    </select>
+                </div>
                 
-                <select name="propertyTypeId" class="form-control mb-2 mr-sm-2">
-                    <option value="">Тип недвижимости</option>
-                    <option th:each="type : ${propertyTypes}" 
-                            th:value="${type.idPropertyType}" 
-                            th:text="${type.propertyTypeName}"
-                            th:selected="${type.idPropertyType == propertyTypeId}">
-                    </option>
-                </select>
+                <div>
+                    <label for="propertyTypeId">Тип недвижимости:</label>
+                    <select id="propertyTypeId" name="propertyTypeId">
+                        <option value="">Тип недвижимости</option>
+                        <option th:each="type : ${propertyTypes}"
+                                th:value="${type.idPropertyType}"
+                                th:text="${type.propertyTypeName}"
+                                th:selected="${type.idPropertyType == propertyTypeId}">
+                        </option>
+                    </select>
+                </div>
 
                 <button type="submit" class="btn btn-primary mb-2">Поиск</button>
             </form>

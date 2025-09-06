@@ -15,27 +15,27 @@
             <form th:action="@{/realtors/add}" th:object="${newRealtor}" method="post">
                 <div>
                     <label for="firstName">Имя:</label>
-                    <input type="text" id="firstName" th:field="*{firstName}" required>
+                    <input type="text" id="firstName" th:field="*{firstName}" placeholder="Имя" required>
                 </div>
                 <div>
                     <label for="lastName">Фамилия:</label>
-                    <input type="text" id="lastName" th:field="*{lastName}" required>
+                    <input type="text" id="lastName" th:field="*{lastName}" placeholder="Фамилия" required>
                 </div>
                 <div>
                     <label for="middleName">Отчество:</label>
-                    <input type="text" id="middleName" th:field="*{middleName}">
+                    <input type="text" id="middleName" th:field="*{middleName}" placeholder="Отчество">
                 </div>
                 <div>
                     <label for="phone">Телефон:</label>
-                    <input type="text" id="phone" th:field="*{phone}" required>
+                    <input type="text" id="phone" th:field="*{phone}" placeholder="Телефон" required>
                 </div>
                 <div>
                     <label for="email">Email:</label>
-                    <input type="email" id="email" th:field="*{email}">
+                    <input type="email" id="email" th:field="*{email}" placeholder="Email">
                 </div>
                 <div>
                     <label for="experienceYears">Опыт работы (лет):</label>
-                    <input type="number" id="experienceYears" th:field="*{experienceYears}" min="0" max="50" required>
+                    <input type="number" id="experienceYears" th:field="*{experienceYears}" placeholder="Опыт работы (лет)" min="0" max="50" required>
                 </div>
                 <button type="submit">Добавить</button>
             </form>
@@ -45,10 +45,22 @@
         <section>
             <h2>Найти запись</h2>
             <form th:action="@{/realtors}" method="get" class="form-inline mb-3">
-                <input type="text" name="lastName" th:value="${param.lastName}" placeholder="Фамилия" class="form-control mb-2 mr-sm-2">
-                <input type="text" name="email" th:value="${param.email}" placeholder="Email" class="form-control mb-2 mr-sm-2">
-                <input type="text" name="phone" th:value="${param.phone}" placeholder="Телефон" class="form-control mb-2 mr-sm-2">
-                <input type="number" name="minExperience" th:value="${param.minExperience}" placeholder="Мин. опыт работы" min="0" max="50" class="form-control mb-2 mr-sm-2">
+                <div>
+                    <label for="lastName">Фамилия:</label>
+                    <input type="text" id="lastName" name="lastName" th:value="${param.lastName}" placeholder="Фамилия">
+                </div>
+                <div>
+                    <label for="email">Email:</label>
+                    <input type="text" id="email" name="email" th:value="${param.email}" placeholder="Email">
+                </div>
+                <div>
+                    <label for="phone">Телефон:</label>
+                    <input type="text" id="phone" name="phone" th:value="${param.phone}" placeholder="Телефон">
+                </div>
+                <div>
+                    <label for="minExperience">Мин. опыт работы:</label>
+                    <input type="number" id="minExperience" name="minExperience" th:value="${param.minExperience}" min="0" max="50" placeholder="Мин. опыт работы">
+                </div>
                 <button type="submit" class="btn btn-primary mb-2">Поиск</button>
             </form>
         </section>
