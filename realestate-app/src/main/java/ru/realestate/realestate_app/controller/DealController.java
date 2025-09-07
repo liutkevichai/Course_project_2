@@ -448,13 +448,27 @@ public class DealController {
         List<DealWithDetailsDto> deals = dealService.findByRealtorIdWithDetails(realtorId);
         return ResponseEntity.ok(deals);
     }
-
+    
+    /**
+     * Получить сделку в табличном формате по идентификатору
+     *
+     * HTTP метод: GET
+     * URL: /api/deals/{id}/for-table (например: /api/deals/123/for-table)
+     *
+     * @param id идентификатор сделки
+     * @return ResponseEntity с информацией о сделке в табличном формате
+     */
+    @GetMapping("/{id}/for-table")
+    public DealTableDto getDealForTable(@PathVariable Long id) {
+        return dealService.getDealForTable(id);
+    }
+    
     /**
      * Найти сделки клиента с детальной информацией
-     * 
+     *
      * HTTP метод: GET
      * URL: /api/deals/search/by-client/{clientId}/with-details (например: /api/deals/search/by-client/1/with-details)
-     * 
+     *
      * @param clientId идентификатор клиента
      * @return ResponseEntity со списком сделок с детальной информацией указанного клиента
      */
@@ -463,4 +477,4 @@ public class DealController {
         List<DealWithDetailsDto> deals = dealService.findByClientIdWithDetails(clientId);
         return ResponseEntity.ok(deals);
     }
-} 
+}

@@ -5,12 +5,17 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ResponseBody;
 import ru.realestate.realestate_app.model.Client;
 import ru.realestate.realestate_app.service.ClientService;
 
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/clients")
@@ -55,5 +60,12 @@ public class ClientWebController {
     public String addClient(@ModelAttribute Client client) {
         clientService.save(client);
         return "redirect:/clients"; // Перенаправляем на страницу списка клиентов
+    }
+
+    @PostMapping("/update/{id}")
+    @ResponseBody
+    public ResponseEntity<Void> updateClient(@PathVariable Long id, @RequestBody Map<String, Object> updates) {
+        clientService.update(id, updates);
+        return ResponseEntity.ok().build();
     }
 }

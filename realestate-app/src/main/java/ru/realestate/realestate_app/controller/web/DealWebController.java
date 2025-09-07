@@ -4,9 +4,13 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.http.ResponseEntity;
 import org.springframework.format.annotation.DateTimeFormat;
 import ru.realestate.realestate_app.model.Deal;
 import ru.realestate.realestate_app.service.DealService;
@@ -16,7 +20,7 @@ import ru.realestate.realestate_app.service.PropertyService;
 import ru.realestate.realestate_app.service.reference.DealTypeService;
 
 import java.time.LocalDate;
-import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/deals")
@@ -83,5 +87,12 @@ public class DealWebController {
     public String addDeal(@ModelAttribute Deal deal) {
         dealService.save(deal);
         return "redirect:/deals";
+    }
+
+    @PostMapping("/update/{id}")
+    @ResponseBody
+    public ResponseEntity<Void> updateDeal(@PathVariable Long id, @RequestBody Map<String, Object> updates) {
+        dealService.update(id, updates);
+        return ResponseEntity.ok().build();
     }
 }

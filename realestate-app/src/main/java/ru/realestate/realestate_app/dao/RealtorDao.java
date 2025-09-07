@@ -205,7 +205,7 @@ public class RealtorDao {
         }
         if (updates.containsKey("experienceYears")) {
             sql.append("experience_years = ?, ");
-            params.add(updates.get("experienceYears"));
+            params.add(Integer.parseInt(updates.get("experienceYears").toString()));
         }
         
         // Убираем последнюю запятую и пробел
@@ -518,12 +518,23 @@ public class RealtorDao {
         
         // Валидация опыта работы
         if (updates.containsKey("experienceYears")) {
-            Integer experienceYears = (Integer) updates.get("experienceYears");
-            if (experienceYears == null || experienceYears < 0) {
-                logger.error("Попытка обновления риелтора с некорректным опытом: {}", experienceYears);
+            Object experienceYearsObj = updates.get("experienceYears");
+            if (experienceYearsObj == null || experienceYearsObj.toString().isEmpty()) {
+                logger.error("Попытка обновления риелтора с пустым значением опыта работы");
+                throw new IllegalArgumentException("Опыт работы не может быть пустым");
+            }
+            Integer experienceYears;
+            try {
+                experienceYears = Integer.parseInt(experienceYearsObj.toString());
+            } catch (NumberFormatException e) {
+                logger.error("Попытка обновления риелтора с некорректным форматом опыта работы: {}", experienceYearsObj);
+                throw new IllegalArgumentException("Некорректный формат опыта работы. Ожидается числовое значение.");
+            }
+            if (experienceYears < 0) {
+                logger.error("Попытка обновления риелтора с отрицательным опытом: {}", experienceYears);
                 throw new IllegalArgumentException("Опыт работы не может быть отрицательным");
             }
-            
+
             if (experienceYears > 100) {
                 logger.error("Попытка обновления риелтора с некорректным опытом: {}", experienceYears);
                 throw new IllegalArgumentException("Опыт работы не может превышать 100 лет");

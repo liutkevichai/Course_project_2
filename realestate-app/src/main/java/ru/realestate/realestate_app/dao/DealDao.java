@@ -155,6 +155,11 @@ public class DealDao {
         validateRelatedEntitiesForUpdate(updates);
         
         logger.debug("Обновление сделки с id: {}", id);
+
+        // Принудительное преобразование Integer в BigDecimal для deal_cost
+        if (updates.containsKey("deal_cost") && updates.get("deal_cost") instanceof Integer) {
+            updates.put("deal_cost", new BigDecimal((Integer) updates.get("deal_cost")));
+        }
         
         // Строим динамический SQL запрос
         StringBuilder sql = new StringBuilder("UPDATE deals SET ");
@@ -163,11 +168,25 @@ public class DealDao {
         // Добавляем поля для обновления
         if (updates.containsKey("dealDate")) {
             sql.append("deal_date = ?, ");
-            params.add(updates.get("dealDate"));
+            Object dateValue = updates.get("dealDate");
+            if (dateValue instanceof LocalDate) {
+                params.add(dateValue);
+            } else if (dateValue instanceof String) {
+                params.add(LocalDate.parse((String) dateValue));
+            } else {
+                throw new IllegalArgumentException("Некорректный формат даты. Ожидается LocalDate или строка в формате ISO_LOCAL_DATE.");
+            }
         }
-        if (updates.containsKey("dealCost")) {
+        if (updates.containsKey("deal_cost")) {
             sql.append("deal_cost = ?, ");
-            params.add(updates.get("dealCost"));
+            Object costValue = updates.get("deal_cost");
+            if (costValue instanceof BigDecimal) {
+                params.add(costValue);
+            } else if (costValue instanceof Number) {
+                params.add(new BigDecimal(costValue.toString()));
+            } else {
+                params.add(new BigDecimal(costValue.toString()));
+            }
         }
         if (updates.containsKey("idDealType")) {
             sql.append("id_deal_type = ?, ");
@@ -899,8 +918,23 @@ public class DealDao {
         }
         
         // Валидация стоимости
-        if (updates.containsKey("dealCost")) {
-            BigDecimal dealCost = (BigDecimal) updates.get("dealCost");
+        if (updates.containsKey("deal_cost")) {
+            Object dealCostObj = updates.get("deal_cost");
+            BigDecimal dealCost;
+
+            if (dealCostObj instanceof BigDecimal) {
+                dealCost = (BigDecimal) dealCostObj;
+            } else if (dealCostObj instanceof Number) {
+                dealCost = new BigDecimal(dealCostObj.toString());
+            } else {
+                try {
+                    dealCost = new BigDecimal(dealCostObj.toString());
+                } catch (NumberFormatException e) {
+                    logger.error("Некорректный формат стоимости сделки: {}", dealCostObj);
+                    throw new IllegalArgumentException("Некорректный формат стоимости сделки", e);
+                }
+            }
+
             if (dealCost == null || dealCost.compareTo(BigDecimal.ZERO) <= 0) {
                 logger.error("Попытка обновления сделки с некорректной стоимостью: {}", dealCost);
                 throw new IllegalArgumentException("Стоимость сделки должна быть больше нуля");
@@ -1024,6 +1058,49 @@ public class DealDao {
         String sql = "SELECT COUNT(*) FROM deal_types WHERE id_deal_type = ?";
         Integer count = jdbcTemplate.queryForObject(sql, Integer.class, dealTypeId);
         return count != null && count > 0;
+    }
+    
+    /**
+     * Найти сделку по идентификатору в формате таблицы
+     * @param id идентификатор сделки
+     * @return сделка в формате таблицы
+     * @throws org.springframework.dao.EmptyResultDataAccessException если сделка не найдена
+     */
+    public DealTableDto getDealForTable(Long id) {
+        if (id == null) {
+            logger.error("Попытка поиска сделки в формате таблицы с null id");
+            throw new IllegalArgumentException("Идентификатор сделки не может быть null");
+        }
+        
+        logger.debug("Поиск сделки в формате таблицы по id: {}", id);
+        String sql = """
+            SELECT
+                d.id_deal as deal_id,
+                d.deal_date,
+                d.deal_cost,
+                -- Клиент (полное имя)
+                CONCAT(c.last_name, ' ', c.first_name,
+                       CASE WHEN c.middle_name IS NOT NULL THEN CONCAT(' ', c.middle_name) ELSE '' END) as client_name,
+                c.phone as client_phone,
+                -- Риелтор (полное имя)
+                CONCAT(r.last_name, ' ', r.first_name,
+                       CASE WHEN r.middle_name IS NOT NULL THEN CONCAT(' ', r.middle_name) ELSE '' END) as realtor_name,
+                -- Адрес недвижимости (краткий)
+                CONCAT(street.street_name, ', ', p.house_number,
+                       CASE WHEN p.apartment_number IS NOT NULL THEN CONCAT('-', p.apartment_number) ELSE '' END) as property_address,
+                -- Типы
+                pt.property_type_name,
+                dt.deal_type_name
+            FROM deals d
+            JOIN clients c ON d.id_client = c.id_client
+            JOIN realtors r ON d.id_realtor = r.id_realtor
+            JOIN properties p ON d.id_property = p.id_property
+            JOIN streets street ON p.id_street = street.id_street
+            JOIN property_types pt ON p.id_property_type = pt.id_property_type
+            JOIN deal_types dt ON d.id_deal_type = dt.id_deal_type
+            WHERE d.id_deal = ?
+            """;
+        return jdbcTemplate.queryForObject(sql, dealTableRowMapper, id);
     }
     
     /**

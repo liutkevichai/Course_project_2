@@ -177,13 +177,13 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr th:each="property : ${properties}">
+                    <tr th:each="property : ${properties}" th:attr="data-id=${property.propertyId}">
                         <td th:text="${property.propertyId}"></td>
                         <td th:text="${property.getTableAddress()}"></td>
                         <td th:text="${property.cityName}"></td>
-                        <td th:text="${property.getAreaFormatted()}"></td>
-                        <td th:text="${property.getCostFormatted()}"></td>
-                        <td th:text="${property.propertyTypeName}"></td>
+                        <td class="editable" th:text="${property.getAreaFormatted()}"></td>
+                        <td class="editable" th:text="${property.getCostFormatted()}"></td>
+                        <td class="editable propertyType" th:text="${property.propertyTypeName}"></td>
                     </tr>
                 </tbody>
             </table>

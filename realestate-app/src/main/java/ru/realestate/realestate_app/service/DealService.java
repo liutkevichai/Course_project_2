@@ -341,7 +341,18 @@ public class DealService {
         if (updates == null || updates.isEmpty()) {
             throw new ValidationException("updates", "Данные для обновления не могут быть пустыми");
         }
-        // Остальная валидация выполняется в DAO
+        
+        if (updates.containsKey("dealDate")) {
+            Object dateValue = updates.get("dealDate");
+            if (dateValue instanceof String) {
+                try {
+                    LocalDate parsedDate = LocalDate.parse((String) dateValue);
+                    updates.put("dealDate", parsedDate); // Заменяем строку на LocalDate
+                } catch (java.time.format.DateTimeParseException e) {
+                    throw new ValidationException("dealDate", "Неверный формат даты. Ожидается формат YYYY-MM-DD.");
+                }
+            }
+        }
     }
 
     /**
@@ -357,13 +368,22 @@ public class DealService {
             
             // Проверяем обновление стоимости
             if (updates.containsKey("dealCost")) {
-                BigDecimal newCost = (BigDecimal) updates.get("dealCost");
+                Object newCostValue = updates.get("dealCost");
+                BigDecimal newCost;
+                if (newCostValue instanceof BigDecimal) {
+                    newCost = (BigDecimal) newCostValue;
+                } else if (newCostValue instanceof Number) {
+                    newCost = new BigDecimal(((Number) newCostValue).toString());
+                } else {
+                    throw new ValidationException("dealCost", "Некорректный тип для стоимости сделки. Ожидается число.");
+                }
+
                 Property property = propertyDao.findById(currentDeal.getIdProperty());
                 
                 if (newCost.compareTo(property.getCost()) > 0) {
                     throw new BusinessRuleException(
                         "DEAL_COST_EXCEEDS_PROPERTY_COST",
-                        String.format("Стоимость сделки (%.2f) не может превышать стоимость объекта недвижимости (%.2f)", 
+                        String.format("Стоимость сделки (%.2f) не может превышать стоимость объекта недвижимости (%.2f)",
                                      newCost, property.getCost())
                     );
                 }
@@ -497,12 +517,29 @@ public class DealService {
             throw re;
         }
     }
-
+    
+    /**
+     * Найти сделку по идентификатору в формате таблицы
+     * @param id идентификатор сделки
+     * @return сделка в формате таблицы
+     * @throws EntityNotFoundException если сделка не найдена
+     * @throws DatabaseException если произошла ошибка при работе с базой данных
+     */
+    public DealTableDto getDealForTable(Long id) {
+        try {
+            return dealDao.getDealForTable(id);
+        } catch (Exception e) {
+            RealEstateException re = ExceptionHandler.handleDatabaseException(e, "SELECT", "Deal", id);
+            ExceptionHandler.logException(re, "Ошибка при поиске сделки в формате таблицы по id: " + id);
+            throw re;
+        }
+    }
+    
     /**
      * Осуществляет поиск сделок по заданным критериям
      * @param startDate  Начальная дата для поиска (может быть null)
      * @param endDate    Конечная дата для поиска (может быть null)
-     * @param realtorId  ID риелтора для фильтрации (может быть null)
+     * @param realtorId ID риелтора для фильтрации (может быть null)
      * @param clientId   ID клиента для фильтрации (может быть null)
      * @param dealTypeId ID типа сделки для фильтрации (может быть null)
      * @return список отфильтрованных сделок в формате DealTableDto

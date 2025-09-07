@@ -15,7 +15,6 @@ import ru.realestate.realestate_app.model.Realtor;
 
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * Сервис для работы с риелторами

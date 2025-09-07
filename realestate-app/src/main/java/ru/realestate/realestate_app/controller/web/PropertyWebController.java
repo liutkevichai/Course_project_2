@@ -4,7 +4,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import ru.realestate.realestate_app.model.Property;
@@ -15,6 +17,7 @@ import ru.realestate.realestate_app.service.reference.GeographyService;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/properties")
@@ -69,6 +72,12 @@ public class PropertyWebController {
     @PostMapping("/add")
     public String addProperty(@ModelAttribute Property property) {
         propertyService.save(property);
+        return "redirect:/properties";
+    }
+    
+    @PostMapping("/update/{id}")
+    public String updateProperty(@PathVariable Long id, @RequestBody Map<String, Object> updates) {
+        propertyService.update(id, updates);
         return "redirect:/properties";
     }
 }

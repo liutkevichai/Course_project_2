@@ -177,11 +177,11 @@ public class PropertyDao {
         // Добавляем поля для обновления
         if (updates.containsKey("area")) {
             sql.append("area = ?, ");
-            params.add(updates.get("area"));
+            params.add(new BigDecimal(updates.get("area").toString()));
         }
         if (updates.containsKey("cost")) {
             sql.append("cost = ?, ");
-            params.add(updates.get("cost"));
+            params.add(new BigDecimal(updates.get("cost").toString()));
         }
         if (updates.containsKey("description")) {
             sql.append("description = ?, ");
@@ -731,19 +731,25 @@ public class PropertyDao {
     private void validatePropertyUpdates(Map<String, Object> updates) {
         // Валидация площади
         if (updates.containsKey("area")) {
-            BigDecimal area = (BigDecimal) updates.get("area");
-            if (area == null || area.compareTo(BigDecimal.ZERO) <= 0) {
-                logger.error("Попытка обновления объекта недвижимости с некорректной площадью: {}", area);
-                throw new IllegalArgumentException("Площадь объекта недвижимости должна быть больше нуля");
+            Object areaObj = updates.get("area");
+            if (areaObj != null) {
+                BigDecimal area = new BigDecimal(areaObj.toString());
+                if (area.compareTo(BigDecimal.ZERO) <= 0) {
+                    logger.error("Попытка обновления объекта недвижимости с некорректной площадью: {}", area);
+                    throw new IllegalArgumentException("Площадь объекта недвижимости должна быть больше нуля");
+                }
             }
         }
         
         // Валидация стоимости
         if (updates.containsKey("cost")) {
-            BigDecimal cost = (BigDecimal) updates.get("cost");
-            if (cost == null || cost.compareTo(BigDecimal.ZERO) <= 0) {
-                logger.error("Попытка обновления объекта недвижимости с некорректной стоимостью: {}", cost);
-                throw new IllegalArgumentException("Стоимость объекта недвижимости должна быть больше нуля");
+            Object costObj = updates.get("cost");
+            if (costObj != null) {
+                BigDecimal cost = new BigDecimal(costObj.toString());
+                if (cost.compareTo(BigDecimal.ZERO) <= 0) {
+                    logger.error("Попытка обновления объекта недвижимости с некорректной стоимостью: {}", cost);
+                    throw new IllegalArgumentException("Стоимость объекта недвижимости должна быть больше нуля");
+                }
             }
         }
         
