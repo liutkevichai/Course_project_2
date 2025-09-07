@@ -1,5 +1,7 @@
 package ru.realestate.realestate_app.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
@@ -29,6 +31,7 @@ import java.util.Map;
 @Service
 public class DealService {
     
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(DealService.class);
     private final DealDao dealDao;
     private final PropertyDao propertyDao; // Добавляем зависимость для проверок
 
@@ -138,9 +141,8 @@ public class DealService {
         try {
             return dealDao.deleteById(id);
         } catch (Exception e) {
-            RealEstateException re = ExceptionHandler.handleDatabaseException(e, "DELETE", "Deal", id);
-            ExceptionHandler.logException(re, "Ошибка при удалении сделки с id: " + id);
-            throw re;
+            log.error("Error deleting deal with id {}", id, e);
+            throw new RuntimeException("Error deleting deal with id " + id, e);
         }
     }
 

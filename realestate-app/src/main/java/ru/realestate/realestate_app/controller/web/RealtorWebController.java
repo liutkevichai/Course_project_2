@@ -2,6 +2,9 @@ package ru.realestate.realestate_app.controller.web;
 
 import java.util.Map;
 
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -47,5 +50,12 @@ public class RealtorWebController {
     public String updateRealtor(@PathVariable Long id, @RequestBody Map<String, Object> updates) {
         realtorService.update(id, updates);
         return "redirect:/realtors";
+    }
+    
+    @DeleteMapping("/delete/{id}")
+    @ResponseBody
+    public ResponseEntity<?> deleteRealtor(@PathVariable Long id) {
+        realtorService.deleteById(id);
+        return ResponseEntity.ok().build();
     }
 }

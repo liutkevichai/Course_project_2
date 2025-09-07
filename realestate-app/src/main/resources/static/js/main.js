@@ -251,6 +251,11 @@ document.addEventListener('DOMContentLoaded', function () {
             clientsTable.addEventListener('click', function(e) {
                 const row = e.target.closest('tr');
                 if (row && !row.classList.contains('editing')) {
+                    // Check if the click was on a delete button inside this row
+                    if (e.target.classList.contains('delete-btn')) {
+                         // The generic delete handler will take care of it.
+                        return;
+                    }
                     editClientRow(row);
                 }
             });
@@ -303,6 +308,7 @@ document.addEventListener('DOMContentLoaded', function () {
         actionsCell.innerHTML = `
             <button class="save-btn">Сохранить</button>
             <button class="cancel-btn">Отмена</button>
+            <button class="delete-btn">Удалить</button>
         `;
         row.appendChild(actionsCell);
         
@@ -402,6 +408,9 @@ document.addEventListener('DOMContentLoaded', function () {
             paymentsTable.addEventListener('click', function(e) {
                 const row = e.target.closest('tr');
                 if (row && !row.classList.contains('editing')) {
+                    if (e.target.classList.contains('delete-btn')) {
+                        return;
+                    }
                     editPaymentRow(row);
                 }
             });
@@ -486,6 +495,7 @@ document.addEventListener('DOMContentLoaded', function () {
         actionsCell.innerHTML = `
             <button class="save-btn">Сохранить</button>
             <button class="cancel-btn">Отмена</button>
+            <button class="delete-btn">Удалить</button>
         `;
         row.appendChild(actionsCell);
         
@@ -637,14 +647,12 @@ document.addEventListener('DOMContentLoaded', function () {
         if (dealsTable) {
             console.log('Найдена таблица сделок, добавляем обработчик событий');
             dealsTable.addEventListener('click', function(e) {
-                console.log('Произошло событие клика в таблице сделок:', e);
                 const row = e.target.closest('tr');
-                console.log('Найденная строка:', row);
                 if (row && !row.classList.contains('editing')) {
-                    console.log('Вызываем editDealRow для строки');
+                    if (e.target.classList.contains('delete-btn')) {
+                        return;
+                    }
                     editDealRow(row);
-                } else {
-                    console.log('Строка не найдена или уже редактируется');
                 }
             });
         } else {
@@ -771,6 +779,7 @@ document.addEventListener('DOMContentLoaded', function () {
         actionsCell.innerHTML = `
             <button class="save-btn">Сохранить</button>
             <button class="cancel-btn">Отмена</button>
+            <button class="delete-btn">Удалить</button>
         `;
         row.appendChild(actionsCell);
 
@@ -876,109 +885,122 @@ document.addEventListener('DOMContentLoaded', function () {
     
     // Обработчик для редактирования строк таблицы риелторов
     // Проверяем, что мы на странице риелторов
-    document.body.addEventListener('click', function(e) {
-        // Проверяем, что мы на странице риелторов
-        if (document.querySelector('main h1') && document.querySelector('main h1').textContent.includes('Риелторы')) {
-            const row = e.target.closest('tbody tr');
-            if (row && !row.classList.contains('editing')) {
-                // Добавляем класс editing
-                row.classList.add('editing');
-                
-                // Сохраняем исходное HTML-содержимое строки
-                row.dataset.originalContent = row.innerHTML;
-                
-                // Получаем данные из ячеек
-                const cells = row.querySelectorAll('td');
-                const realtorId = cells[0].textContent;
-                
-                // Заменяем содержимое ячеек на поля ввода, сохраняя исходные значения
-                for (let i = 1; i < cells.length; i++) { // Пропускаем первую ячейку (ID)
-                    const cellValue = cells[i].textContent;
-                    const input = document.createElement('input');
-                    input.type = 'text';
-                    input.value = cellValue;
-                    input.className = 'edit-input';
-                    cells[i].innerHTML = '';
-                    cells[i].appendChild(input);
-                }
-                
-                // В последнюю ячейку добавляем кнопки "Сохранить" и "Отмена"
-                const actionsCell = document.createElement('td');
-                actionsCell.innerHTML = `
-                    <button class="save-btn">Сохранить</button>
-                    <button class="cancel-btn">Отмена</button>
-                `;
-                row.appendChild(actionsCell);
-                
-                // Добавляем обработчики для кнопок
-                const saveBtn = actionsCell.querySelector('.save-btn');
-                const cancelBtn = actionsCell.querySelector('.cancel-btn');
-                
-                saveBtn.addEventListener('click', function() {
-                    // Собираем данные из полей ввода
-                    const inputs = row.querySelectorAll('input.edit-input');
+    if (document.querySelector('main h1') && document.querySelector('main h1').textContent.includes('Риелторы')) {
+        const realtorsTable = document.querySelector('main table tbody');
+        if (realtorsTable) {
+            realtorsTable.addEventListener('click', function(e) {
+                const row = e.target.closest('tr');
+                if (row && !row.classList.contains('editing')) {
+                    // Check if the click was on a delete button inside this row
+                    if (e.target.classList.contains('delete-btn')) {
+                         // The generic delete handler will take care of it.
+                        return;
+                    }
+                    // Получаем данные из ячеек
+                    const cells = row.querySelectorAll('td');
+                    const realtorId = cells[0].textContent;
                     
-                    // Формируем объект updates с ключами, соответствующими полям в Realtor.java
-                    const updates = {
-                        firstName: inputs[0].value, // Имя
-                        lastName: inputs[1].value,  // Фамилия
-                        phone: inputs[2].value,     // Телефон
-                        email: inputs[3].value,     // Email
-                        experienceYears: inputs[4].value // Опыт работы
-                    };
+                    // Добавляем класс editing
+                    row.classList.add('editing');
                     
-                    // Получаем id записи из data-record-id атрибута строки
-                    // или из первой ячейки
-                    const id = realtorId;
+                    // Сохраняем исходное HTML-содержимое строки
+                    row.dataset.originalContent = row.innerHTML;
+                    row.dataset.recordId = realtorId;
                     
-                    // Формируем POST запрос на эндпоинт /realtors/update/{id}
-                    fetch(`/realtors/update/${id}`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(updates)
-                    })
-                    .then(response => {
-                        if (response.ok) {
-                            // После успешного сохранения обновляем ячейки новыми значениями
-                            // и возвращаем строку в исходное состояние
-                            cells[1].textContent = inputs[0].value;
-                            cells[2].textContent = inputs[1].value;
-                            cells[3].textContent = inputs[2].value;
-                            cells[4].textContent = inputs[3].value;
-                            cells[5].textContent = inputs[4].value;
-                            
-                            // Удаляем последнюю ячейку с кнопками
-                            row.removeChild(row.lastChild);
-                            
-                            // Убираем класс editing
-                            row.classList.remove('editing');
-                        } else {
-                            console.error('Ошибка при сохранении данных риелтора:', response.status, response.statusText);
+                    // Заменяем содержимое ячеек на поля ввода, сохраняя исходные значения
+                    for (let i = 1; i < cells.length; i++) { // Пропускаем первую ячейку (ID)
+                        const cellValue = cells[i].textContent;
+                        const input = document.createElement('input');
+                        input.type = 'text';
+                        input.value = cellValue;
+                        input.className = 'edit-input';
+                        cells[i].innerHTML = '';
+                        cells[i].appendChild(input);
+                    }
+                    
+                    // В последнюю ячейку добавляем кнопки "Сохранить" и "Отмена"
+                    const actionsCell = document.createElement('td');
+                    actionsCell.innerHTML = `
+                        <button class="save-btn">Сохранить</button>
+                        <button class="cancel-btn">Отмена</button>
+                        <button class="delete-btn">Удалить</button>
+                    `;
+                    row.appendChild(actionsCell);
+                    
+                    // Добавляем обработчики для кнопок
+                    const saveBtn = actionsCell.querySelector('.save-btn');
+                    const cancelBtn = actionsCell.querySelector('.cancel-btn');
+                    
+                    saveBtn.addEventListener('click', function() {
+                        // Собираем данные из полей ввода
+                        const inputs = row.querySelectorAll('input.edit-input');
+                        
+                        // Формируем объект updates с ключами, соответствующими полям в Realtor.java
+                        const updates = {
+                            firstName: inputs[0].value, // Имя
+                            lastName: inputs[1].value,  // Фамилия
+                            phone: inputs[2].value,     // Телефон
+                            email: inputs[3].value,     // Email
+                            experienceYears: inputs[4].value // Опыт работы
+                        };
+                        
+                        // Получаем id записи из data-record-id атрибута строки
+                        const id = row.dataset.recordId;
+                        
+                        // Формируем POST запрос на эндпоинт /realtors/update/{id}
+                        fetch(`/realtors/update/${id}`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(updates)
+                        })
+                        .then(response => {
+                            if (response.ok) {
+                                // После успешного сохранения обновляем ячейки новыми значениями
+                                // и возвращаем строку в исходное состояние
+                                cells[1].textContent = inputs[0].value;
+                                cells[2].textContent = inputs[1].value;
+                                cells[3].textContent = inputs[2].value;
+                                cells[4].textContent = inputs[3].value;
+                                cells[5].textContent = inputs[4].value;
+                                
+                                // Удаляем последнюю ячейку с кнопками
+                                row.removeChild(row.lastChild);
+                                
+                                // Убираем класс editing
+                                row.classList.remove('editing');
+                            } else {
+                                console.error('Ошибка при сохранении данных риелтора:', response.status, response.statusText);
+                                // Возвращаем строку в исходное состояние
+                                cancelEditRealtorRow(row);
+                                alert('Произошла ошибка при сохранении данных риелтора. Пожалуйста, попробуйте еще раз.');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Ошибка при отправке запроса:', error);
                             // Возвращаем строку в исходное состояние
-                            row.innerHTML = row.dataset.originalContent;
-                            row.classList.remove('editing');
-                            alert('Произошла ошибка при сохранении данных риелтора. Пожалуйста, попробуйте еще раз.');
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Ошибка при отправке запроса:', error);
-                        // Возвращаем строку в исходное состояние
-                        row.innerHTML = row.dataset.originalContent;
-                        row.classList.remove('editing');
-                        alert('Произошла ошибка при сохранении данных риелтора. Пожалуйста, проверьте подключение к сети и попробуйте еще раз.');
+                            cancelEditRealtorRow(row);
+                            alert('Произошла ошибка при сохранении данных риелтора. Пожалуйста, проверьте подключение к сети и попробуйте еще раз.');
+                        });
                     });
-                });
-                
-                cancelBtn.addEventListener('click', function() {
-                    // Возвращаем строке ее исходное HTML-содержимое
-                    row.innerHTML = row.dataset.originalContent;
-                    row.classList.remove('editing');
-                });
-            }
+                    
+                    cancelBtn.addEventListener('click', function() {
+                        // Возвращаем строке ее исходное HTML-содержимое
+                        cancelEditRealtorRow(row);
+                    });
+                }
+            });
         }
-    });
+    }
+    
+    // Функция для отмены редактирования строки риелтора
+    function cancelEditRealtorRow(row) {
+        // Восстанавливаем исходное содержимое строки
+        row.innerHTML = row.dataset.originalContent;
+        // Удаляем класс editing
+        row.classList.remove('editing');
+    }
     
     // Обработчик для редактирования строк таблицы недвижимости
     // Проверяем, что мы на странице недвижимости
@@ -988,6 +1010,9 @@ document.addEventListener('DOMContentLoaded', function () {
             propertiesTable.addEventListener('click', function(e) {
                 const row = e.target.closest('tr');
                 if (row && !row.classList.contains('editing')) {
+                    if (e.target.classList.contains('delete-btn')) {
+                        return;
+                    }
                     editPropertyRow(row);
                 }
             });
@@ -1045,6 +1070,7 @@ document.addEventListener('DOMContentLoaded', function () {
         actionsCell.innerHTML = `
             <button class="save-btn">Сохранить</button>
             <button class="cancel-btn">Отмена</button>
+            <button class="delete-btn">Удалить</button>
         `;
         row.appendChild(actionsCell);
         
@@ -1174,5 +1200,53 @@ document.addEventListener('DOMContentLoaded', function () {
         // Удаляем класс editing
         row.classList.remove('editing');
     }
+    
+    // Обработчик для кнопок удаления с использованием делегирования событий
+    document.body.addEventListener('click', function(e) {
+        if (e.target.classList.contains('delete-btn')) {
+            // Показываем диалоговое окно подтверждения
+            if (!confirm('Вы уверены, что хотите удалить эту запись?')) {
+                return; // Если пользователь не подтверждает удаление, ничего не делаем
+            }
+            
+            // Получаем родительскую строку (tr)
+            const row = e.target.closest('tr');
+            if (!row) return;
+            
+            // Получаем recordId из текстового содержимого первой ячейки строки
+            const recordId = row.cells[0].textContent;
+            if (!recordId) {
+                alert('Не удалось получить ID записи для удаления.');
+                return;
+            }
+            
+            // Отправляем DELETE запрос
+            fetch(`${window.location.pathname}/delete/${recordId}`, {
+                method: 'DELETE'
+            })
+            .then(response => {
+                if (response.ok) {
+                    // В случае успешного ответа удаляем строку из DOM
+                    row.remove();
+                } else {
+                    // Парсим JSON из тела ответа
+                    response.json().then(errorData => {
+                        // Показываем поле message, если оно есть, иначе - общее сообщение
+                        alert(errorData.message || 'Ошибка при удалении записи.');
+                    }).catch(() => {
+                        // Если тело ответа - не JSON, показываем как текст
+                        response.text().then(errorMessage => {
+                             alert(errorMessage || 'Ошибка при удалении записи.');
+                        });
+                    });
+                }
+            })
+            .catch(error => {
+                // Этот блок сработает при сетевых ошибках
+                console.error('Fetch error:', error);
+                alert('Сетевая ошибка при попытке удаления.');
+            });
+        }
+    });
     
 });

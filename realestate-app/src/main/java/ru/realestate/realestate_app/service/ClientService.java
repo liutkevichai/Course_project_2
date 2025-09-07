@@ -1,5 +1,7 @@
 package ru.realestate.realestate_app.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +26,7 @@ import java.util.Map;
 @Service
 public class ClientService {
 
+    private static final Logger log = LoggerFactory.getLogger(ClientService.class);
     private final ClientDao clientDao;
     private final DealDao dealDao; // Добавляем зависимость для проверок
 
@@ -140,8 +143,8 @@ public class ClientService {
         try {
             return clientDao.deleteById(id);
         } catch (Exception e) {
+            log.error("Error deleting client with id {}", id, e);
             RealEstateException re = ExceptionHandler.handleDatabaseException(e, "DELETE", "Client", id);
-            ExceptionHandler.logException(re, "Ошибка при удалении клиента с id: " + id);
             throw re;
         }
     }

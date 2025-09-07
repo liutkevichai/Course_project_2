@@ -24,12 +24,12 @@ public class PaymentController {
 
     @GetMapping
     public List<Payment> getAllPayments() {
-        return paymentService.getAllPayments();
+        return paymentService.findAll();
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Payment> getPaymentById(@PathVariable Long id) {
-        Payment payment = paymentService.getPaymentById(id);
+        Payment payment = paymentService.findById(id);
         return ResponseEntity.ok(payment);
     }
 
@@ -40,19 +40,19 @@ public class PaymentController {
 
     @PostMapping
     public ResponseEntity<Payment> createPayment(@Valid @RequestBody Payment payment) {
-        Payment createdPayment = paymentService.createPayment(payment);
+        Payment createdPayment = paymentService.save(payment);
         return new ResponseEntity<>(createdPayment, HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<Payment> updatePayment(@PathVariable Long id, @Valid @RequestBody Payment paymentDetails) {
-        Payment updatedPayment = paymentService.updatePayment(id, paymentDetails);
+        Payment updatedPayment = paymentService.update(id, paymentDetails);
         return ResponseEntity.ok(updatedPayment);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletePayment(@PathVariable Long id) {
-        paymentService.deletePayment(id);
+        paymentService.deleteById(id);
         return ResponseEntity.noContent().build();
     }
 }

@@ -23,11 +23,11 @@ public class PaymentService {
         this.paymentDao = paymentDao;
     }
 
-    public List<Payment> getAllPayments() {
+    public List<Payment> findAll() {
         return paymentDao.findAll();
     }
 
-    public Payment getPaymentById(Long id) {
+    public Payment findById(Long id) {
         return paymentDao.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Payment", id));
     }
@@ -36,22 +36,22 @@ public class PaymentService {
         return paymentDao.findByDealId(dealId);
     }
 
-    public Payment createPayment(Payment payment) {
+    public Payment save(Payment payment) {
         // Здесь могут быть бизнес-правила, например, проверка, что сумма платежей не превышает сумму сделки
         return paymentDao.save(payment);
     }
 
-    public Payment updatePayment(Long id, Payment paymentDetails) {
-        Payment payment = getPaymentById(id);
+    public Payment update(Long id, Payment paymentDetails) {
+        Payment payment = findById(id);
         payment.setPaymentDate(paymentDetails.getPaymentDate());
         payment.setAmount(paymentDetails.getAmount());
         payment.setIdDeal(paymentDetails.getIdDeal());
         return paymentDao.update(payment);
     }
 
-    public void deletePayment(Long id) {
+    public void deleteById(Long id) {
         // Проверяем, существует ли платеж перед удалением
-        getPaymentById(id);
+        findById(id);
         paymentDao.delete(id);
     }
     

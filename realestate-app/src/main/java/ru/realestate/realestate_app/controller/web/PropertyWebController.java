@@ -9,6 +9,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.http.ResponseEntity;
 import ru.realestate.realestate_app.model.Property;
 import ru.realestate.realestate_app.model.dto.PropertyTableDto;
 import ru.realestate.realestate_app.service.PropertyService;
@@ -76,8 +79,16 @@ public class PropertyWebController {
     }
     
     @PostMapping("/update/{id}")
-    public String updateProperty(@PathVariable Long id, @RequestBody Map<String, Object> updates) {
+    @ResponseBody
+    public ResponseEntity<Void> updateProperty(@PathVariable Long id, @RequestBody Map<String, Object> updates) {
         propertyService.update(id, updates);
-        return "redirect:/properties";
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/delete/{id}")
+    @ResponseBody
+    public ResponseEntity<?> deleteProperty(@PathVariable Long id) {
+        propertyService.deleteById(id);
+        return ResponseEntity.ok().build();
     }
 }

@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.http.ResponseEntity;
 import org.springframework.format.annotation.DateTimeFormat;
 import ru.realestate.realestate_app.model.Deal;
@@ -93,6 +94,13 @@ public class DealWebController {
     @ResponseBody
     public ResponseEntity<Void> updateDeal(@PathVariable Long id, @RequestBody Map<String, Object> updates) {
         dealService.update(id, updates);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/delete/{id}")
+    @ResponseBody
+    public ResponseEntity<?> deleteDeal(@PathVariable Long id) {
+        dealService.deleteById(id);
         return ResponseEntity.ok().build();
     }
 }

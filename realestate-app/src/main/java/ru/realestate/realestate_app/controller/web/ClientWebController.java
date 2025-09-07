@@ -2,6 +2,7 @@ package ru.realestate.realestate_app.controller.web;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -66,6 +67,13 @@ public class ClientWebController {
     @ResponseBody
     public ResponseEntity<Void> updateClient(@PathVariable Long id, @RequestBody Map<String, Object> updates) {
         clientService.update(id, updates);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/delete/{id}")
+    @ResponseBody
+    public ResponseEntity<Void> deleteClient(@PathVariable Long id) {
+        clientService.deleteById(id);
         return ResponseEntity.ok().build();
     }
 }
