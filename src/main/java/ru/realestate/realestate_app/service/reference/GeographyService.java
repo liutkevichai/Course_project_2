@@ -670,4 +670,84 @@ public class GeographyService {
             throw re;
         }
     }
-} 
+    
+    /**
+     * Поиск регионов с детальной информацией по нескольким критериям
+     *
+     * @param regionNamePattern паттерн названия региона (может быть null)
+     * @param regionCode код региона (может быть null)
+     * @param countryId идентификатор страны (может быть null)
+     * @return список регионов, соответствующих критериям поиска
+     * @throws DatabaseException если произошла ошибка при работе с базой данных
+     */
+    public List<RegionWithDetailsDto> searchRegionsWithDetails(String regionNamePattern, String regionCode, Long countryId) {
+        try {
+            return geographyDao.searchRegionsWithDetails(regionNamePattern, regionCode, countryId);
+        } catch (Exception e) {
+            RealEstateException re = ExceptionHandler.handleDatabaseException(e, "SELECT", "Region", null);
+            ExceptionHandler.logException(re, "Ошибка при поиске регионов с детальной информацией по критериям: " +
+                "regionNamePattern=" + regionNamePattern + ", regionCode=" + regionCode + ", countryId=" + countryId);
+            throw re;
+        }
+    }
+    
+    /**
+     * Поиск городов с детальной информацией по нескольким критериям
+     *
+     * @param cityNamePattern паттерн названия города (может быть null)
+     * @param regionId идентификатор региона (может быть null)
+     * @param countryId идентификатор страны (может быть null)
+     * @return список городов, соответствующих критериям поиска
+     * @throws DatabaseException если произошла ошибка при работе с базой данных
+     */
+    public List<CityWithDetailsDto> searchCitiesWithDetails(String cityNamePattern, Long regionId, Long countryId) {
+        try {
+            return geographyDao.searchCitiesWithDetails(cityNamePattern, regionId, countryId);
+        } catch (Exception e) {
+            RealEstateException re = ExceptionHandler.handleDatabaseException(e, "SELECT", "City", null);
+            ExceptionHandler.logException(re, "Ошибка при поиске городов с детальной информацией по критериям: " +
+                "cityNamePattern=" + cityNamePattern + ", regionId=" + regionId + ", countryId=" + countryId);
+            throw re;
+        }
+    }
+    
+    /**
+     * Поиск районов с детальной информацией по нескольким критериям
+     *
+     * @param districtNamePattern паттерн названия района (может быть null)
+     * @param cityId идентификатор города (может быть null)
+     * @param regionId идентификатор региона (может быть null)
+     * @return список районов, соответствующих критериям поиска
+     * @throws DatabaseException если произошла ошибка при работе с базой данных
+     */
+    public List<DistrictWithDetailsDto> searchDistrictsWithDetails(String districtNamePattern, Long cityId, Long regionId) {
+        try {
+            return geographyDao.searchDistrictsWithDetails(districtNamePattern, cityId, regionId);
+        } catch (Exception e) {
+            RealEstateException re = ExceptionHandler.handleDatabaseException(e, "SELECT", "District", null);
+            ExceptionHandler.logException(re, "Ошибка при поиске районов с детальной информацией по критериям: " +
+                "districtNamePattern=" + districtNamePattern + ", cityId=" + cityId + ", regionId=" + regionId);
+            throw re;
+        }
+    }
+    
+    /**
+     * Поиск улиц с детальной информацией по нескольким критериям
+     *
+     * @param streetNamePattern паттерн названия улицы (может быть null)
+     * @param cityId идентификатор города (может быть null)
+     * @param regionId идентификатор региона (может быть null)
+     * @return список улиц, соответствующих критериям поиска
+     * @throws DatabaseException если произошла ошибка при работе с базой данных
+     */
+    public List<StreetWithDetailsDto> searchStreetsWithDetails(String streetNamePattern, Long cityId, Long regionId) {
+        try {
+            return geographyDao.searchStreetsWithDetails(streetNamePattern, cityId, regionId);
+        } catch (Exception e) {
+            RealEstateException re = ExceptionHandler.handleDatabaseException(e, "SELECT", "Street", null);
+            ExceptionHandler.logException(re, "Ошибка при поиске улиц с детальной информацией по критериям: " +
+                "streetNamePattern=" + streetNamePattern + ", cityId=" + cityId + ", regionId=" + regionId);
+            throw re;
+        }
+    }
+}

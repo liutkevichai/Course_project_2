@@ -1,6 +1,6 @@
 # API Endpoints - Агентство недвижимости
 
-## Клиенты (/api/clients)
+## Клиенты (`/api/clients`)
 ```
 GET    /api/clients
 GET    /api/clients/{id}
@@ -13,7 +13,7 @@ GET    /api/clients/search/by-email
 GET    /api/clients/count
 ```
 
-## Недвижимость (/api/properties)
+## Недвижимость (`/api/properties`)
 ```
 GET    /api/properties
 GET    /api/properties/{id}
@@ -32,7 +32,7 @@ GET    /api/properties/search/by-city/{cityId}/with-details
 GET    /api/properties/search/by-type/{propertyTypeId}/with-details
 ```
 
-## Риелторы (/api/realtors)
+## Риелторы (`/api/realtors`)
 ```
 GET    /api/realtors
 GET    /api/realtors/{id}
@@ -46,7 +46,7 @@ GET    /api/realtors/search/by-email
 GET    /api/realtors/count
 ```
 
-## Сделки (/api/deals)
+## Сделки (`/api/deals`)
 ```
 GET    /api/deals
 GET    /api/deals/{id}
@@ -65,27 +65,28 @@ GET    /api/deals/count
 GET    /api/deals/with-details
 GET    /api/deals/{id}/with-details
 GET    /api/deals/for-table
+GET    /api/deals/{id}/for-table
 GET    /api/deals/search/by-date-with-details
 GET    /api/deals/search/by-date-range-with-details
 GET    /api/deals/search/by-realtor/{realtorId}/with-details
 GET    /api/deals/search/by-client/{clientId}/with-details
 ```
 
-## Типы сделок (/api/deal-types)
+## Типы сделок (`/api/deal-types`)
 ```
 GET    /api/deal-types
 GET    /api/deal-types/{id}
 GET    /api/deal-types/search/by-name
 ```
 
-## Типы недвижимости (/api/property-types)
+## Типы недвижимости (`/api/property-types`)
 ```
 GET    /api/property-types
 GET    /api/property-types/{id}
 GET    /api/property-types/search/by-name
 ```
 
-## Платежи (/api/payments)
+## Платежи (`/api/payments`)
 ```
 GET    /api/payments
 GET    /api/payments/{id}
@@ -95,7 +96,7 @@ DELETE /api/payments/{id}
 GET    /api/payments/deal/{dealId}
 ```
 
-## География (/api/geography)
+## География (`/api/geography`)
 
 ### Страны
 ```
@@ -156,7 +157,4 @@ GET    /api/geography/cities/{cityId}/streets/with-details
 
 ---
 
-**Всего endpoints: 90**
-- **CRUD операции**: 33
-- **Поиск и фильтрация**: 33
-- **DTO с детальной информацией**: 24
+**Всего эндпоинтов: 92**

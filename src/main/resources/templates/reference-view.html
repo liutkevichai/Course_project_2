@@ -9,6 +9,134 @@
     <main>
         <h1 th:text="${pageTitle}">Справочная таблица</h1>
         
+        <!-- Форма "Найти запись" -->
+        <section th:if="${pageTitle == 'Регионы'}">
+            <h2>Найти запись</h2>
+            <form th:action="@{/reference/regions}" method="get">
+                <div>
+                    <label for="searchRegionName">Название:</label>
+                    <select id="searchRegionName" name="regionName">
+                        <option value="">Выберите регион</option>
+                        <option th:each="region : ${allRegions}"
+                                th:value="${region.regionName}"
+                                th:text="${region.regionName}"
+                                th:selected="${regionName != null and region.regionName == regionName}"></option>
+                    </select>
+                </div>
+                <div>
+                    <label for="searchRegionCode">Код:</label>
+                    <input type="text" id="searchRegionCode" name="regionCode" th:value="${regionCode}" placeholder="Код региона">
+                </div>
+                <div>
+                    <label for="searchCountryId">Страна:</label>
+                    <select id="searchCountryId" name="countryId">
+                        <option value="">Выберите страну</option>
+                        <option th:each="country : ${countries}"
+                                th:value="${country.idCountry}"
+                                th:text="${country.countryName}"
+                                th:selected="${countryId != null and country.idCountry == countryId}"></option>
+                    </select>
+                </div>
+                <button type="submit">Поиск</button>
+            </form>
+        </section>
+        
+        <!-- Форма "Найти запись" для городов -->
+        <section th:if="${pageTitle == 'Города'}">
+            <h2>Найти запись</h2>
+            <form th:action="@{/reference/cities}" method="get">
+                <div>
+                    <label for="searchCityName">Название:</label>
+                    <input type="text" id="searchCityName" name="cityName" th:value="${cityName}" placeholder="Название города">
+                </div>
+                <div>
+                    <label for="searchRegionId">Регион:</label>
+                    <select id="searchRegionId" name="regionId">
+                        <option value="">Выберите регион</option>
+                        <option th:each="region : ${allRegions}"
+                                th:value="${region.regionId}"
+                                th:text="${region.regionName}"
+                                th:selected="${regionId != null and region.regionId == regionId}"></option>
+                    </select>
+                </div>
+                <div>
+                    <label for="searchCountryIdCities">Страна:</label>
+                    <select id="searchCountryIdCities" name="countryId">
+                        <option value="">Выберите страну</option>
+                        <option th:each="country : ${countries}"
+                                th:value="${country.idCountry}"
+                                th:text="${country.countryName}"
+                                th:selected="${countryId != null and country.idCountry == countryId}"></option>
+                    </select>
+                </div>
+                <button type="submit">Поиск</button>
+            </form>
+        </section>
+        
+        <!-- Форма "Найти запись" для районов -->
+        <section th:if="${pageTitle == 'Районы'}">
+            <h2>Найти запись</h2>
+            <form th:action="@{/reference/districts}" method="get">
+                <div>
+                    <label for="searchDistrictName">Название:</label>
+                    <input type="text" id="searchDistrictName" name="districtName" th:value="${districtName}" placeholder="Название района">
+                </div>
+                <div>
+                    <label for="searchCityId">Город:</label>
+                    <select id="searchCityId" name="cityId">
+                        <option value="">Выберите город</option>
+                        <option th:each="city : ${allCities}"
+                                th:value="${city.cityId}"
+                                th:text="${city.cityName}"
+                                th:selected="${cityId != null and city.cityId == cityId}"></option>
+                    </select>
+                </div>
+                <div>
+                    <label for="searchRegionIdDistricts">Регион:</label>
+                    <select id="searchRegionIdDistricts" name="regionId">
+                        <option value="">Выберите регион</option>
+                        <option th:each="region : ${allRegions}"
+                                th:value="${region.regionId}"
+                                th:text="${region.regionName}"
+                                th:selected="${regionId != null and region.regionId == regionId}"></option>
+                    </select>
+                </div>
+                <button type="submit">Поиск</button>
+            </form>
+        </section>
+        
+        <!-- Форма "Найти запись" для улиц -->
+        <section th:if="${pageTitle == 'Улицы'}">
+            <h2>Найти запись</h2>
+            <form th:action="@{/reference/streets}" method="get">
+                <div>
+                    <label for="searchStreetName">Название:</label>
+                    <input type="text" id="searchStreetName" name="streetName" th:value="${streetName}" placeholder="Название улицы">
+                </div>
+                <div>
+                    <label for="searchCityIdStreets">Город:</label>
+                    <select id="searchCityIdStreets" name="cityId">
+                        <option value="">Выберите город</option>
+                        <option th:each="city : ${allCities}"
+                                th:value="${city.cityId}"
+                                th:text="${city.cityName}"
+                                th:selected="${cityId != null and city.cityId == cityId}"></option>
+                    </select>
+                </div>
+                <div>
+                    <label for="searchRegionIdStreets">Регион:</label>
+                    <select id="searchRegionIdStreets" name="regionId">
+                        <option value="">Выберите регион</option>
+                        <option th:each="region : ${allRegions}"
+                                th:value="${region.regionId}"
+                                th:text="${region.regionName}"
+                                th:selected="${regionId != null and region.regionId == regionId}"></option>
+                    </select>
+                </div>
+                <button type="submit">Поиск</button>
+            </form>
+        </section>
+        
         <!-- Таблица данных -->
         <section>
             <table>

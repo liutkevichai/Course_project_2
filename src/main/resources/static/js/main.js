@@ -243,6 +243,42 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     }
     
+    // Универсальная функция для добавления кнопок действий
+    function addActionButtons(row) {
+        // Добавляем заголовок "Действия" если его еще нет
+        const table = row.closest('table');
+        const headerRow = table.querySelector('thead tr');
+        if (!headerRow.querySelector('th[data-actions-header]')) {
+            const actionsHeader = document.createElement('th');
+            actionsHeader.textContent = 'Действия';
+            actionsHeader.setAttribute('data-actions-header', 'true');
+            headerRow.appendChild(actionsHeader);
+        }
+        
+        // Создаем ячейку с кнопками
+        const actionsCell = document.createElement('td');
+        actionsCell.innerHTML = `
+            <div class="edit-actions">
+                <button class="save-btn">Сохранить</button>
+                <button class="cancel-btn">Отмена</button>
+                <button class="delete-btn" title="Удалить"></button>
+            </div>
+        `;
+        row.appendChild(actionsCell);
+        return actionsCell;
+    }
+    
+    // Универсальная функция для удаления заголовка действий если нет редактируемых строк
+    function removeActionsHeaderIfNeeded(table) {
+        const editingRows = table.querySelectorAll('tbody tr.editing');
+        if (editingRows.length === 0) {
+            const actionsHeader = table.querySelector('th[data-actions-header]');
+            if (actionsHeader) {
+                actionsHeader.remove();
+            }
+        }
+    }
+    
     // Обработчик для редактирования строк таблицы клиентов
     // Проверяем, что мы на странице клиентов
     if (document.querySelector('main h1') && document.querySelector('main h1').textContent.includes('Клиенты')) {
@@ -303,14 +339,8 @@ document.addEventListener('DOMContentLoaded', function () {
             cell.appendChild(input);
         });
         
-        // Добавляем кнопки "Сохранить" и "Отмена" в последнюю ячейку
-        const actionsCell = document.createElement('td');
-        actionsCell.innerHTML = `
-            <button class="save-btn">Сохранить</button>
-            <button class="cancel-btn">Отмена</button>
-            <button class="delete-btn">Удалить</button>
-        `;
-        row.appendChild(actionsCell);
+        // Добавляем кнопки действий
+        const actionsCell = addActionButtons(row);
         
         // Обработчики для кнопок
         const saveBtn = actionsCell.querySelector('.save-btn');
@@ -373,6 +403,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 
                 // Убираем класс editing
                 row.classList.remove('editing');
+                
+                // Удаляем заголовок действий если нужно
+                const table = row.closest('table');
+                removeActionsHeaderIfNeeded(table);
             } else {
                 // В случае ошибки выводим сообщение в консоль
                 console.error('Ошибка при сохранении данных клиента:', response.status, response.statusText);
@@ -394,10 +428,13 @@ document.addEventListener('DOMContentLoaded', function () {
     
     // Функция для отмены редактирования строки клиента
     function cancelEditClientRow(row) {
+        const table = row.closest('table');
         // Восстанавливаем исходное содержимое строки
         row.innerHTML = row.dataset.originalContent;
         // Удаляем класс editing
         row.classList.remove('editing');
+        // Удаляем заголовок действий если нужно
+        removeActionsHeaderIfNeeded(table);
     }
     
     // Обработчик для редактирования строк таблицы платежей
@@ -490,14 +527,8 @@ document.addEventListener('DOMContentLoaded', function () {
             updateDealDetails(this.value, row);
         });
         
-        // Добавляем кнопки "Сохранить" и "Отмена" в новую ячейку
-        const actionsCell = document.createElement('td');
-        actionsCell.innerHTML = `
-            <button class="save-btn">Сохранить</button>
-            <button class="cancel-btn">Отмена</button>
-            <button class="delete-btn">Удалить</button>
-        `;
-        row.appendChild(actionsCell);
+        // Добавляем кнопки действий
+        const actionsCell = addActionButtons(row);
         
         // Обработчики для кнопок
         const saveBtn = actionsCell.querySelector('.save-btn');
@@ -563,6 +594,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 
                 // Убираем класс editing
                 row.classList.remove('editing');
+                
+                // Удаляем заголовок действий если нужно
+                const table = row.closest('table');
+                removeActionsHeaderIfNeeded(table);
             } else {
                 // В случае ошибки выводим сообщение в консоль
                 console.error('Ошибка при сохранении данных платежа:', response.status, response.statusText);
@@ -584,10 +619,13 @@ document.addEventListener('DOMContentLoaded', function () {
     
     // Функция для отмены редактирования строки платежа
     function cancelEditPaymentRow(row) {
+        const table = row.closest('table');
         // Восстанавливаем исходное содержимое строки
         row.innerHTML = row.dataset.originalContent;
         // Удаляем класс editing
         row.classList.remove('editing');
+        // Удаляем заголовок действий если нужно
+        removeActionsHeaderIfNeeded(table);
     }
     
     // Функция для форматирования даты из YYYY-MM-DD в DD.MM.YYYY
@@ -775,13 +813,7 @@ document.addEventListener('DOMContentLoaded', function () {
             });
 
         // --- Кнопки управления ---
-        const actionsCell = document.createElement('td');
-        actionsCell.innerHTML = `
-            <button class="save-btn">Сохранить</button>
-            <button class="cancel-btn">Отмена</button>
-            <button class="delete-btn">Удалить</button>
-        `;
-        row.appendChild(actionsCell);
+        const actionsCell = addActionButtons(row);
 
         actionsCell.querySelector('.save-btn').addEventListener('click', () => saveDealRow(row));
         actionsCell.querySelector('.cancel-btn').addEventListener('click', () => cancelEditDealRow(row));
@@ -856,6 +888,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 
                 // Убираем класс editing
                 row.classList.remove('editing');
+                
+                // Удаляем заголовок действий если нужно
+                const table = row.closest('table');
+                removeActionsHeaderIfNeeded(table);
             } else {
                 // В случае ошибки выводим сообщение в консоль
                 console.error('Ошибка при сохранении данных сделки:', response.status, response.statusText);
@@ -877,10 +913,13 @@ document.addEventListener('DOMContentLoaded', function () {
     
     // Функция для отмены редактирования строки сделки
     function cancelEditDealRow(row) {
+        const table = row.closest('table');
         // Восстанавливаем исходное содержимое строки
         row.innerHTML = row.dataset.originalContent;
         // Удаляем класс editing
         row.classList.remove('editing');
+        // Удаляем заголовок действий если нужно
+        removeActionsHeaderIfNeeded(table);
     }
     
     // Обработчик для редактирования строк таблицы риелторов
@@ -918,14 +957,8 @@ document.addEventListener('DOMContentLoaded', function () {
                         cells[i].appendChild(input);
                     }
                     
-                    // В последнюю ячейку добавляем кнопки "Сохранить" и "Отмена"
-                    const actionsCell = document.createElement('td');
-                    actionsCell.innerHTML = `
-                        <button class="save-btn">Сохранить</button>
-                        <button class="cancel-btn">Отмена</button>
-                        <button class="delete-btn">Удалить</button>
-                    `;
-                    row.appendChild(actionsCell);
+                    // Добавляем кнопки действий
+                    const actionsCell = addActionButtons(row);
                     
                     // Добавляем обработчики для кнопок
                     const saveBtn = actionsCell.querySelector('.save-btn');
@@ -970,6 +1003,10 @@ document.addEventListener('DOMContentLoaded', function () {
                                 
                                 // Убираем класс editing
                                 row.classList.remove('editing');
+                                
+                                // Удаляем заголовок действий если нужно
+                                const table = row.closest('table');
+                                removeActionsHeaderIfNeeded(table);
                             } else {
                                 console.error('Ошибка при сохранении данных риелтора:', response.status, response.statusText);
                                 // Возвращаем строку в исходное состояние
@@ -996,10 +1033,13 @@ document.addEventListener('DOMContentLoaded', function () {
     
     // Функция для отмены редактирования строки риелтора
     function cancelEditRealtorRow(row) {
+        const table = row.closest('table');
         // Восстанавливаем исходное содержимое строки
         row.innerHTML = row.dataset.originalContent;
         // Удаляем класс editing
         row.classList.remove('editing');
+        // Удаляем заголовок действий если нужно
+        removeActionsHeaderIfNeeded(table);
     }
     
     // Обработчик для редактирования строк таблицы недвижимости
@@ -1065,14 +1105,8 @@ document.addEventListener('DOMContentLoaded', function () {
         // Создаем выпадающий список для типа недвижимости
         createPropertyTypeSelect(typeValue, typeCell);
         
-        // Добавляем кнопки "Сохранить" и "Отмена" в новую ячейку
-        const actionsCell = document.createElement('td');
-        actionsCell.innerHTML = `
-            <button class="save-btn">Сохранить</button>
-            <button class="cancel-btn">Отмена</button>
-            <button class="delete-btn">Удалить</button>
-        `;
-        row.appendChild(actionsCell);
+        // Добавляем кнопки действий
+        const actionsCell = addActionButtons(row);
         
         // Обработчики для кнопок
         const saveBtn = actionsCell.querySelector('.save-btn');
@@ -1174,6 +1208,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 
                 // Убираем класс editing
                 row.classList.remove('editing');
+                
+                // Удаляем заголовок действий если нужно
+                const table = row.closest('table');
+                removeActionsHeaderIfNeeded(table);
             } else {
                 // В случае ошибки выводим сообщение в консоль
                 console.error('Ошибка при сохранении данных недвижимости:', response.status, response.statusText);
@@ -1195,10 +1233,13 @@ document.addEventListener('DOMContentLoaded', function () {
     
     // Функция для отмены редактирования строки недвижимости
     function cancelEditPropertyRow(row) {
+        const table = row.closest('table');
         // Восстанавливаем исходное содержимое строки
         row.innerHTML = row.dataset.originalContent;
         // Удаляем класс editing
         row.classList.remove('editing');
+        // Удаляем заголовок действий если нужно
+        removeActionsHeaderIfNeeded(table);
     }
     
     // Обработчик для кнопок удаления с использованием делегирования событий

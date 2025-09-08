@@ -1,4 +1,35 @@
 /* Базовые стили */
+:root {
+    /* Основные цвета (только голубая гамма) */
+    --primary: #0284C7;
+    --primary-light: #0EA5E9;
+    --primary-dark: #0369A1;
+    --secondary: #0891B2;
+    --accent: #06B6D4;
+    
+    /* Нейтральные цвета */
+    --background: #F8FAFC;
+    --surface: #FFFFFF;
+    --border: #E2E8F0;
+    --text-primary: #1E293B;
+    --text-secondary: #64748B;
+    --text-light: #94A3B8;
+    
+    /* Тени (более тонкие) */
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
+    --shadow-md: 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+    --shadow-lg: 0 4px 8px 0 rgba(0, 0, 0, 0.08);
+    
+    /* Радиусы скругления (более консервативные) */
+    --radius-sm: 3px;
+    --radius-md: 6px;
+    --radius-lg: 8px;
+    
+    /* Переходы */
+    --transition-fast: 150ms ease-in-out;
+    --transition-normal: 250ms ease-in-out;
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -7,47 +38,62 @@
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #f5f5f5;
-    color: #333;
+    background-color: var(--background);
+    color: var(--text-primary);
     line-height: 1.6;
+    font-size: 14px;
+    font-weight: 400;
 }
 
 /* Стили заголовка */
 header {
-    background-color: #2c3e50;
+    background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
     color: white;
-    padding: 1rem;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    padding: 1.25rem 2rem;
+    box-shadow: 0 2px 12px rgba(3, 105, 161, 0.15);
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    border-bottom: 2px solid var(--primary);
 }
 
 header h1 {
-    font-size: 1.8rem;
+    font-size: 1.75rem;
+    font-weight: 700;
     text-align: center;
+    margin: 0;
+    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+    letter-spacing: -0.025em;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
 header h1 a {
     color: white;
     text-decoration: none;
+    transition: var(--transition-normal);
+    display: inline-block;
 }
 
-header h1 a:hover,
-header h1 a:active,
-header h1 a:visited {
-    color: white;
-    text-decoration: none;
+header h1 a:hover {
+    transform: translateY(-1px);
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 /* Стили боковой панели */
 aside {
-    background-color: #34495e;
-    color: white;
-    width: 250px;
+    background: var(--surface);
+    border-right: 2px solid var(--border);
+    width: 230px;
     height: 100vh;
     position: fixed;
     top: 0;
     left: 0;
-    padding-top: 70px;
+    padding-top: 85px;
     overflow-y: auto;
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.08);
+    z-index: 900;
 }
 
 aside nav ul {
@@ -56,26 +102,66 @@ aside nav ul {
 }
 
 aside nav ul li {
-    border-bottom: 1px solid #2c3e50;
+    border-bottom: 1px solid var(--border);
 }
 
 aside nav ul li a {
     display: block;
-    color: white;
+    color: var(--text-primary);
     text-decoration: none;
-    padding: 1rem;
-    transition: background-color 0.3s;
+    padding: 1rem 1.5rem;
+    transition: var(--transition-fast);
+    font-weight: 500;
 }
 
 aside nav ul li a:hover {
-    background-color: #2c3e50;
+    background-color: var(--primary-light);
+    color: white;
 }
 
 /* Стили основного содержимого */
 main {
-    margin-left: 250px;
-    padding: 2rem;
-    margin-top: 70px;
+    margin-left: 230px;
+    margin-top: 85px;
+    padding: 2.5rem;
+    color: var(--text-primary);
+    border-left: 2px solid var(--border);
+    min-height: calc(100vh - 85px);
+}
+
+main h1 {
+    font-size: 2.25rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 2.5rem;
+    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+    letter-spacing: -0.025em;
+    position: relative;
+    padding-bottom: 1rem;
+    background: linear-gradient(135deg, var(--text-primary) 0%, var(--primary-dark) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+main h1::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 80px;
+    height: 3px;
+    background: linear-gradient(90deg, var(--primary) 0%, var(--accent) 100%);
+    border-radius: 2px;
+}
+
+main h2 {
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: var(--primary);
+    margin: 2rem 0 1.25rem 0;
+    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+    letter-spacing: -0.01em;
 }
 
 /* Стили таблицы */
@@ -83,32 +169,47 @@ table {
     width: 100%;
     border-collapse: collapse;
     margin: 1rem 0;
-    background-color: white;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    background: var(--surface);
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    overflow: hidden;
 }
 
-th, td {
-    padding: 1rem;
-    text-align: left;
-    border-bottom: 1px solid #ddd;
+thead {
+    background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
 }
 
 th {
-    background-color: #3498db;
+    background: transparent;
     color: white;
+    padding: 1.25rem 1rem;
+    text-align: left;
+    font-weight: 600;
+    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+    letter-spacing: -0.01em;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    border-bottom: 2px solid var(--primary);
+}
+
+td {
+    padding: 1rem;
+    border-bottom: 1px solid var(--border);
+    color: var(--text-primary);
 }
 
 tr:hover {
-    background-color: #f5f5f5;
+    background-color: rgba(2, 132, 199, 0.05);
 }
 
 /* Стили форм */
 form {
-    background-color: white;
+    background: var(--surface);
     padding: 2rem;
-    border-radius: 5px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-md);
     margin: 1rem 0;
+    border: 1px solid var(--border);
 }
 
 form div {
@@ -118,48 +219,132 @@ form div {
 label {
     display: block;
     margin-bottom: 0.5rem;
-    font-weight: bold;
+    font-weight: 600;
+    color: var(--text-primary);
 }
 
 input, select, textarea {
     width: 100%;
-    padding: 0.5rem;
-    border: 1px solid #ddd;
-    border-radius: 3px;
+    padding: 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
     font-family: inherit;
+    transition: var(--transition-fast);
+    background: var(--surface);
+    color: var(--text-primary);
+}
+
+input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px rgba(2, 132, 199, 0.1);
+}
+
+input:hover, select:hover, textarea:hover {
+    border-color: var(--primary-light);
 }
 
 button, .btn {
     display: inline-block;
-    background-color: #3498db;
+    background-color: var(--primary);
     color: white;
     padding: 0.75rem 1.5rem;
     border: none;
-    border-radius: 3px;
+    border-radius: var(--radius-sm);
     cursor: pointer;
+    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-weight: 600;
     text-decoration: none;
     font-size: 1rem;
-    transition: background-color 0.3s;
+    transition: var(--transition-fast);
 }
 
 button:hover, .btn:hover {
-    background-color: #2980b9;
+    background-color: var(--primary-light);
 }
 
 button.secondary, .btn.secondary {
-    background-color: #95a5a6;
+    background-color: var(--text-secondary);
 }
 
 button.secondary:hover, .btn.secondary:hover {
-    background-color: #7f8c8d;
+    background-color: var(--text-primary);
 }
 
 button.danger, .btn.danger {
-    background-color: #e74c3c;
+    background-color: #DC2626;
 }
 
 button.danger:hover, .btn.danger:hover {
-    background-color: #c0392b;
+    background-color: #EF4444;
+}
+
+/* Стили для кнопок редактирования в таблицах */
+.edit-actions {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    justify-content: flex-start;
+    flex-wrap: nowrap;
+}
+
+.save-btn, .cancel-btn {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    border-radius: var(--radius-sm);
+    border: none;
+    cursor: pointer;
+    transition: var(--transition-fast);
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.save-btn {
+    background-color: var(--primary);
+    color: white;
+}
+
+.save-btn:hover {
+    background-color: var(--primary-light);
+    transform: translateY(-1px);
+}
+
+.cancel-btn {
+    background-color: var(--text-secondary);
+    color: white;
+}
+
+.cancel-btn:hover {
+    background-color: var(--text-primary);
+    transform: translateY(-1px);
+}
+
+.delete-btn {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    background-color: #DC2626;
+    color: white;
+    border: none;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: var(--transition-fast);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    margin-left: 0.25rem;
+}
+
+.delete-btn:hover {
+    background-color: #EF4444;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(220, 38, 38, 0.3);
+}
+
+.delete-btn::before {
+    content: '🗑️';
+    font-size: 14px;
 }
 
 /* Вспомогательные классы */
@@ -185,16 +370,34 @@ button.danger:hover, .btn.danger:hover {
 
 /* Адаптивный дизайн */
 @media (max-width: 768px) {
+    header {
+        position: fixed;
+        padding: 1rem 1.5rem;
+    }
+    
+    header h1 {
+        font-size: 1.5rem;
+    }
+    
     aside {
         width: 100%;
         height: auto;
         position: relative;
         padding-top: 0;
+        margin-top: 70px;
+        z-index: 800;
     }
     
     main {
         margin-left: 0;
-        margin-top: 0;
+        margin-top: 70px;
+        padding: 1.5rem;
+        min-height: calc(100vh - 70px);
+    }
+    
+    main h1 {
+        font-size: 1.8rem;
+        margin-bottom: 1.5rem;
     }
 }
 
@@ -205,26 +408,28 @@ button.danger:hover, .btn.danger:hover {
 
 .dropdown-toggle {
     display: block;
-    color: white;
+    color: var(--text-primary);
     text-decoration: none;
-    padding: 1rem;
-    background-color: #34495e;
+    padding: 1rem 1.5rem;
+    background: transparent;
     border: none;
     width: 100%;
     text-align: left;
     cursor: pointer;
-    transition: background-color 0.3s;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    font-size: 1rem;
+    transition: var(--transition-fast);
+    font-family: inherit;
+    font-size: 0.9rem;
+    font-weight: 500;
 }
 
 .dropdown-toggle:hover {
-    background-color: #2c3e50;
+    background-color: var(--primary-light);
+    color: white;
 }
 
 .dropdown-menu {
     display: none;
-    background-color: #2c3e50;
+    background: var(--surface);
     min-width: 160px;
     box-shadow: 0 8px 16px rgba(0,0,0,0.2);
     z-index: 1;
@@ -232,17 +437,64 @@ button.danger:hover, .btn.danger:hover {
 }
 
 .dropdown-menu a {
-    color: white;
-    padding: 12px 16px;
+    color: var(--text-primary);
+    padding: 0.75rem 1rem;
     text-decoration: none;
     display: block;
-    transition: background-color 0.3s;
+    transition: var(--transition-fast);
 }
 
 .dropdown-menu a:hover {
-    background-color: #34495e;
+    background-color: var(--primary-light);
+    color: white;
 }
 
+/* Стили секций */
+section {
+    background: var(--surface);
+    border-radius: var(--radius-md);
+    padding: 1.5rem;
+    margin: 1.5rem 0;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border);
+}
+
+section h2 {
+    color: var(--primary);
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 0.5rem;
+    margin-bottom: 1rem;
+}
 .dropdown-menu.show {
+
+/* Стили для счетчиков записей */
+section p {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    margin-top: 1rem;
+    padding: 0.75rem;
+    background-color: rgba(2, 132, 199, 0.05);
+    border-radius: var(--radius-sm);
+    border-left: 3px solid var(--primary);
+}
+
+
+/* Стили для placeholder'ов */
+input::placeholder,
+select::placeholder,
+textarea::placeholder {
+    color: var(--text-light);
+    opacity: 1;
+}
+
+input:focus::placeholder,
+select:focus::placeholder,
+textarea:focus::placeholder {
+    opacity: 0.5;
+}
+section p span {
+    font-weight: 600;
+    color: var(--primary);
+}
     display: block;
 }

@@ -13,6 +13,7 @@ import ru.realestate.realestate_app.model.dto.DistrictWithDetailsDto;
 import ru.realestate.realestate_app.model.dto.StreetWithDetailsDto;
 
 import java.util.List;
+import java.util.ArrayList;
 
 /**
  * DAO класс для работы с географическими справочниками
@@ -779,4 +780,229 @@ public class GeographyDao {
         return jdbcTemplate.query(sql, streetWithDetailsRowMapper, cityId);
     }
     
-} 
+    /**
+     * Поиск регионов с детальной информацией по нескольким критериям
+     *
+     * @param regionNamePattern паттерн названия региона (может быть null)
+     * @param regionCode код региона (может быть null)
+     * @param countryId идентификатор страны (может быть null)
+     * @return список регионов, соответствующих критериям поиска
+     */
+    public List<RegionWithDetailsDto> searchRegionsWithDetails(String regionNamePattern, String regionCode, Long countryId) {
+        StringBuilder sql = new StringBuilder("""
+            SELECT
+                r.id_region as region_id,
+                r.name as region_name,
+                r.code as region_code,
+                c.id_country as country_id,
+                c.country_name
+            FROM regions r
+            JOIN countries c ON r.id_country = c.id_country
+            WHERE 1=1
+            """);
+            
+        // Добавляем условия поиска в зависимости от переданных параметров
+        if (regionNamePattern != null && !regionNamePattern.isEmpty()) {
+            sql.append(" AND r.name ILIKE ?");
+        }
+        
+        if (regionCode != null && !regionCode.isEmpty()) {
+            sql.append(" AND r.code ILIKE ?");
+        }
+        
+        if (countryId != null) {
+            sql.append(" AND r.id_country = ?");
+        }
+        
+        sql.append(" ORDER BY r.name");
+        
+        // Подготавливаем параметры для запроса
+        List<Object> params = new ArrayList<>();
+        if (regionNamePattern != null && !regionNamePattern.isEmpty()) {
+            params.add("%" + regionNamePattern + "%");
+        }
+        
+        if (regionCode != null && !regionCode.isEmpty()) {
+            params.add("%" + regionCode + "%");
+        }
+        
+        if (countryId != null) {
+            params.add(countryId);
+        }
+        
+        return jdbcTemplate.query(sql.toString(), regionWithDetailsRowMapper, params.toArray());
+    }
+    
+    /**
+     * Поиск городов с детальной информацией по нескольким критериям
+     *
+     * @param cityNamePattern паттерн названия города (может быть null)
+     * @param regionId идентификатор региона (может быть null)
+     * @param countryId идентификатор страны (может быть null)
+     * @return список городов, соответствующих критериям поиска
+     */
+    public List<CityWithDetailsDto> searchCitiesWithDetails(String cityNamePattern, Long regionId, Long countryId) {
+        StringBuilder sql = new StringBuilder("""
+            SELECT
+                c.id_city as city_id,
+                c.city_name,
+                r.id_region as region_id,
+                r.name as region_name,
+                r.code as region_code,
+                country.id_country as country_id,
+                country.country_name
+            FROM cities c
+            JOIN regions r ON c.id_region = r.id_region
+            JOIN countries country ON r.id_country = country.id_country
+            WHERE 1=1
+            """);
+            
+        // Добавляем условия поиска в зависимости от переданных параметров
+        if (cityNamePattern != null && !cityNamePattern.isEmpty()) {
+            sql.append(" AND c.city_name ILIKE ?");
+        }
+        
+        if (regionId != null) {
+            sql.append(" AND r.id_region = ?");
+        }
+        
+        if (countryId != null) {
+            sql.append(" AND country.id_country = ?");
+        }
+        
+        sql.append(" ORDER BY c.city_name");
+        
+        // Подготавливаем параметры для запроса
+        List<Object> params = new ArrayList<>();
+        if (cityNamePattern != null && !cityNamePattern.isEmpty()) {
+            params.add("%" + cityNamePattern + "%");
+        }
+        
+        if (regionId != null) {
+            params.add(regionId);
+        }
+        
+        if (countryId != null) {
+            params.add(countryId);
+        }
+        
+        return jdbcTemplate.query(sql.toString(), cityWithDetailsRowMapper, params.toArray());
+    }
+    
+    /**
+     * Поиск районов с детальной информацией по нескольким критериям
+     *
+     * @param districtNamePattern паттерн названия района (может быть null)
+     * @param cityId идентификатор города (может быть null)
+     * @param regionId идентификатор региона (может быть null)
+     * @return список районов, соответствующих критериям поиска
+     */
+    public List<DistrictWithDetailsDto> searchDistrictsWithDetails(String districtNamePattern, Long cityId, Long regionId) {
+        StringBuilder sql = new StringBuilder("""
+            SELECT
+                d.id_district as district_id,
+                d.district_name,
+                c.id_city as city_id,
+                c.city_name,
+                r.id_region as region_id,
+                r.name as region_name,
+                country.id_country as country_id,
+                country.country_name
+            FROM districts d
+            JOIN cities c ON d.id_city = c.id_city
+            JOIN regions r ON c.id_region = r.id_region
+            JOIN countries country ON r.id_country = country.id_country
+            WHERE 1=1
+            """);
+            
+        // Добавляем условия поиска в зависимости от переданных параметров
+        if (districtNamePattern != null && !districtNamePattern.isEmpty()) {
+            sql.append(" AND d.district_name ILIKE ?");
+        }
+        
+        if (cityId != null) {
+            sql.append(" AND c.id_city = ?");
+        }
+        
+        if (regionId != null) {
+            sql.append(" AND r.id_region = ?");
+        }
+        
+        sql.append(" ORDER BY d.district_name");
+        
+        // Подготавливаем параметры для запроса
+        List<Object> params = new ArrayList<>();
+        if (districtNamePattern != null && !districtNamePattern.isEmpty()) {
+            params.add("%" + districtNamePattern + "%");
+        }
+        
+        if (cityId != null) {
+            params.add(cityId);
+        }
+        
+        if (regionId != null) {
+            params.add(regionId);
+        }
+        
+        return jdbcTemplate.query(sql.toString(), districtWithDetailsRowMapper, params.toArray());
+    }
+    
+    /**
+     * Поиск улиц с детальной информацией по нескольким критериям
+     *
+     * @param streetNamePattern паттерн названия улицы (может быть null)
+     * @param cityId идентификатор города (может быть null)
+     * @param regionId идентификатор региона (может быть null)
+     * @return список улиц, соответствующих критериям поиска
+     */
+    public List<StreetWithDetailsDto> searchStreetsWithDetails(String streetNamePattern, Long cityId, Long regionId) {
+        StringBuilder sql = new StringBuilder("""
+            SELECT
+                s.id_street as street_id,
+                s.street_name,
+                c.id_city as city_id,
+                c.city_name,
+                r.id_region as region_id,
+                r.name as region_name,
+                country.id_country as country_id,
+                country.country_name
+            FROM streets s
+            JOIN cities c ON s.id_city = c.id_city
+            JOIN regions r ON c.id_region = r.id_region
+            JOIN countries country ON r.id_country = country.id_country
+            WHERE 1=1
+            """);
+            
+        // Добавляем условия поиска в зависимости от переданных параметров
+        if (streetNamePattern != null && !streetNamePattern.isEmpty()) {
+            sql.append(" AND s.street_name ILIKE ?");
+        }
+        
+        if (cityId != null) {
+            sql.append(" AND c.id_city = ?");
+        }
+        
+        if (regionId != null) {
+            sql.append(" AND r.id_region = ?");
+        }
+        
+        sql.append(" ORDER BY s.street_name");
+        
+        // Подготавливаем параметры для запроса
+        List<Object> params = new ArrayList<>();
+        if (streetNamePattern != null && !streetNamePattern.isEmpty()) {
+            params.add("%" + streetNamePattern + "%");
+        }
+        
+        if (cityId != null) {
+            params.add(cityId);
+        }
+        
+        if (regionId != null) {
+            params.add(regionId);
+        }
+        
+        return jdbcTemplate.query(sql.toString(), streetWithDetailsRowMapper, params.toArray());
+    }
+    
+}
