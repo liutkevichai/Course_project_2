@@ -1,9 +1,12 @@
 package ru.realestate.realestate_app.dao;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
+import ru.realestate.realestate_app.exception.DatabaseException;
 import ru.realestate.realestate_app.mapper.PaymentRowMapper;
 import ru.realestate.realestate_app.mapper.dto.PaymentTableRowMapper;
 import ru.realestate.realestate_app.model.Payment;
@@ -20,6 +23,8 @@ import java.util.Optional;
  */
 @Repository
 public class PaymentDao {
+    private static final Logger logger = LoggerFactory.getLogger(PaymentDao.class);
+    
     private final JdbcTemplate jdbcTemplate;
     private final PaymentRowMapper paymentRowMapper;
     private final PaymentTableRowMapper paymentTableRowMapper;
@@ -51,9 +56,16 @@ public class PaymentDao {
             ps.setLong(3, payment.getIdDeal());
             return ps;
         }, keyHolder);
-        if (keyHolder.getKey() != null) {
-            payment.setIdPayment(keyHolder.getKey().longValue());
+        Number key = keyHolder.getKey();
+        Long generatedId = null;
+        if (key != null) {
+            generatedId = key.longValue();
         }
+        if (generatedId == null) {
+            logger.error("Не удалось получить сгенерированный id для платежа");
+            throw new DatabaseException("INSERT", "Не удалось создать платеж в базе данных");
+        }
+        payment.setIdPayment(generatedId);
         return payment;
     }
 

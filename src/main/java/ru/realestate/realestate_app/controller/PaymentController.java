@@ -35,7 +35,7 @@ public class PaymentController {
 
     @GetMapping("/deal/{dealId}")
     public List<Payment> getPaymentsByDealId(@PathVariable Long dealId) {
-        return paymentService.getPaymentsByDealId(dealId);
+        return paymentService.findByDealId(dealId);
     }
 
     @PostMapping

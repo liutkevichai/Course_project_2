@@ -1,7 +1,5 @@
 package ru.realestate.realestate_app.service;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
@@ -25,7 +23,6 @@ import java.util.Map;
  */
 @Service
 public class RealtorService {
-    private static final Logger log = LoggerFactory.getLogger(RealtorService.class);
 
     private final RealtorDao realtorDao;
     private final DealDao dealDao; // Добавляем зависимость для проверок
@@ -143,8 +140,9 @@ public class RealtorService {
         try {
             return realtorDao.deleteById(id);
         } catch (Exception e) {
-            log.error("Error deleting realtor with id {}", id, e);
-            throw new RuntimeException("Error deleting realtor with id " + id, e);
+            RealEstateException re = ExceptionHandler.handleDatabaseException(e, "DELETE", "Realtor", id);
+            ExceptionHandler.logException(re, "Ошибка при удалении риелтора с id: " + id);
+            throw re;
         }
     }
 
@@ -292,7 +290,7 @@ public class RealtorService {
             if (existingRealtorByEmail != null) {
                 throw new ValidationException("email", "Риелтор с таким email уже существует");
             }
-        } catch (EmptyResultDataAccessException e) {
+        } catch (EmptyResultDataAccessException _) {
             // Email уникален, продолжаем
         }
         
@@ -302,7 +300,7 @@ public class RealtorService {
             if (existingRealtorByPhone != null) {
                 throw new ValidationException("phone", "Риелтор с таким номером телефона уже существует");
             }
-        } catch (EmptyResultDataAccessException e) {
+        } catch (EmptyResultDataAccessException _) {
             // Телефон уникален, продолжаем
         }
     }
@@ -321,7 +319,7 @@ public class RealtorService {
                 if (existingRealtor != null && !existingRealtor.getIdRealtor().equals(realtorId)) {
                     throw new ValidationException("email", "Риелтор с таким email уже существует");
                 }
-            } catch (EmptyResultDataAccessException e) {
+            } catch (EmptyResultDataAccessException _) {
                 // Email уникален, продолжаем
             }
         }
@@ -333,7 +331,7 @@ public class RealtorService {
                 if (existingRealtor != null && !existingRealtor.getIdRealtor().equals(realtorId)) {
                     throw new ValidationException("phone", "Риелтор с таким номером телефона уже существует");
                 }
-            } catch (EmptyResultDataAccessException e) {
+            } catch (EmptyResultDataAccessException _) {
                 // Телефон уникален, продолжаем
             }
         }

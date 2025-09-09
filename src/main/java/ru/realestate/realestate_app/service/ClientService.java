@@ -1,7 +1,5 @@
 package ru.realestate.realestate_app.service;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
@@ -26,7 +24,6 @@ import java.util.Map;
 @Service
 public class ClientService {
 
-    private static final Logger log = LoggerFactory.getLogger(ClientService.class);
     private final ClientDao clientDao;
     private final DealDao dealDao; // Добавляем зависимость для проверок
 
@@ -143,8 +140,8 @@ public class ClientService {
         try {
             return clientDao.deleteById(id);
         } catch (Exception e) {
-            log.error("Error deleting client with id {}", id, e);
             RealEstateException re = ExceptionHandler.handleDatabaseException(e, "DELETE", "Client", id);
+            ExceptionHandler.logException(re, "Ошибка при удалении клиента с id: " + id);
             throw re;
         }
     }
@@ -257,7 +254,7 @@ public class ClientService {
             if (existingClientByEmail != null) {
                 throw new ValidationException("email", "Клиент с таким email уже существует");
             }
-        } catch (EmptyResultDataAccessException e) {
+        } catch (EmptyResultDataAccessException _) {
             // Email уникален, продолжаем
         }
         
@@ -267,7 +264,7 @@ public class ClientService {
             if (existingClientByPhone != null) {
                 throw new ValidationException("phone", "Клиент с таким номером телефона уже существует");
             }
-        } catch (EmptyResultDataAccessException e) {
+        } catch (EmptyResultDataAccessException _) {
             // Телефон уникален, продолжаем
         }
     }
@@ -286,7 +283,7 @@ public class ClientService {
                 if (existingClient != null && !existingClient.getIdClient().equals(clientId)) {
                     throw new ValidationException("email", "Клиент с таким email уже существует");
                 }
-            } catch (EmptyResultDataAccessException e) {
+            } catch (EmptyResultDataAccessException _) {
                 // Email уникален, продолжаем
             }
         }
@@ -298,7 +295,7 @@ public class ClientService {
                 if (existingClient != null && !existingClient.getIdClient().equals(clientId)) {
                     throw new ValidationException("phone", "Клиент с таким номером телефона уже существует");
                 }
-            } catch (EmptyResultDataAccessException e) {
+            } catch (EmptyResultDataAccessException _) {
                 // Телефон уникален, продолжаем
             }
         }

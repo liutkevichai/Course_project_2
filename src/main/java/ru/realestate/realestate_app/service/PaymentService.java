@@ -32,7 +32,7 @@ public class PaymentService {
                 .orElseThrow(() -> new EntityNotFoundException("Payment", id));
     }
 
-    public List<Payment> getPaymentsByDealId(Long dealId) {
+    public List<Payment> findByDealId(Long dealId) {
         return paymentDao.findByDealId(dealId);
     }
 

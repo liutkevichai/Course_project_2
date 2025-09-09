@@ -1,7 +1,5 @@
 package ru.realestate.realestate_app.service;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
@@ -31,7 +29,6 @@ import java.util.Map;
 @Service
 public class DealService {
     
-    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(DealService.class);
     private final DealDao dealDao;
     private final PropertyDao propertyDao; // Добавляем зависимость для проверок
 
@@ -141,8 +138,9 @@ public class DealService {
         try {
             return dealDao.deleteById(id);
         } catch (Exception e) {
-            log.error("Error deleting deal with id {}", id, e);
-            throw new RuntimeException("Error deleting deal with id " + id, e);
+            RealEstateException re = ExceptionHandler.handleDatabaseException(e, "DELETE", "Deal", id);
+            ExceptionHandler.logException(re, "Ошибка при удалении сделки с id: " + id);
+            throw re;
         }
     }
 
@@ -323,7 +321,7 @@ public class DealService {
                 );
             }
             
-        } catch (EmptyResultDataAccessException e) {
+        } catch (EmptyResultDataAccessException _) {
             throw new EntityNotFoundException("Property", deal.getIdProperty());
         } catch (BusinessRuleException e) {
             throw e; // Перебрасываем бизнес-исключения как есть
@@ -346,11 +344,11 @@ public class DealService {
         
         if (updates.containsKey("dealDate")) {
             Object dateValue = updates.get("dealDate");
-            if (dateValue instanceof String) {
+            if (dateValue instanceof String stringDate) {
                 try {
-                    LocalDate parsedDate = LocalDate.parse((String) dateValue);
+                    LocalDate parsedDate = LocalDate.parse(stringDate);
                     updates.put("dealDate", parsedDate); // Заменяем строку на LocalDate
-                } catch (java.time.format.DateTimeParseException e) {
+                } catch (java.time.format.DateTimeParseException _) {
                     throw new ValidationException("dealDate", "Неверный формат даты. Ожидается формат YYYY-MM-DD.");
                 }
             }
@@ -371,14 +369,11 @@ public class DealService {
             // Проверяем обновление стоимости
             if (updates.containsKey("dealCost")) {
                 Object newCostValue = updates.get("dealCost");
-                BigDecimal newCost;
-                if (newCostValue instanceof BigDecimal) {
-                    newCost = (BigDecimal) newCostValue;
-                } else if (newCostValue instanceof Number) {
-                    newCost = new BigDecimal(((Number) newCostValue).toString());
-                } else {
-                    throw new ValidationException("dealCost", "Некорректный тип для стоимости сделки. Ожидается число.");
-                }
+                BigDecimal newCost = switch (newCostValue) {
+                    case BigDecimal bigDecimalValue -> bigDecimalValue;
+                    case Number numberValue -> new BigDecimal(numberValue.toString());
+                    default -> throw new ValidationException("dealCost", "Некорректный тип для стоимости сделки. Ожидается число.");
+                };
 
                 Property property = propertyDao.findById(currentDeal.getIdProperty());
                 
@@ -391,7 +386,7 @@ public class DealService {
                 }
             }
             
-        } catch (EmptyResultDataAccessException e) {
+        } catch (EmptyResultDataAccessException _) {
             throw new EntityNotFoundException("Deal", dealId);
         } catch (BusinessRuleException e) {
             throw e; // Перебрасываем бизнес-исключения как есть
