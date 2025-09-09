@@ -105,13 +105,14 @@ public class PaymentDao {
                 CONCAT(c.last_name, ' ', c.first_name,
                        CASE WHEN c.middle_name IS NOT NULL THEN CONCAT(' ', c.middle_name) ELSE '' END) as client_fio,
                 -- Адрес недвижимости (краткий)
-                CONCAT(street.street_name, ', ', prop.house_number,
+                CONCAT(city.city_name, ', ', street.street_name, ', ', prop.house_number,
                        CASE WHEN prop.apartment_number IS NOT NULL THEN CONCAT('-', prop.apartment_number) ELSE '' END) as property_address
             FROM payments p
             JOIN deals d ON p.id_deal = d.id_deal
             JOIN clients c ON d.id_client = c.id_client
             JOIN properties prop ON d.id_property = prop.id_property
             JOIN streets street ON prop.id_street = street.id_street
+            JOIN cities city ON prop.id_city = city.id_city
             ORDER BY p.payment_date DESC
             """;
         return jdbcTemplate.query(sql, paymentTableRowMapper);
@@ -135,12 +136,13 @@ public class PaymentDao {
                 d.id_deal,
                 d.deal_date,
                 CONCAT(c.last_name, ' ', c.first_name, CASE WHEN c.middle_name IS NOT NULL THEN CONCAT(' ', c.middle_name) ELSE '' END) as client_fio,
-                CONCAT(street.street_name, ', ', prop.house_number, CASE WHEN prop.apartment_number IS NOT NULL THEN CONCAT('-', prop.apartment_number) ELSE '' END) as property_address
+                CONCAT(city.city_name, ', ', street.street_name, ', ', prop.house_number, CASE WHEN prop.apartment_number IS NOT NULL THEN CONCAT('-', prop.apartment_number) ELSE '' END) as property_address
             FROM payments p
             JOIN deals d ON p.id_deal = d.id_deal
             JOIN clients c ON d.id_client = c.id_client
             JOIN properties prop ON d.id_property = prop.id_property
             JOIN streets street ON prop.id_street = street.id_street
+            JOIN cities city ON prop.id_city = city.id_city
             """;
 
         StringBuilder whereClause = new StringBuilder();

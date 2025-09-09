@@ -41,7 +41,7 @@
                         <option value="">Выберите недвижимость</option>
                         <option th:each="property : ${properties}"
                                 th:value="${property.propertyId}"
-                                th:text="${property.getTableAddress()}">
+                                th:text="${property.getAddressWithCity() + ' - ' + property.getPropertySummary()}">
                         </option>
                     </select>
                 </div>
@@ -145,8 +145,8 @@
                         <td th:text="${deal.dealId}"></td>
                         <td th:text="${deal.getDealDateFormatted()}"></td>
                         <td th:text="${deal.propertyAddress}"></td>
-                        <td th:text="${deal.clientName}"></td>
-                        <td th:text="${deal.realtorName}"></td>
+                        <td th:text="${deal.clientNameShort}"></td>
+                        <td th:text="${deal.realtorNameShort}"></td>
                         <td th:text="${deal.getDealCostFormatted()}"></td>
                         <td th:text="${deal.dealTypeName}"></td>
                     </tr>

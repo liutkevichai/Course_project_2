@@ -154,21 +154,45 @@ public class PropertyTableDto {
     /**
      * Получить информацию о местоположении
      * 
-     * @return местоположение в формате "г. Москва, Центральный р-н"
+     * @return местоположение в формате "г. Москва, ул. Лесная, 4"
      */
-    public String getLocationInfo() {
-        StringBuilder location = new StringBuilder();
+    public String getAddressWithCity() {
+        StringBuilder address = new StringBuilder();
         
         if (cityName != null) {
-            location.append("г. ").append(cityName);
+            address.append("г. ").append(cityName);
         }
         
-        if (districtName != null) {
-            if (!location.isEmpty()) location.append(", ");
-            location.append(districtName).append(" р-н");
+        // Добавляем улицу
+        if (streetName != null) {
+            if (!address.isEmpty())
+                address.append(", ");
+            address.append("ул. ").append(streetName);
+        }
+
+        // Добавляем номер дома
+        if (houseNumber != null) {
+            if (!address.isEmpty())
+                address.append(", ");
+            address.append(houseNumber);
+
+            // Добавляем литеру дома если есть
+            if (houseLetter != null) {
+                address.append(houseLetter);
+            }
+
+            // Добавляем корпус если есть
+            if (buildingNumber != null) {
+                address.append("к").append(buildingNumber);
+            }
+
+            // Добавляем квартиру через дефис для компактности
+            if (apartmentNumber != null) {
+                address.append("-").append(apartmentNumber);
+            }
         }
         
-        return !location.isEmpty() ? location.toString() : "Местоположение не указано";
+        return !address.isEmpty() ? address.toString() : "Местоположение не указано";
     }
     
     /**
@@ -192,34 +216,6 @@ public class PropertyTableDto {
         if (area == null) return "Не указана";
         
         return area + " м²";
-    }
-    
-    /**
-     * Получить стоимость за квадратный метр
-     * 
-     * @return стоимость за м² в рублях
-     */
-    public BigDecimal getCostPerSquareMeter() {
-        if (cost == null || area == null || area.compareTo(BigDecimal.ZERO) == 0) {
-            return BigDecimal.ZERO;
-        }
-        
-        return cost.divide(area, 0, RoundingMode.HALF_UP);
-    }
-    
-    /**
-     * Получить отформатированную стоимость за квадратный метр
-     * 
-     * @return стоимость за м² в формате "58 824 ₽/м²"
-     */
-    public String getCostPerSquareMeterFormatted() {
-        BigDecimal costPerM2 = getCostPerSquareMeter();
-        if (costPerM2.compareTo(BigDecimal.ZERO) == 0) {
-            return "Не рассчитано";
-        }
-        
-        NumberFormat formatter = NumberFormat.getNumberInstance(Locale.of("ru", "RU"));
-        return formatter.format(costPerM2) + " ₽/м²";
     }
     
     /**

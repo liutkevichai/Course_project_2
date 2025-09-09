@@ -121,7 +121,7 @@ public class DealTableDto {
     }
     
     /**
-     * Получить краткое имя клиента (Фамилия И.)
+     * Получить краткое имя клиента (Фамилия И. О.)
      * 
      * @return краткое имя для компактного отображения
      */
@@ -129,14 +129,16 @@ public class DealTableDto {
         if (clientName == null || clientName.trim().isEmpty()) return "Не указан";
         
         String[] parts = clientName.trim().split("\\s+");
-        if (parts.length >= 2) {
-            return parts[0] + " " + parts[1].charAt(0) + ".";
+        if (parts.length >= 3) {
+            return String.format("%s %s. %s.", parts[0], parts[1].charAt(0), parts[2].charAt(0));
+        } else if (parts.length == 2) {
+            return String.format("%s %s.", parts[0], parts[1].charAt(0));
         }
         return clientName;
     }
     
     /**
-     * Получить краткое имя риелтора (Фамилия И.)
+     * Получить краткое имя риелтора (Фамилия И. О.)
      * 
      * @return краткое имя для компактного отображения
      */
@@ -144,49 +146,12 @@ public class DealTableDto {
         if (realtorName == null || realtorName.trim().isEmpty()) return "Не указан";
         
         String[] parts = realtorName.trim().split("\\s+");
-        if (parts.length >= 2) {
-            return parts[0] + " " + parts[1].charAt(0) + ".";
+        if (parts.length >= 3) {
+            return String.format("%s %s. %s.", parts[0], parts[1].charAt(0), parts[2].charAt(0));
+        } else if (parts.length == 2) {
+            return String.format("%s %s.", parts[0], parts[1].charAt(0));
         }
         return realtorName;
-    }
-    
-    /**
-     * Получить очень краткий адрес (только улица и дом)
-     * 
-     * @return адрес в формате "ул. Ленина, 10"
-     */
-    public String getPropertyAddressShort() {
-        if (propertyAddress == null || propertyAddress.trim().isEmpty()) return "Адрес не указан";
-        
-        // Извлекаем только улицу и дом из полного адреса
-        String[] parts = propertyAddress.split(",");
-        StringBuilder shortAddress = new StringBuilder();
-        
-        for (String part : parts) {
-            part = part.trim();
-            if (part.startsWith("ул.") || part.startsWith("д.")) {
-                if (!shortAddress.isEmpty()) shortAddress.append(", ");
-                shortAddress.append(part);
-            }
-        }
-        
-        return !shortAddress.isEmpty() ? shortAddress.toString() : propertyAddress;
-    }
-    
-    /**
-     * Получить CSS класс для статуса сделки (для стилизации в веб-интерфейсе)
-     * 
-     * @return CSS класс в зависимости от типа сделки
-     */
-    public String getDealTypeClass() {
-        if (dealTypeName == null) return "deal-unknown";
-        
-        return switch (dealTypeName.toLowerCase()) {
-            case "продажа" -> "deal-sale";
-            case "аренда" -> "deal-rent";
-            case "обмен" -> "deal-exchange";
-            default -> "deal-other";
-        };
     }
     
     // ========== ГЕТТЕРЫ И СЕТТЕРЫ ==========

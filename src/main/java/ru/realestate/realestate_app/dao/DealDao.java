@@ -548,7 +548,7 @@ public class DealDao {
                 CONCAT(r.last_name, ' ', r.first_name,
                        CASE WHEN r.middle_name IS NOT NULL THEN CONCAT(' ', r.middle_name) ELSE '' END) as realtor_name,
                 -- Адрес недвижимости (краткий)
-                CONCAT(street.street_name, ', ', p.house_number,
+                CONCAT(city.city_name, ', ', street.street_name, ', ', p.house_number,
                        CASE WHEN p.apartment_number IS NOT NULL THEN CONCAT('-', p.apartment_number) ELSE '' END) as property_address,
                 -- Типы
                 pt.property_type_name,
@@ -558,6 +558,7 @@ public class DealDao {
             JOIN realtors r ON d.id_realtor = r.id_realtor
             JOIN properties p ON d.id_property = p.id_property
             JOIN streets street ON p.id_street = street.id_street
+            JOIN cities city ON p.id_city = city.id_city
             JOIN property_types pt ON p.id_property_type = pt.id_property_type
             JOIN deal_types dt ON d.id_deal_type = dt.id_deal_type
             ORDER BY d.deal_date DESC
@@ -1082,7 +1083,7 @@ public class DealDao {
                 CONCAT(r.last_name, ' ', r.first_name,
                        CASE WHEN r.middle_name IS NOT NULL THEN CONCAT(' ', r.middle_name) ELSE '' END) as realtor_name,
                 -- Адрес недвижимости (краткий)
-                CONCAT(street.street_name, ', ', p.house_number,
+                CONCAT(city.city_name, ', ', street.street_name, ', ', p.house_number,
                        CASE WHEN p.apartment_number IS NOT NULL THEN CONCAT('-', p.apartment_number) ELSE '' END) as property_address,
                 -- Типы
                 pt.property_type_name,
@@ -1092,6 +1093,7 @@ public class DealDao {
             JOIN realtors r ON d.id_realtor = r.id_realtor
             JOIN properties p ON d.id_property = p.id_property
             JOIN streets street ON p.id_street = street.id_street
+            JOIN cities city ON p.id_city = city.id_city
             JOIN property_types pt ON p.id_property_type = pt.id_property_type
             JOIN deal_types dt ON d.id_deal_type = dt.id_deal_type
             WHERE d.id_deal = ?
@@ -1119,7 +1121,7 @@ public class DealDao {
                 CONCAT(c.last_name, ' ', c.first_name, CASE WHEN c.middle_name IS NOT NULL THEN CONCAT(' ', c.middle_name) ELSE '' END) as client_name,
                 c.phone as client_phone,
                 CONCAT(r.last_name, ' ', r.first_name, CASE WHEN r.middle_name IS NOT NULL THEN CONCAT(' ', r.middle_name) ELSE '' END) as realtor_name,
-                CONCAT(street.street_name, ', ', p.house_number, CASE WHEN p.apartment_number IS NOT NULL THEN CONCAT('-', p.apartment_number) ELSE '' END) as property_address,
+                CONCAT(city.city_name, ', ', street.street_name, ', ', p.house_number, CASE WHEN p.apartment_number IS NOT NULL THEN CONCAT('-', p.apartment_number) ELSE '' END) as property_address,
                 pt.property_type_name,
                 dt.deal_type_name
             FROM deals d
@@ -1127,6 +1129,7 @@ public class DealDao {
             JOIN realtors r ON d.id_realtor = r.id_realtor
             JOIN properties p ON d.id_property = p.id_property
             JOIN streets street ON p.id_street = street.id_street
+            JOIN cities city ON p.id_city = city.id_city
             JOIN property_types pt ON p.id_property_type = pt.id_property_type
             JOIN deal_types dt ON d.id_deal_type = dt.id_deal_type
             """;

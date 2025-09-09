@@ -109,7 +109,7 @@ public class PropertyDao {
             PreparedStatement ps = connection.prepareStatement(
                 "INSERT INTO properties (area, cost, description, postal_code, house_number, " +
                 "house_letter, building_number, apartment_number, id_property_type, id_country, " +
-                "id_region, id_city, id_district, id_street) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                "id_region, id_city, id_district, id_street) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                 new String[]{"id_property"}
             );
             
