@@ -157,8 +157,8 @@ public class DealDao {
         logger.debug("Обновление сделки с id: {}", id);
 
         // Принудительное преобразование Integer в BigDecimal для deal_cost
-        if (updates.containsKey("deal_cost") && updates.get("deal_cost") instanceof Integer) {
-            updates.put("deal_cost", new BigDecimal((Integer) updates.get("deal_cost")));
+        if (updates.containsKey("deal_cost") && updates.get("deal_cost") instanceof Integer integer) {
+            updates.put("deal_cost", new BigDecimal(integer));
         }
         
         // Строим динамический SQL запрос
@@ -169,23 +169,19 @@ public class DealDao {
         if (updates.containsKey("dealDate")) {
             sql.append("deal_date = ?, ");
             Object dateValue = updates.get("dealDate");
-            if (dateValue instanceof LocalDate) {
-                params.add(dateValue);
-            } else if (dateValue instanceof String) {
-                params.add(LocalDate.parse((String) dateValue));
-            } else {
-                throw new IllegalArgumentException("Некорректный формат даты. Ожидается LocalDate или строка в формате ISO_LOCAL_DATE.");
+            switch (dateValue) {
+              case LocalDate localDate -> params.add(localDate);
+              case String string -> params.add(LocalDate.parse(string));
+              default -> throw new IllegalArgumentException("Некорректный формат даты. Ожидается LocalDate или строка в формате ISO_LOCAL_DATE.");
             }
         }
         if (updates.containsKey("deal_cost")) {
             sql.append("deal_cost = ?, ");
             Object costValue = updates.get("deal_cost");
-            if (costValue instanceof BigDecimal) {
-                params.add(costValue);
-            } else if (costValue instanceof Number) {
-                params.add(new BigDecimal(costValue.toString()));
-            } else {
-                params.add(new BigDecimal(costValue.toString()));
+            switch (costValue) {
+              case BigDecimal bigDecimal -> params.add(bigDecimal);
+              case Number number -> params.add(new BigDecimal(number.toString()));
+              default -> params.add(new BigDecimal(costValue.toString()));
             }
         }
         if (updates.containsKey("idDealType")) {
@@ -922,20 +918,20 @@ public class DealDao {
             Object dealCostObj = updates.get("deal_cost");
             BigDecimal dealCost;
 
-            if (dealCostObj instanceof BigDecimal) {
-                dealCost = (BigDecimal) dealCostObj;
-            } else if (dealCostObj instanceof Number) {
-                dealCost = new BigDecimal(dealCostObj.toString());
-            } else {
-                try {
-                    dealCost = new BigDecimal(dealCostObj.toString());
-                } catch (NumberFormatException e) {
-                    logger.error("Некорректный формат стоимости сделки: {}", dealCostObj);
-                    throw new IllegalArgumentException("Некорректный формат стоимости сделки", e);
-                }
+            switch (dealCostObj) {
+              case BigDecimal bigDecimal -> dealCost = bigDecimal;
+              case Number number -> dealCost = new BigDecimal(number.toString());
+              default -> {
+                  try {
+                      dealCost = new BigDecimal(dealCostObj.toString());
+                  } catch (NumberFormatException e) {
+                      logger.error("Некорректный формат стоимости сделки: {}", dealCostObj);
+                      throw new IllegalArgumentException("Некорректный формат стоимости сделки", e);
+                  }
+              }
             }
 
-            if (dealCost == null || dealCost.compareTo(BigDecimal.ZERO) <= 0) {
+            if (dealCost.compareTo(BigDecimal.ZERO) <= 0) {
                 logger.error("Попытка обновления сделки с некорректной стоимостью: {}", dealCost);
                 throw new IllegalArgumentException("Стоимость сделки должна быть больше нуля");
             }

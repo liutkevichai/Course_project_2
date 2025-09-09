@@ -427,24 +427,47 @@ button.danger:hover, .btn.danger:hover {
     color: white;
 }
 
+/* Базовые стили для меню (скрыто по умолчанию) */
 .dropdown-menu {
     display: none;
-    background: var(--surface);
+    background: var(--background);
     min-width: 160px;
-    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+    box-shadow: 0 8px 16px rgba(0,0,0.2);
     z-index: 1;
-    position: relative;
+    position: absolute;
+    top: 100%;
+    left: 0;
 }
 
-.dropdown-menu a {
+/* Стили для отображаемого меню */
+.dropdown-menu.show {
+    display: block;
+    background: var(--background);
+    min-width: 100%;
+    box-shadow: var(--shadow-md);
+    z-index: 1001;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    border-top: 1px solid var(--border);
+    border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+}
+
+.dropdown-menu.show a {
     color: var(--text-primary);
-    padding: 0.75rem 1rem;
+    padding: 0.75rem 1.5rem 0.75rem 2.5rem;
     text-decoration: none;
     display: block;
     transition: var(--transition-fast);
+    border-bottom: 1px solid var(--border);
+    font-size: 0.85rem;
 }
 
-.dropdown-menu a:hover {
+.dropdown-menu.show a:last-child {
+    border-bottom: none;
+}
+
+.dropdown-menu.show a:hover {
     background-color: var(--primary-light);
     color: white;
 }
@@ -465,7 +488,21 @@ section h2 {
     padding-bottom: 0.5rem;
     margin-bottom: 1rem;
 }
+.dropdown-menu {
+    display: none;
+    background: var(--background);
+    min-width: 100%;
+    box-shadow: var(--shadow-md);
+    z-index: 1001;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    border-top: 1px solid var(--border);
+    border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+}
+
 .dropdown-menu.show {
+    display: block;
 
 /* Стили для счетчиков записей */
 section p {
