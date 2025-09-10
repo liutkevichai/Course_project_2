@@ -15,6 +15,7 @@ import ru.realestate.realestate_app.model.Deal;
 import ru.realestate.realestate_app.model.Property;
 import ru.realestate.realestate_app.model.dto.DealWithDetailsDto;
 import ru.realestate.realestate_app.model.dto.DealTableDto;
+import ru.realestate.realestate_app.model.dto.DealReportDto;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -551,4 +552,19 @@ public class DealService {
             throw re;
         }
     }
+
+   /**
+    * Получить все сделки для отчета
+    * @return список всех сделок с полной информацией для отчета
+    * @throws DatabaseException если произошла ошибка при работе с базой данных
+    */
+   public List<DealReportDto> findAllForReport() {
+       try {
+           return dealDao.findAllForReport();
+       } catch (Exception e) {
+           RealEstateException re = ExceptionHandler.handleDatabaseException(e, "SELECT", "Deal", null);
+           ExceptionHandler.logException(re, "Ошибка при получении списка всех сделок для отчета");
+           throw re;
+       }
+   }
 }

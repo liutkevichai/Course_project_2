@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ResponseBody;
 import ru.realestate.realestate_app.model.Client;
 import ru.realestate.realestate_app.service.ClientService;
+import ru.realestate.realestate_app.service.CsvExportService;
 
 import java.util.List;
 import java.util.Map;
@@ -23,9 +24,11 @@ import java.util.Map;
 public class ClientWebController {
 
     private final ClientService clientService;
+    private final CsvExportService csvExportService;
 
-    public ClientWebController(ClientService clientService) {
+    public ClientWebController(ClientService clientService, CsvExportService csvExportService) {
         this.clientService = clientService;
+        this.csvExportService = csvExportService;
     }
 
     @GetMapping
@@ -75,5 +78,28 @@ public class ClientWebController {
     public ResponseEntity<Void> deleteClient(@PathVariable Long id) {
         clientService.deleteById(id);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/report")
+    public ResponseEntity<byte[]> generateClientReport() {
+        try {
+            // Получаем всех клиентов
+            List<Client> clients = clientService.findAll();
+            
+            // Экспортируем клиентов в CSV
+            byte[] csvData = csvExportService.exportToCsv(clients, Client.class);
+
+            // Формируем имя файла с текущей датой
+            String fileName = "clients_report_" + java.time.LocalDate.now() + ".csv";
+            
+            // Возвращаем CSV-файл с правильными заголовками
+            return ResponseEntity.ok()
+                    .header("Content-Disposition", "attachment; filename=" + fileName)
+                    .header("Content-Type", "text/csv; charset=utf-8")
+                    .body(csvData);
+        } catch (Exception _) {
+            // В случае ошибки возвращаем пустой массив
+            return ResponseEntity.internalServerError().body(new byte[0]);
+        }
     }
 }

@@ -7,6 +7,7 @@ import ru.realestate.realestate_app.exception.RealEstateException;
 import ru.realestate.realestate_app.exception.handler.ExceptionHandler;
 import ru.realestate.realestate_app.model.Payment;
 import ru.realestate.realestate_app.model.dto.PaymentTableDto;
+import ru.realestate.realestate_app.model.dto.PaymentReportDto;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -79,5 +80,20 @@ public class PaymentService {
             ExceptionHandler.logException(re, "Ошибка при поиске платежей");
             throw re;
         }
-    }
+   }
+
+   /**
+    * Получить все платежи для отчета
+    * @return список всех платежей с полной информацией для отчета
+    * @throws DatabaseException если произошла ошибка при работе с базой данных
+    */
+   public List<PaymentReportDto> findAllForReport() {
+       try {
+           return paymentDao.findAllForReport();
+       } catch (Exception e) {
+           RealEstateException re = ExceptionHandler.handleDatabaseException(e, "SELECT", "Payment", null);
+           ExceptionHandler.logException(re, "Ошибка при получении списка всех платежей для отчета");
+           throw re;
+       }
+   }
 }

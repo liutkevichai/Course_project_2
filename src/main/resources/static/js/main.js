@@ -1075,7 +1075,7 @@ document.addEventListener('DOMContentLoaded', function () {
         row.classList.add('editing');
         
         // Заменяем содержимое редактируемых ячеек на input поля
-        // Редактируемые поля: Площадь (3), Стоимость (4), Тип (5)
+        // Редактируемые поля: Площадь (3), Стоимость (4), Описание (5), Тип (6)
         
         // Площадь (ячейка 3)
         const areaCell = cells[3];
@@ -1098,9 +1098,19 @@ document.addEventListener('DOMContentLoaded', function () {
         costInput.className = 'edit-input';
         costCell.innerHTML = '';
         costCell.appendChild(costInput);
+
+        // Описание (ячейка 5) - используем textarea
+        const descriptionCell = cells[5];
+        const descriptionValue = descriptionCell.textContent;
+        const descriptionTextarea = document.createElement('textarea');
+        descriptionTextarea.value = descriptionValue;
+        descriptionTextarea.className = 'edit-input';
+        descriptionTextarea.rows = 2; // Начальное количество строк
+        descriptionCell.innerHTML = '';
+        descriptionCell.appendChild(descriptionTextarea);
         
-        // Тип недвижимости (ячейка 5)
-        const typeCell = cells[5];
+        // Тип недвижимости (ячейка 6)
+        const typeCell = cells[6];
         const typeValue = typeCell.textContent;
         // Создаем выпадающий список для типа недвижимости
         createPropertyTypeSelect(typeValue, typeCell);
@@ -1172,10 +1182,11 @@ document.addEventListener('DOMContentLoaded', function () {
         
         // Собираем новые значения из полей input и select
         // Индексы соответствуют структуре таблицы:
-        // 0 - ID (не редактируется), 1 - Адрес, 2 - Город, 3 - Площадь, 4 - Стоимость, 5 - Тип
+        // 0 - ID (не редактируется), 1 - Адрес, 2 - Город, 3 - Площадь, 4 - Стоимость, 5 - Описание, 6 - Тип
         const area = cells[3].querySelector('input').value;
         const price = cells[4].querySelector('input').value;
-        const propertyTypeSelect = cells[5].querySelector('select');
+        const description = cells[5].querySelector('textarea').value; // Изменено на textarea
+        const propertyTypeSelect = cells[6].querySelector('select');
         const propertyTypeId = propertyTypeSelect.value;
         
         // Получаем текстовое значение типа недвижимости для отображения
@@ -1185,6 +1196,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const updates = {
             area: parseFloat(area) || 0,
             price: parseFloat(price) || 0,
+            description: description,
             propertyTypeId: parseInt(propertyTypeId) || 0
         };
         
@@ -1201,7 +1213,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 // В случае успешного ответа обновляем UI
                 cells[3].textContent = area + ' м²';
                 cells[4].textContent = new Intl.NumberFormat('ru-RU').format(price) + ' ₽';
-                cells[5].textContent = propertyTypeText;
+                cells[5].textContent = description;
+                cells[6].textContent = propertyTypeText;
                 
                 // Удаляем последнюю ячейку с кнопками
                 row.removeChild(row.lastChild);

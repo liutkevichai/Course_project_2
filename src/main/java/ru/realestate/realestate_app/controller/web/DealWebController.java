@@ -13,12 +13,15 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.http.ResponseEntity;
 import org.springframework.format.annotation.DateTimeFormat;
+import ru.realestate.realestate_app.model.dto.DealReportDto;
+import ru.realestate.realestate_app.service.CsvExportService;
 import ru.realestate.realestate_app.model.Deal;
 import ru.realestate.realestate_app.service.DealService;
 import ru.realestate.realestate_app.service.ClientService;
 import ru.realestate.realestate_app.service.RealtorService;
 import ru.realestate.realestate_app.service.PropertyService;
 import ru.realestate.realestate_app.service.reference.DealTypeService;
+import java.util.List;
 
 import java.time.LocalDate;
 import java.util.Map;
@@ -33,14 +36,17 @@ public class DealWebController {
     private final PropertyService propertyService;
     private final DealTypeService dealTypeService;
 
+    private final CsvExportService csvExportService;
+
     public DealWebController(DealService dealService, ClientService clientService,
                              RealtorService realtorService, PropertyService propertyService,
-                             DealTypeService dealTypeService) {
+                             DealTypeService dealTypeService, CsvExportService csvExportService) {
         this.dealService = dealService;
         this.clientService = clientService;
         this.realtorService = realtorService;
         this.propertyService = propertyService;
         this.dealTypeService = dealTypeService;
+        this.csvExportService = csvExportService;
     }
 
     @GetMapping
@@ -99,8 +105,31 @@ public class DealWebController {
 
     @DeleteMapping("/delete/{id}")
     @ResponseBody
-    public ResponseEntity<?> deleteDeal(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteDeal(@PathVariable Long id) {
         dealService.deleteById(id);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/report")
+    public ResponseEntity<byte[]> generateDealReport() {
+        try {
+            // Получаем все сделки для отчета
+            List<DealReportDto> deals = dealService.findAllForReport();
+
+            // Экспортируем данные в CSV
+            byte[] csvData = csvExportService.exportToCsv(deals, DealReportDto.class);
+
+            // Формируем имя файла с текущей датой
+            String fileName = "deals_report_" + java.time.LocalDate.now() + ".csv";
+
+            // Возвращаем ответ с CSV данными
+            return ResponseEntity.ok()
+                    .header("Content-Disposition", "attachment; filename=\"" + fileName + "\"")
+                    .header("Content-Type", "text/csv; charset=utf-8")
+                    .body(csvData);
+        } catch (Exception _) {
+            // В случае ошибки возвращаем пустой массив байтов
+            return ResponseEntity.internalServerError().body(new byte[0]);
+        }
     }
 }

@@ -13,6 +13,7 @@ import ru.realestate.realestate_app.exception.handler.ExceptionHandler;
 import ru.realestate.realestate_app.model.Property;
 import ru.realestate.realestate_app.model.dto.PropertyWithDetailsDto;
 import ru.realestate.realestate_app.model.dto.PropertyTableDto;
+import ru.realestate.realestate_app.model.dto.PropertyReportDto;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -366,6 +367,21 @@ public class PropertyService {
         } catch (Exception e) {
             RealEstateException re = ExceptionHandler.handleDatabaseException(e, "SELECT", "Property", null);
             ExceptionHandler.logException(re, "Ошибка при поиске объектов недвижимости по заданным критериям");
+            throw re;
+        }
+    }
+    
+    /**
+     * Получить все объекты недвижимости для отчета
+     * @return список всех объектов недвижимости с полной информацией для отчета
+     * @throws DatabaseException если произошла ошибка при работе с базой данных
+     */
+    public List<PropertyReportDto> findAllForReport() {
+        try {
+            return propertyDao.findAllForReport();
+        } catch (Exception e) {
+            RealEstateException re = ExceptionHandler.handleDatabaseException(e, "SELECT", "Property", null);
+            ExceptionHandler.logException(re, "Ошибка при получении списка всех объектов недвижимости для отчета");
             throw re;
         }
     }

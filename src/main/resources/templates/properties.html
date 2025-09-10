@@ -165,14 +165,18 @@
         <!-- Таблица недвижимости -->
         <section>
             <h2>Список недвижимости</h2>
+            <div class="report-button-container">
+                <a href="/properties/report" class="btn-report">Скачать отчет</a>
+            </div>
             <table>
                 <thead>
                     <tr>
                         <th>ID</th>
                         <th>Адрес</th>
-                        <th>Город</th>
+                        <th class="col-city">Город</th>
                         <th>Площадь</th>
                         <th>Стоимость</th>
+                        <th>Описание</th>
                         <th>Тип</th>
                     </tr>
                 </thead>
@@ -180,9 +184,10 @@
                     <tr th:each="property : ${properties}" th:attr="data-id=${property.propertyId}">
                         <td th:text="${property.propertyId}"></td>
                         <td th:text="${property.getTableAddress()}"></td>
-                        <td th:text="${property.cityName}"></td>
+                        <td class="col-city" th:text="${property.cityName}"></td>
                         <td class="editable" th:text="${property.getAreaFormatted()}"></td>
                         <td class="editable" th:text="${property.getCostFormatted()}"></td>
+                        <td class="editable" th:text="${property.getShortDescription()}"></td>
                         <td class="editable propertyType" th:text="${property.propertyTypeName}"></td>
                     </tr>
                 </tbody>

@@ -13,6 +13,8 @@ import ru.realestate.realestate_app.mapper.dto.DealTableRowMapper;
 import ru.realestate.realestate_app.model.Deal;
 import ru.realestate.realestate_app.model.dto.DealWithDetailsDto;
 import ru.realestate.realestate_app.model.dto.DealTableDto;
+import ru.realestate.realestate_app.model.dto.DealReportDto;
+import ru.realestate.realestate_app.mapper.dto.DealReportRowMapper;
 
 import java.math.BigDecimal;
 import java.sql.PreparedStatement;
@@ -1173,5 +1175,35 @@ public class DealDao {
         finalSql += " ORDER BY d.deal_date DESC";
         
         return jdbcTemplate.query(finalSql, dealTableRowMapper, params.toArray());
+    }
+
+    /**
+     * Получить все сделки для отчета
+     * @return список всех сделок с полной информацией для отчета
+     */
+    public List<DealReportDto> findAllForReport() {
+        logger.debug("Получение списка всех сделок для отчета");
+        String sql = """
+            SELECT
+                d.id_deal,
+                d.deal_date,
+                d.deal_cost,
+                CONCAT(c.last_name, ' ', SUBSTRING(c.first_name, 1, 1), '.',
+                       CASE WHEN c.middle_name IS NOT NULL THEN CONCAT(SUBSTRING(c.middle_name, 1, 1), '.') ELSE '' END) as client_full_name,
+                CONCAT(r.last_name, ' ', SUBSTRING(r.first_name, 1, 1), '.',
+                       CASE WHEN r.middle_name IS NOT NULL THEN CONCAT(SUBSTRING(r.middle_name, 1, 1), '.') ELSE '' END) as realtor_full_name,
+                CONCAT(city.city_name, ', ', street.street_name, ', ', p.house_number,
+                       CASE WHEN p.apartment_number IS NOT NULL THEN CONCAT('-', p.apartment_number) ELSE '' END) as property_address,
+                dt.deal_type_name
+            FROM deals d
+            JOIN clients c ON d.id_client = c.id_client
+            JOIN realtors r ON d.id_realtor = r.id_realtor
+            JOIN properties p ON d.id_property = p.id_property
+            JOIN streets street ON p.id_street = street.id_street
+            JOIN cities city ON p.id_city = city.id_city
+            JOIN deal_types dt ON d.id_deal_type = dt.id_deal_type
+            ORDER BY d.deal_date DESC
+            """;
+        return jdbcTemplate.query(sql, new DealReportRowMapper());
     }
 }

@@ -11,6 +11,8 @@ import ru.realestate.realestate_app.mapper.PaymentRowMapper;
 import ru.realestate.realestate_app.mapper.dto.PaymentTableRowMapper;
 import ru.realestate.realestate_app.model.Payment;
 import ru.realestate.realestate_app.model.dto.PaymentTableDto;
+import ru.realestate.realestate_app.model.dto.PaymentReportDto;
+import ru.realestate.realestate_app.mapper.dto.PaymentReportRowMapper;
 
 import java.sql.PreparedStatement;
 import java.time.LocalDate;
@@ -171,5 +173,29 @@ public class PaymentDao {
         finalSql += " ORDER BY p.payment_date DESC";
 
         return jdbcTemplate.query(finalSql, paymentTableRowMapper, params.toArray());
+    }
+
+    /**
+     * Получить все платежи для отчета
+     * @return список всех платежей с полной информацией для отчета
+     */
+    public List<PaymentReportDto> findAllForReport() {
+        logger.debug("Получение списка всех платежей для отчета");
+        String sql = """
+            SELECT
+                p.id_payment,
+                p.payment_date,
+                p.amount,
+                d.deal_cost,
+                CONCAT(c.last_name, ' ', SUBSTRING(c.first_name, 1, 1), '.',
+                       CASE WHEN c.middle_name IS NOT NULL THEN CONCAT(SUBSTRING(c.middle_name, 1, 1), '.') ELSE '' END) as client_full_name,
+                dt.deal_type_name
+            FROM payments p
+            JOIN deals d ON p.id_deal = d.id_deal
+            JOIN clients c ON d.id_client = c.id_client
+            JOIN deal_types dt ON d.id_deal_type = dt.id_deal_type
+            ORDER BY p.payment_date DESC
+            """;
+        return jdbcTemplate.query(sql, new PaymentReportRowMapper());
     }
 }

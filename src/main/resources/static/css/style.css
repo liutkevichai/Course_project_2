@@ -428,15 +428,18 @@ button.danger:hover, .btn.danger:hover {
 }
 
 /* Базовые стили для меню (скрыто по умолчанию) */
+
 .dropdown-menu {
     display: none;
     background: var(--background);
-    min-width: 160px;
-    box-shadow: 0 8px 16px rgba(0,0,0.2);
-    z-index: 1;
+    min-width: 100%;
+    box-shadow: var(--shadow-md);
+    z-index: 1001;
     position: absolute;
     top: 100%;
     left: 0;
+    border-top: 1px solid var(--border);
+    border-radius: 0 0 var(--radius-sm) var(--radius-sm);
 }
 
 /* Стили для отображаемого меню */
@@ -488,21 +491,6 @@ section h2 {
     padding-bottom: 0.5rem;
     margin-bottom: 1rem;
 }
-.dropdown-menu {
-    display: none;
-    background: var(--background);
-    min-width: 100%;
-    box-shadow: var(--shadow-md);
-    z-index: 1001;
-    position: absolute;
-    top: 100%;
-    left: 0;
-    border-top: 1px solid var(--border);
-    border-radius: 0 0 var(--radius-sm) var(--radius-sm);
-}
-
-.dropdown-menu.show {
-    display: block;
 
 /* Стили для счетчиков записей */
 section p {
@@ -533,5 +521,38 @@ section p span {
     font-weight: 600;
     color: var(--primary);
 }
-    display: block;
+
+/* Стили для колонок таблицы */
+.col-city {
+    width: 10%;
+    max-width: 150px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
+
+/* Стили для кнопки отчета */
+.btn-report {
+    background-color: #eaeef4; /* Светло-серый цвет */
+    color: #506076; /* Темно-серый текст */
+    padding: 0.25rem 0.5rem; /* Меньше padding, чем у основных кнопок */
+    font-size: 0.875rem; /* Меньший размер шрифта */
+    border: 1px solid #cbd5e1; /* Тонкая граница */
+    border-radius: var(--radius-sm); /* Маленький радиус скругления */
+    cursor: pointer;
+    transition: var(--transition-fast);
+    text-decoration: none;
+    display: inline-block;
+}
+
+.btn-report:hover {
+    background-color: #cbd5e1; /* Немного темнее при наведении */
+    border-color: #94a3b8;
+}
+
+/* Стили для контейнера кнопки отчета */
+.report-button-container {
+    text-align: right;
+    margin-bottom: 1rem;
+}
+

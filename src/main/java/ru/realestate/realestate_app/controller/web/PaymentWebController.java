@@ -12,8 +12,9 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.HttpStatus;
 import org.springframework.format.annotation.DateTimeFormat;
+import ru.realestate.realestate_app.model.dto.PaymentReportDto;
+import ru.realestate.realestate_app.service.CsvExportService;
 import ru.realestate.realestate_app.service.PaymentService;
 import ru.realestate.realestate_app.service.DealService;
 import ru.realestate.realestate_app.model.Payment;
@@ -30,9 +31,12 @@ public class PaymentWebController {
     private final PaymentService paymentService;
     private final DealService dealService;
 
-    public PaymentWebController(PaymentService paymentService, DealService dealService) {
+    private final CsvExportService csvExportService;
+
+    public PaymentWebController(PaymentService paymentService, DealService dealService, CsvExportService csvExportService) {
         this.paymentService = paymentService;
         this.dealService = dealService;
+        this.csvExportService = csvExportService;
     }
 
     @GetMapping
@@ -87,12 +91,31 @@ public class PaymentWebController {
     
     @DeleteMapping("/delete/{id}")
     @ResponseBody
-    public ResponseEntity<?> deletePayment(@PathVariable Long id) {
+    public ResponseEntity<Void> deletePayment(@PathVariable Long id) {
+        paymentService.deleteById(id);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/report")
+    public ResponseEntity<byte[]> generatePaymentReport() {
         try {
-            paymentService.deleteById(id);
-            return ResponseEntity.ok().build();
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error deleting record");
+            // Получаем все платежи для отчета
+            List<PaymentReportDto> payments = paymentService.findAllForReport();
+
+            // Экспортируем данные в CSV
+            byte[] csvData = csvExportService.exportToCsv(payments, PaymentReportDto.class);
+
+            // Формируем имя файла с текущей датой
+            String fileName = "payments_report_" + java.time.LocalDate.now() + ".csv";
+
+            // Возвращаем ответ с CSV данными
+            return ResponseEntity.ok()
+                    .header("Content-Disposition", "attachment; filename=\"" + fileName + "\"")
+                    .header("Content-Type", "text/csv; charset=utf-8")
+                    .body(csvData);
+        } catch (Exception _) {
+            // В случае ошибки возвращаем пустой массив байтов
+            return ResponseEntity.internalServerError().body(new byte[0]);
         }
     }
 }

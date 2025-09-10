@@ -13,7 +13,9 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.http.ResponseEntity;
 import ru.realestate.realestate_app.model.Property;
+import ru.realestate.realestate_app.model.dto.PropertyReportDto;
 import ru.realestate.realestate_app.model.dto.PropertyTableDto;
+import ru.realestate.realestate_app.service.CsvExportService;
 import ru.realestate.realestate_app.service.PropertyService;
 import ru.realestate.realestate_app.service.reference.PropertyTypeService;
 import ru.realestate.realestate_app.service.reference.GeographyService;
@@ -29,13 +31,16 @@ public class PropertyWebController {
     private final PropertyService propertyService;
     private final PropertyTypeService propertyTypeService;
     private final GeographyService geographyService;
+    private final CsvExportService csvExportService;
 
     public PropertyWebController(PropertyService propertyService,
                                 PropertyTypeService propertyTypeService,
-                                GeographyService geographyService) {
+                                GeographyService geographyService,
+                                CsvExportService csvExportService) {
         this.propertyService = propertyService;
         this.propertyTypeService = propertyTypeService;
         this.geographyService = geographyService;
+        this.csvExportService = csvExportService;
     }
 
     @GetMapping
@@ -90,5 +95,28 @@ public class PropertyWebController {
     public ResponseEntity<?> deleteProperty(@PathVariable Long id) {
         propertyService.deleteById(id);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/report")
+    public ResponseEntity<byte[]> generatePropertyReport() {
+        try {
+            // Получаем все объекты недвижимости для отчета
+            List<PropertyReportDto> properties = propertyService.findAllForReport();
+            
+            // Экспортируем данные в CSV
+            byte[] csvData = csvExportService.exportToCsv(properties, PropertyReportDto.class);
+            
+            // Формируем имя файла с текущей датой
+            String fileName = "properties_report_" + java.time.LocalDate.now() + ".csv";
+            
+            // Возвращаем ответ с CSV данными
+            return ResponseEntity.ok()
+                    .header("Content-Disposition", "attachment; filename=\"" + fileName + "\"")
+                    .header("Content-Type", "text/csv; charset=utf-8")
+                    .body(csvData);
+        } catch (Exception _) {
+            // В случае ошибки возвращаем пустой массив байтов
+            return ResponseEntity.internalServerError().body(new byte[0]);
+        }
     }
 }

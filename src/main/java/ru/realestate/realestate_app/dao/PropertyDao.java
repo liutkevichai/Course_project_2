@@ -13,6 +13,8 @@ import ru.realestate.realestate_app.mapper.dto.PropertyTableRowMapper;
 import ru.realestate.realestate_app.model.Property;
 import ru.realestate.realestate_app.model.dto.PropertyWithDetailsDto;
 import ru.realestate.realestate_app.model.dto.PropertyTableDto;
+import ru.realestate.realestate_app.model.dto.PropertyReportDto;
+import ru.realestate.realestate_app.mapper.dto.PropertyReportRowMapper;
 
 import java.math.BigDecimal;
 import java.sql.PreparedStatement;
@@ -666,6 +668,43 @@ public class PropertyDao {
         sql.append(" ORDER BY p.cost DESC");
 
         return jdbcTemplate.query(sql.toString(), new PropertyTableRowMapper(), params.toArray());
+    }
+    /**
+     * Получить все объекты недвижимости для отчета
+     * @return список всех объектов недвижимости с полной информацией для отчета
+     */
+    public List<PropertyReportDto> findAllForReport() {
+        logger.debug("Получение списка всех объектов недвижимости для отчета");
+        String sql = """
+            SELECT 
+                p.id_property as property_id,
+                p.area,
+                p.cost,
+                p.description,
+                p.postal_code,
+                p.house_number,
+                p.house_letter,
+                p.building_number,
+                p.apartment_number,
+                -- Тип недвижимости
+                pt.property_type_name,
+                -- География
+                country.country_name,
+                region.code as region_code,
+                region.name as region_name,
+                city.city_name,
+                district.district_name,
+                street.street_name
+            FROM properties p
+            JOIN property_types pt ON p.id_property_type = pt.id_property_type
+            JOIN countries country ON p.id_country = country.id_country
+            JOIN regions region ON p.id_region = region.id_region
+            JOIN cities city ON p.id_city = city.id_city
+            JOIN districts district ON p.id_district = district.id_district
+            JOIN streets street ON p.id_street = street.id_street
+            ORDER BY p.id_property
+            """;
+        return jdbcTemplate.query(sql, new PropertyReportRowMapper());
     }
 
     /**
