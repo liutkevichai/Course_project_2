@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{_layout :: head}">
+    <title>Документация API - БД Агентство недвижимости</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/api-docs.css}">
+</head>
+<body>
+    <div th:replace="~{_layout :: header}"></div>
+    <div th:replace="~{_layout :: sidebar}"></div>
+    
+    <main>
+        <h1>Документация API - Агентство недвижимости</h1>
+        <div class="api-docs-container">
+            <div th:utext="${apiEndpointsHtml}"></div>
+        </div>
+    </main>
+    
+    <div th:replace="~{_layout :: footer}"></div>
+</body>
+</html>

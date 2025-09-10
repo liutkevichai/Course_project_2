@@ -8,7 +8,29 @@
     <main>
         <!-- Здесь будет содержимое, специфичное для страницы -->
         <h1>Добро пожаловать</h1>
-        <p>Это главная страница приложения "База данных недвижимости".</p>
+        <p>Это главная страница приложения "База данных агентства недвижимости".</p>
+        
+        <div class="main-links">
+            <h2>Основные сущности</h2>
+            <ul>
+                <li><a href="/clients">Клиенты</a></li>
+                <li><a href="/deals">Сделки</a></li>
+                <li><a href="/payments">Платежи</a></li>
+                <li><a href="/properties">Недвижимость</a></li>
+                <li><a href="/realtors">Риелторы</a></li>
+            </ul>
+            
+            <h2>Справочные данные</h2>
+            <ul>
+                <li><a href="/reference/deal-types">Типы сделок</a></li>
+                <li><a href="/reference/property-types">Типы недвижимости</a></li>
+                <li><a href="/reference/countries">Страны</a></li>
+                <li><a href="/reference/regions">Регионы</a></li>
+                <li><a href="/reference/cities">Города</a></li>
+                <li><a href="/reference/districts">Районы</a></li>
+                <li><a href="/reference/streets">Улицы</a></li>
+            </ul>
+        </div>
     </main>
     <div th:replace="~{_layout :: footer}"></div>
 </body>

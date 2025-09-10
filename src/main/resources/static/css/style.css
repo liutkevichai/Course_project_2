@@ -57,16 +57,18 @@ header {
     right: 0;
     z-index: 1000;
     border-bottom: 2px solid var(--primary);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 header h1 {
-    font-size: 1.75rem;
-    font-weight: 700;
-    text-align: center;
-    margin: 0;
-    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
-    letter-spacing: -0.025em;
-    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+font-size: 1.75rem;
+font-weight: 700;
+margin: 0;
+font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+letter-spacing: -0.025em;
+text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
 header h1 a {
@@ -81,10 +83,26 @@ header h1 a:hover {
     text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
+/* Стили для ссылки API в заголовке */
+.header-api-link {
+    color: white;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1.1rem;
+    transition: none;
+}
+
+.header-api-link:hover,
+.header-api-link:active,
+.header-api-link:visited {
+    color: white;
+    text-decoration: none;
+}
+
 /* Стили боковой панели */
 aside {
     background: var(--surface);
-    border-right: 2px solid var(--border);
+    border-right: 0px solid var(--border);
     width: 230px;
     height: 100vh;
     position: fixed;
@@ -445,15 +463,6 @@ button.danger:hover, .btn.danger:hover {
 /* Стили для отображаемого меню */
 .dropdown-menu.show {
     display: block;
-    background: var(--background);
-    min-width: 100%;
-    box-shadow: var(--shadow-md);
-    z-index: 1001;
-    position: absolute;
-    top: 100%;
-    left: 0;
-    border-top: 1px solid var(--border);
-    border-radius: 0 0 var(--radius-sm) var(--radius-sm);
 }
 
 .dropdown-menu.show a {
@@ -554,5 +563,56 @@ section p span {
 .report-button-container {
     text-align: right;
     margin-bottom: 1rem;
+}
+
+/* Стили для списков ссылок на главной странице */
+.main-links {
+    margin-top: 2rem;
+}
+
+.main-links h2 {
+    color: var(--primary);
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 0.5rem;
+    margin-bottom: 1rem;
+    font-size: 1.4rem;
+    font-weight: 600;
+    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+    letter-spacing: -0.01em;
+}
+
+.main-links ul {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 2rem 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 0.75rem;
+}
+
+.main-links ul li {
+    margin: 0;
+}
+
+.main-links ul li a {
+    display: block;
+    color: var(--text-primary);
+    text-decoration: none;
+    padding: 0.75rem 1rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    transition: var(--transition-fast);
+    font-weight: 500;
+    box-shadow: var(--shadow-sm);
+    text-align: center;
+}
+
+.main-links ul li a:hover {
+    background-color: var(--primary-light);
+    color: white;
+    border-color: var(--primary-light);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
 }
 
