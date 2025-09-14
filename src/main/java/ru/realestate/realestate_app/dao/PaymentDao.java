@@ -38,7 +38,7 @@ public class PaymentDao {
     }
 
     public List<Payment> findAll() {
-        String sql = "SELECT * FROM payments";
+        String sql = "SELECT * FROM payments ORDER BY id_payment";
         return jdbcTemplate.query(sql, paymentRowMapper);
     }
 
@@ -115,7 +115,7 @@ public class PaymentDao {
             JOIN properties prop ON d.id_property = prop.id_property
             JOIN streets street ON prop.id_street = street.id_street
             JOIN cities city ON prop.id_city = city.id_city
-            ORDER BY p.payment_date DESC
+            ORDER BY p.id_payment
             """;
         return jdbcTemplate.query(sql, paymentTableRowMapper);
     }
@@ -194,7 +194,7 @@ public class PaymentDao {
             JOIN deals d ON p.id_deal = d.id_deal
             JOIN clients c ON d.id_client = c.id_client
             JOIN deal_types dt ON d.id_deal_type = dt.id_deal_type
-            ORDER BY p.payment_date DESC
+            ORDER BY p.id_payment
             """;
         return jdbcTemplate.query(sql, new PaymentReportRowMapper());
     }

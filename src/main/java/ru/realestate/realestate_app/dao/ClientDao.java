@@ -50,7 +50,7 @@ public class ClientDao {
     public List<Client> findAll() {
         logger.debug("Получение списка всех клиентов");
         return jdbcTemplate.query(
-            "SELECT * FROM clients ORDER BY last_name, first_name",
+            "SELECT * FROM clients ORDER BY id_client",
             clientRowMapper
         );
     }

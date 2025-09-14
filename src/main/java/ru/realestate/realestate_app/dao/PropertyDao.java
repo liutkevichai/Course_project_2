@@ -378,7 +378,7 @@ public class PropertyDao {
             JOIN cities city ON p.id_city = city.id_city
             JOIN districts district ON p.id_district = district.id_district
             JOIN streets street ON p.id_street = street.id_street
-            ORDER BY p.cost DESC
+            ORDER BY p.id_property
             """;
         return jdbcTemplate.query(sql, propertyWithDetailsRowMapper);
     }
@@ -461,7 +461,7 @@ public class PropertyDao {
             JOIN cities city ON p.id_city = city.id_city
             JOIN districts district ON p.id_district = district.id_district
             JOIN streets street ON p.id_street = street.id_street
-            ORDER BY p.cost DESC
+            ORDER BY p.id_property
             """;
         return jdbcTemplate.query(sql, propertyTableRowMapper);
     }
@@ -665,7 +665,7 @@ public class PropertyDao {
             params.add(streetId);
         }
 
-        sql.append(" ORDER BY p.cost DESC");
+        sql.append(" ORDER BY p.id_property");
 
         return jdbcTemplate.query(sql.toString(), new PropertyTableRowMapper(), params.toArray());
     }

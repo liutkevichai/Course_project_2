@@ -29,7 +29,7 @@ public class PropertyTypeDao {
      */
     public List<PropertyType> findAll() {
         return jdbcTemplate.query(
-            "SELECT * FROM property_types ORDER BY property_type_name",
+            "SELECT * FROM property_types ORDER BY id_property_type",
             (rs, _) -> new PropertyType(
                 rs.getLong("id_property_type"),
                 rs.getString("property_type_name")

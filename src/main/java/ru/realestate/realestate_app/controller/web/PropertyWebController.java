@@ -92,7 +92,7 @@ public class PropertyWebController {
 
     @DeleteMapping("/delete/{id}")
     @ResponseBody
-    public ResponseEntity<?> deleteProperty(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteProperty(@PathVariable Long id) {
         propertyService.deleteById(id);
         return ResponseEntity.ok().build();
     }

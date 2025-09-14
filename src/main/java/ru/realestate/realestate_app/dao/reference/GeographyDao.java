@@ -56,7 +56,7 @@ public class GeographyDao {
      */
     public List<Country> findAllCountries() {
         return jdbcTemplate.query(
-            "SELECT * FROM countries ORDER BY country_name",
+            "SELECT * FROM countries ORDER BY id_country",
             (rs, _) -> new Country(
                 rs.getLong("id_country"),
                 rs.getString("country_name")
@@ -106,7 +106,7 @@ public class GeographyDao {
      */
     public List<Region> findAllRegions() {
         return jdbcTemplate.query(
-            "SELECT * FROM regions ORDER BY name",
+            "SELECT * FROM regions ORDER BY id_region",
             (rs, _) -> new Region(
                 rs.getLong("id_region"),
                 rs.getString("name"),
@@ -159,7 +159,7 @@ public class GeographyDao {
      */
     public List<Region> findRegionsByCountry(Long countryId) {
         return jdbcTemplate.query(
-            "SELECT * FROM regions WHERE id_country = ? ORDER BY name",
+            "SELECT * FROM regions WHERE id_country = ? ORDER BY id_region",
             (rs, _) -> new Region(
                 rs.getLong("id_region"),
                 rs.getString("name"),
@@ -198,7 +198,7 @@ public class GeographyDao {
      */
     public List<City> findAllCities() {
         return jdbcTemplate.query(
-            "SELECT * FROM cities ORDER BY city_name",
+            "SELECT * FROM cities ORDER BY id_city",
             (rs, _) -> new City(
                 rs.getLong("id_city"),
                 rs.getString("city_name"),
@@ -232,7 +232,7 @@ public class GeographyDao {
      */
     public List<City> findCitiesByRegion(Long regionId) {
         return jdbcTemplate.query(
-            "SELECT * FROM cities WHERE id_region = ? ORDER BY city_name",
+            "SELECT * FROM cities WHERE id_region = ? ORDER BY id_city",
             (rs, _) -> new City(
                 rs.getLong("id_city"),
                 rs.getString("city_name"),
@@ -251,7 +251,7 @@ public class GeographyDao {
         return jdbcTemplate.query(
             "SELECT c.* FROM cities c " +
             "INNER JOIN regions r ON c.id_region = r.id_region " +
-            "WHERE r.id_country = ? ORDER BY c.city_name",
+            "WHERE r.id_country = ? ORDER BY c.id_city",
             (rs, _) -> new City(
                 rs.getLong("id_city"),
                 rs.getString("city_name"),
@@ -287,7 +287,7 @@ public class GeographyDao {
      */
     public List<City> findCitiesByNamePattern(String cityNamePattern) {
         return jdbcTemplate.query(
-            "SELECT * FROM cities WHERE city_name ILIKE ? ORDER BY city_name",
+            "SELECT * FROM cities WHERE city_name ILIKE ? ORDER BY id_city",
             (rs, _) -> new City(
                 rs.getLong("id_city"),
                 rs.getString("city_name"),
@@ -305,7 +305,7 @@ public class GeographyDao {
      */
     public List<District> findAllDistricts() {
         return jdbcTemplate.query(
-            "SELECT * FROM districts ORDER BY district_name",
+            "SELECT * FROM districts ORDER BY id_district",
             (rs, _) -> new District(
                 rs.getLong("id_district"),
                 rs.getString("district_name"),
@@ -339,7 +339,7 @@ public class GeographyDao {
      */
     public List<District> findDistrictsByCity(Long cityId) {
         return jdbcTemplate.query(
-            "SELECT * FROM districts WHERE id_city = ? ORDER BY district_name",
+            "SELECT * FROM districts WHERE id_city = ? ORDER BY id_district",
             (rs, _) -> new District(
                 rs.getLong("id_district"),
                 rs.getString("district_name"),
@@ -358,7 +358,7 @@ public class GeographyDao {
         return jdbcTemplate.query(
             "SELECT d.* FROM districts d " +
             "INNER JOIN cities c ON d.id_city = c.id_city " +
-            "WHERE c.id_region = ? ORDER BY d.district_name",
+            "WHERE c.id_region = ? ORDER BY d.id_district",
             (rs, _) -> new District(
                 rs.getLong("id_district"),
                 rs.getString("district_name"),
@@ -378,7 +378,7 @@ public class GeographyDao {
             "SELECT d.* FROM districts d " +
             "INNER JOIN cities c ON d.id_city = c.id_city " +
             "INNER JOIN regions r ON c.id_region = r.id_region " +
-            "WHERE r.id_country = ? ORDER BY d.district_name",
+            "WHERE r.id_country = ? ORDER BY d.id_district",
             (rs, _) -> new District(
                 rs.getLong("id_district"),
                 rs.getString("district_name"),
@@ -415,7 +415,7 @@ public class GeographyDao {
      */
     public List<Street> findAllStreets() {
         return jdbcTemplate.query(
-            "SELECT * FROM streets ORDER BY street_name",
+            "SELECT * FROM streets ORDER BY id_street",
             (rs, _) -> new Street(
                 rs.getLong("id_street"),
                 rs.getString("street_name"),
@@ -449,7 +449,7 @@ public class GeographyDao {
      */
     public List<Street> findStreetsByCity(Long cityId) {
         return jdbcTemplate.query(
-            "SELECT * FROM streets WHERE id_city = ? ORDER BY street_name",
+            "SELECT * FROM streets WHERE id_city = ? ORDER BY id_street",
             (rs, _) -> new Street(
                 rs.getLong("id_street"),
                 rs.getString("street_name"),
@@ -485,7 +485,7 @@ public class GeographyDao {
      */
     public List<Street> findStreetsByNamePattern(String streetNamePattern) {
         return jdbcTemplate.query(
-            "SELECT * FROM streets WHERE street_name ILIKE ? ORDER BY street_name",
+            "SELECT * FROM streets WHERE street_name ILIKE ? ORDER BY id_street",
             (rs, _) -> new Street(
                 rs.getLong("id_street"),
                 rs.getString("street_name"),
@@ -511,7 +511,7 @@ public class GeographyDao {
                 c.country_name
             FROM regions r
             JOIN countries c ON r.id_country = c.id_country
-            ORDER BY r.name
+            ORDER BY r.id_region
             """;
         return jdbcTemplate.query(sql, regionWithDetailsRowMapper);
     }
@@ -553,7 +553,7 @@ public class GeographyDao {
             FROM regions r
             JOIN countries c ON r.id_country = c.id_country
             WHERE r.id_country = ?
-            ORDER BY r.name
+            ORDER BY r.id_region
             """;
         return jdbcTemplate.query(sql, regionWithDetailsRowMapper, countryId);
     }
@@ -575,7 +575,7 @@ public class GeographyDao {
             FROM cities c
             JOIN regions r ON c.id_region = r.id_region
             JOIN countries country ON r.id_country = country.id_country
-            ORDER BY c.city_name
+            ORDER BY c.id_city
             """;
         return jdbcTemplate.query(sql, cityWithDetailsRowMapper);
     }
@@ -623,7 +623,7 @@ public class GeographyDao {
             JOIN regions r ON c.id_region = r.id_region
             JOIN countries country ON r.id_country = country.id_country
             WHERE c.id_region = ?
-            ORDER BY c.city_name
+            ORDER BY c.id_city
             """;
         return jdbcTemplate.query(sql, cityWithDetailsRowMapper, regionId);
     }
@@ -647,7 +647,7 @@ public class GeographyDao {
             JOIN cities c ON d.id_city = c.id_city
             JOIN regions r ON c.id_region = r.id_region
             JOIN countries country ON r.id_country = country.id_country
-            ORDER BY d.district_name
+            ORDER BY d.id_district
             """;
         return jdbcTemplate.query(sql, districtWithDetailsRowMapper);
     }
@@ -699,7 +699,7 @@ public class GeographyDao {
             JOIN regions r ON c.id_region = r.id_region
             JOIN countries country ON r.id_country = country.id_country
             WHERE d.id_city = ?
-            ORDER BY d.district_name
+            ORDER BY d.id_district
             """;
         return jdbcTemplate.query(sql, districtWithDetailsRowMapper, cityId);
     }
@@ -723,7 +723,7 @@ public class GeographyDao {
             JOIN cities c ON s.id_city = c.id_city
             JOIN regions r ON c.id_region = r.id_region
             JOIN countries country ON r.id_country = country.id_country
-            ORDER BY s.street_name
+            ORDER BY s.id_street
             """;
         return jdbcTemplate.query(sql, streetWithDetailsRowMapper);
     }
@@ -775,7 +775,7 @@ public class GeographyDao {
             JOIN regions r ON c.id_region = r.id_region
             JOIN countries country ON r.id_country = country.id_country
             WHERE s.id_city = ?
-            ORDER BY s.street_name
+            ORDER BY s.id_street
             """;
         return jdbcTemplate.query(sql, streetWithDetailsRowMapper, cityId);
     }
@@ -814,7 +814,7 @@ public class GeographyDao {
             sql.append(" AND r.id_country = ?");
         }
         
-        sql.append(" ORDER BY r.name");
+        sql.append(" ORDER BY r.id_region");
         
         // Подготавливаем параметры для запроса
         List<Object> params = new ArrayList<>();
@@ -870,7 +870,7 @@ public class GeographyDao {
             sql.append(" AND country.id_country = ?");
         }
         
-        sql.append(" ORDER BY c.city_name");
+        sql.append(" ORDER BY c.id_city");
         
         // Подготавливаем параметры для запроса
         List<Object> params = new ArrayList<>();
@@ -928,7 +928,7 @@ public class GeographyDao {
             sql.append(" AND r.id_region = ?");
         }
         
-        sql.append(" ORDER BY d.district_name");
+        sql.append(" ORDER BY d.id_district");
         
         // Подготавливаем параметры для запроса
         List<Object> params = new ArrayList<>();
@@ -986,7 +986,7 @@ public class GeographyDao {
             sql.append(" AND r.id_region = ?");
         }
         
-        sql.append(" ORDER BY s.street_name");
+        sql.append(" ORDER BY s.id_street");
         
         // Подготавливаем параметры для запроса
         List<Object> params = new ArrayList<>();

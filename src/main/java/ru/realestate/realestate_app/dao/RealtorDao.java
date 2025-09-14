@@ -52,7 +52,7 @@ public class RealtorDao {
     public List<Realtor> findAll() {
         logger.debug("Получение списка всех риелторов");
         return jdbcTemplate.query(
-            "SELECT * FROM realtors ORDER BY last_name, first_name",
+            "SELECT * FROM realtors ORDER BY id_realtor",
             realtorRowMapper
         );
     }
@@ -334,7 +334,7 @@ public class RealtorDao {
             params.add(minExperience);
         }
 
-        sql.append(" ORDER BY last_name, first_name");
+        sql.append(" ORDER BY id_realtor");
 
         return jdbcTemplate.query(sql.toString(), realtorRowMapper, params.toArray());
     }

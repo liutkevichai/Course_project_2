@@ -29,7 +29,7 @@ public class DealTypeDao {
      */
     public List<DealType> findAll() {
         return jdbcTemplate.query(
-            "SELECT * FROM deal_types ORDER BY deal_type_name",
+            "SELECT * FROM deal_types ORDER BY id_deal_type",
             (rs, _) -> new DealType(
                 rs.getLong("id_deal_type"),
                 rs.getString("deal_type_name")

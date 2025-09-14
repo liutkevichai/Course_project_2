@@ -60,7 +60,7 @@ public class DealDao {
     public List<Deal> findAll() {
         logger.debug("Получение списка всех сделок");
         return jdbcTemplate.query(
-            "SELECT * FROM deals ORDER BY deal_date DESC",
+            "SELECT * FROM deals ORDER BY id_deal",
             dealRowMapper
         );
     }
@@ -458,7 +458,7 @@ public class DealDao {
             JOIN streets street ON p.id_street = street.id_street
             JOIN property_types pt ON p.id_property_type = pt.id_property_type
             JOIN deal_types dt ON d.id_deal_type = dt.id_deal_type
-            ORDER BY d.deal_date DESC
+            ORDER BY d.id_deal
             """;
         return jdbcTemplate.query(sql, dealWithDetailsRowMapper);
     }
@@ -563,7 +563,7 @@ public class DealDao {
             JOIN cities city ON p.id_city = city.id_city
             JOIN property_types pt ON p.id_property_type = pt.id_property_type
             JOIN deal_types dt ON d.id_deal_type = dt.id_deal_type
-            ORDER BY d.deal_date DESC
+            ORDER BY d.id_deal
             """;
         return jdbcTemplate.query(sql, dealTableRowMapper);
     }
